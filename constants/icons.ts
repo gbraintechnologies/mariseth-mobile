@@ -1,0 +1,38 @@
+export const icons = {
+  arrowRight: require("@/assets/images/icons/arrowright.svg"),
+  arrowLeft: require("@/assets/images/icons/arrowleft.svg"),
+  arrowCorner: require("@/assets/images/icons/arrowcorner.svg"),
+  bill: require("@/assets/images/icons/bill.svg"),
+
+  card: require("@/assets/images/icons/card.svg"),
+  credits: require("@/assets/images/icons/credits.svg"),
+  dialog: require("@/assets/images/icons/dialog.svg"),
+  edit: require("@/assets/images/icons/edit.svg"),
+  farmers: require("@/assets/images/icons/farmers.svg"),
+  farm: require("@/assets/images/icons/farm.svg"),
+  farmer: require("@/assets/images/icons/farmer.svg"),
+  home: require("@/assets/images/icons/home.svg"),
+  logout: require("@/assets/images/icons/logout.svg"),
+  location: require("@/assets/images/icons/location.svg"),
+  money: require("@/assets/images/icons/money.svg"),
+  more: require("@/assets/images/icons/menu.svg"),
+  notification: require("@/assets/images/icons/notification.svg"),
+  password: require("@/assets/images/icons/password.svg"),
+  phone: require("@/assets/images/icons/phone.svg"),
+
+  user: require("@/assets/images/icons/user.svg"),
+  userAdd: require("@/assets/images/icons/useradd.svg"),
+
+  // WEATHER ICONS
+  rainy: require("@/assets/images/icons/rain.png"),
+  heavyRain: require("@/assets/images/icons/heavyrain.png"),
+  thunderStorm: require("@/assets/images/icons/thunderstorm.png"),
+  cloudy: require("@/assets/images/icons/cloudy.png"),
+  sunny: require("@/assets/images/icons/sunny.png"),
+  windy: require("@/assets/images/icons/windy.png"),
+
+  wind: require("@/assets/images/icons/wind.svg"),
+  rainn: require("@/assets/images/icons/rainn.svg"),
+  humidity: require("@/assets/images/icons/humidity.svg"),
+  pressure: require("@/assets/images/icons/pressure.svg"),
+};
