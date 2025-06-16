@@ -1,38 +1,43 @@
 import { colors } from "@/constants/colors";
 import { width } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
+import { myFarm } from "@/types/farm";
 import { Image } from "expo-image";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import AppText from "./apptext";
 import InfoCard from "./infocard";
-
-const FarmDetails = React.memo(() => {
+interface farmDetailsProps {
+  item: myFarm;
+}
+const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
+  const farmingMethods =
+    item?.farming_methods?.map((method: any) => method).join(", ") ?? "N/A";
   const farmDetails = {
     information: [
       {
         key: "Farm Name",
-        value: "Sunset Farms",
+        value: item?.name ?? "N/A",
       },
       {
         key: "Location",
-        value: "GPS 7403-435",
+        value: item?.location ?? "N/A",
       },
       {
         key: "District",
-        value: "Sissala East",
+        value: item?.district ?? "N/A",
       },
       {
         key: "Total Land Size",
-        value: "3.5 acres",
+        value: item?.size ?? "N/A",
       },
       {
         key: "Land Ownership",
-        value: "Other (Renting)",
+        value: item?.land_ownership ?? "N/A",
       },
       {
         key: "Livestock Kept",
-        value: "N/A",
+        value: (item?.livestock_kept as any) ?? "N/A",
       },
     ],
   };
@@ -42,19 +47,19 @@ const FarmDetails = React.memo(() => {
     information: [
       {
         key: "Use of Fertilizers",
-        value: "Organic",
+        value: item?.use_of_fertilizers ?? "N/A",
       },
       {
         key: "Farming Methods",
-        value: "Conventional",
+        value: farmingMethods,
       },
       {
         key: "Irrigation",
-        value: "Yes",
+        value: (item?.irrigation ? "Yes" : "No") as any,
       },
       {
         key: "Access to Market",
-        value: "Yes",
+        value: (item?.has_access_to_market ? "Yes" : "No") as any,
       },
     ],
   };

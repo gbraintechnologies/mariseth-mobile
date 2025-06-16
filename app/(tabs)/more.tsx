@@ -4,6 +4,7 @@ import ProfileCard from "@/components/ui/profilecard";
 import { colors } from "@/constants/colors";
 import { moreLinks } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
+import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
 import { moreLink } from "@/types/more";
 import { Image } from "expo-image";
@@ -14,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const More = () => {
   const topInset = useSafeAreaInsets().top;
+  const user = userStore((state) => state.user);
   return (
     <>
       <LogoutModal />
@@ -25,7 +27,7 @@ const More = () => {
           },
         ]}
       >
-        <ProfileCard />
+        <ProfileCard item={user} />
         <View style={{ marginTop: 31 }}>
           {moreLinks.map((item: moreLink, index: number) => {
             const isLast = index === moreLinks.length - 1;

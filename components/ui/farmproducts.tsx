@@ -1,11 +1,13 @@
 import { colors } from "@/constants/colors";
 import { width } from "@/constants/generalconstants";
+import { farmProduct } from "@/types/farm";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
-
-const FarmProducts = () => {
-  const crops = ["Soya Beans", "Cocoa", "Oil Palm", "Maize"];
+interface farmProductsProps {
+  products: farmProduct[];
+}
+const FarmProducts: React.FC<farmProductsProps> = ({ products }) => {
   return (
     <View style={{ width, paddingHorizontal: 16 }}>
       <AppText
@@ -24,10 +26,10 @@ const FarmProducts = () => {
           justifyContent: "space-between",
         }}
       >
-        {crops.map((crop, index) => (
-          <View style={styles.cropCard} key={index}>
+        {products.map((crop, index: number) => (
+          <View style={styles.cropCard} key={crop?.id}>
             <AppText fontFamily="Medium" fontSize={13} color="textBold">
-              {crop}
+              {crop?.product?.name}
             </AppText>
           </View>
         ))}

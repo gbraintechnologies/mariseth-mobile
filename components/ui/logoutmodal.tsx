@@ -1,5 +1,10 @@
 import { colors } from "@/constants/colors";
+import { endpoints } from "@/constants/endpoints";
+import useAuthMutation from "@/hooks/usemutation";
+import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
+import { handleAuthApiError } from "@/utils/commonmethods";
+import { router } from "expo-router";
 import React from "react";
 import { Modal, StyleSheet, View } from "react-native";
 import Animated, {
@@ -7,6 +12,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useToast } from "react-native-toast-notifications";
 import { useStore } from "zustand";
 import AppButton from "./appbutton";
 import AppText from "./apptext";
@@ -15,6 +21,7 @@ const LogoutModal = React.memo(() => {
     useUniversalStore,
     (state) => state.logoutModalVisible
   );
+  const user = useStore(userStore, (state) => state.user);
 
   const translateY = useSharedValue(300);
 
@@ -28,12 +35,31 @@ const LogoutModal = React.memo(() => {
     transform: [{ translateY: translateY.value }],
   }));
 
+  const toast = useToast();
+
+  const { mutate, isLoading } = useAuthMutation(
+    endpoints.logout,
+    "POST",
+    "logout",
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        userStore.setState({ user: null });
+        useUniversalStore.setState({ logoutModalVisible: false });
+        router.replace(`/(auth)/signin`);
+      },
+      onError: (error: any) => {
+        handleAuthApiError(error, null, toast);
+      },
+    }
+  );
   return (
     <Modal
       visible={logoutModalVisible}
       animationType="fade"
       statusBarTranslucent
       transparent
+      navigationBarTranslucent
     >
       <View style={[styles.loadingContainer, StyleSheet.absoluteFill]}>
         <Animated.View
@@ -88,7 +114,10 @@ const LogoutModal = React.memo(() => {
               btnColor="error"
               width={"46%"}
               style={{}}
-              onPress={() => {}}
+              loading={isLoading}
+              onPress={() => {
+                mutate({ refresh_token: user?.refresh_token });
+              }}
             />
 
             <AppButton

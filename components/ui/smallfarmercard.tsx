@@ -1,21 +1,24 @@
 import { colors } from "@/constants/colors";
+import { smallHolder } from "@/types/farmers";
+import { dataEncoder } from "@/utils/commonmethods";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import AppText from "./apptext";
 import InitialsAvatar from "./initialsavatar";
 interface smallCardFarmer {
-  item?: any;
+  item?: smallHolder;
 }
 const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
+  const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
   return (
     <Pressable
       style={styles.smallFarmerCardContainer}
       onPress={() => {
-        router.navigate("/myfarmers/farmerdetails");
+        router.navigate(`/myfarmers/farmerdetails?data=${dataEncoder(item)}`);
       }}
     >
-      <InitialsAvatar name={item?.name} />
+      <InitialsAvatar name={name} />
       <View style={{ flexDirection: "column", flex: 1, marginLeft: 12 }}>
         <AppText
           fontFamily="SemiBold"
@@ -23,7 +26,7 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
           color="textBold"
           style={{ marginBottom: 6 }}
         >
-          {item?.name}
+          {name}
         </AppText>
 
         <View style={{ flexDirection: "row" }}>
@@ -33,7 +36,7 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
             color="textPrimary"
             style={{}}
           >
-            {item?.phone} .
+            {item?.phone_number} .
           </AppText>
 
           <AppText fontFamily="Medium" fontSize={13} color="primary">
@@ -42,13 +45,13 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
         </View>
       </View>
 
-      {item?.status === "New" && (
+      {/* {item?.status === "New" && (
         <View style={styles.smallFarmerStatusContainer}>
           <AppText fontFamily="Medium" fontSize={10} color="primary">
             New
           </AppText>
         </View>
-      )}
+      )} */}
     </Pressable>
   );
 };

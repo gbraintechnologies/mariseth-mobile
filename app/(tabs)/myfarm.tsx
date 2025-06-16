@@ -2,14 +2,32 @@ import AppText from "@/components/ui/apptext";
 import FarmDetails from "@/components/ui/farmdetails";
 import FarmProducts from "@/components/ui/farmproducts";
 import { SegmentedScrollView } from "@/components/ui/segmentedview";
+import MyFarmSP from "@/components/ui/skeletonplaceholders/myfarm";
 import { colors } from "@/constants/colors";
+import { endpoints } from "@/constants/endpoints";
 import { universalBlurhash } from "@/constants/generalconstants";
 import { images } from "@/constants/images";
+import { useFetchQuery } from "@/hooks/usefetchquery";
+import { userStore } from "@/stores/userstore";
+import { myFarm } from "@/types/farm";
 import { ImageBackground } from "expo-image";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { useStore } from "zustand";
 
 const MyFarm = () => {
+  const user = useStore(userStore, (state) => state.user);
+  const {
+    data,
+    isLoading,
+    error,
+  }: { data: myFarm; isLoading: boolean; error: unknown } = useFetchQuery(
+    endpoints.myFarm,
+    "myfarm"
+  );
+
+  if (isLoading) return <MyFarmSP />;
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
@@ -27,10 +45,10 @@ const MyFarm = () => {
         >
           <View style={{ paddingLeft: 25, paddingBottom: 22 }}>
             <AppText fontFamily="Bold" fontSize={20} color="white">
-              Sunset Farms
+              {data?.name}
             </AppText>
             <AppText fontFamily="SemiBold" fontSize={16} color="white">
-              EF-110203 · Sissala East · SF
+              {user?.farmer?.farmer_id} · {data?.location} · {data?.farm_id}
             </AppText>
           </View>
         </ImageBackground>
@@ -40,8 +58,8 @@ const MyFarm = () => {
         storeKey="myFarm"
         options={["Farm Details", "Farm Products"]}
       >
-        <FarmDetails />
-        <FarmProducts />
+        <FarmDetails item={data} />
+        <FarmProducts products={data?.products} />
       </SegmentedScrollView>
     </ScrollView>
   );

@@ -2,8 +2,11 @@ import AppText from "@/components/ui/apptext";
 import FarmerCard from "@/components/ui/farmercard";
 import WeatherCard from "@/components/ui/weathercard";
 import { colors } from "@/constants/colors";
+import { endpoints } from "@/constants/endpoints";
 import { icons } from "@/constants/icons";
+import { useFetchQuery } from "@/hooks/usefetchquery";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import {
   Pressable,
@@ -13,6 +16,13 @@ import {
   View,
 } from "react-native";
 const Index = () => {
+  const { data, isLoading, error } = useFetchQuery(
+    endpoints.activeCredit,
+    "activecredit"
+  );
+
+  // console.log(error);
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
@@ -47,7 +57,7 @@ const Index = () => {
           </View>
         </View>
       </View>
-      <FarmerCard type="big" onPress={() => console.log("pressed")} />
+      <FarmerCard type="big" onPress={() => router.navigate("/myfarmers")} />
       <View style={{ paddingHorizontal: 16 }}>
         <View style={styles.activeCreditContainer}>
           <View
@@ -88,6 +98,7 @@ const Index = () => {
                 borderRadius: 40,
                 alignItems: "center",
               }}
+              onPress={() => router.navigate("/credits")}
             >
               <AppText fontFamily="SemiBold" fontSize={12} color="primary">
                 View

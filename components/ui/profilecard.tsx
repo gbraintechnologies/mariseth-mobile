@@ -1,15 +1,22 @@
+import { user } from "@/types/user";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import AppText from "./apptext";
 import InitialsAvatar from "./initialsavatar";
 interface profileCard {
-  item?: any;
+  item: user | null;
 }
 const ProfileCard: React.FC<profileCard> = ({ item }) => {
+  const fullName = item?.first_name + " " + item?.last_name;
+  const type = item?.farmer?.type;
+  const formattedType = type
+    ? type.charAt(0).toUpperCase() + type.slice(1)
+    : "";
+  const phone = item?.phone_number;
   return (
     <Pressable style={styles.profileCardContainer}>
       <InitialsAvatar
-        name="Kwame Ansah"
+        name={fullName}
         fontSize={22}
         containerSize={55}
         bgColor="grey"
@@ -22,7 +29,7 @@ const ProfileCard: React.FC<profileCard> = ({ item }) => {
           color="textBold"
           style={{ marginBottom: 2 }}
         >
-          Kwame Ansah
+          {fullName}
         </AppText>
         <View style={{ flexDirection: "row" }}>
           <AppText
@@ -31,11 +38,11 @@ const ProfileCard: React.FC<profileCard> = ({ item }) => {
             color="primary"
             style={{ marginRight: 3 }}
           >
-            Lead Farmer
+            {formattedType} Farmer
           </AppText>
 
           <AppText fontSize={12} fontFamily="Medium" color="textPrimary">
-            . +233 25 456 7889
+            . {`+${phone}`}
           </AppText>
         </View>
       </View>

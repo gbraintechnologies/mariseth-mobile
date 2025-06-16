@@ -1,3 +1,4 @@
+import { headerHandler } from "@/utils/layoutmethods";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -8,7 +9,7 @@ export default function MoreLayout() {
         name="profileinformation"
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="changepassword" options={{ headerShown: false }} />
+      <Stack.Screen name="changepin" options={headerHandler("Change Pin")} />
       <Stack.Screen name="profileedit" options={{}} />
     </Stack>
   );

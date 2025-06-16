@@ -1,10 +1,34 @@
+import { endpoints } from "@/constants/endpoints";
 import { width } from "@/constants/generalconstants";
+import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
 import FarmCard from "./farmcard";
 
 const Farms = () => {
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    items,
+  } = usePaginatedInfiniteQuery<any>(
+    endpoints.leadFarmersFarms,
+    "leadfarmersfarms",
+    {
+      page_size: 10,
+      query: "",
+    }
+  );
+
+  // console.log("====================================");
+  // console.log(JSON.stringify(items));
+  // console.log("====================================");
+  // if (isLoading) return <ActivityIndicator />;
+  // if (isError) return <Text>Error loading farms.</Text>;
   const farms = [
     {
       name: "Sunset Farms",

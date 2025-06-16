@@ -3,7 +3,8 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/constants/colors";
 import { isIOS, largeScreen } from "@/constants/generalconstants";
-import { Eye, EyeSlash } from "iconsax-react-native";
+import { icons } from "@/constants/icons";
+import { Image } from "expo-image";
 import AppText from "./apptext";
 
 interface AppTextInputProps {
@@ -132,11 +133,11 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
             onPress={togglePasswordVisibility}
             style={styles.iconContainer2}
           >
-            {isPasswordVisible ? (
-              <Eye variant="Bulk" size={25} color={eyeIconColor} />
-            ) : (
-              <EyeSlash variant="Bulk" size={25} color={eyeIconColor} />
-            )}
+            <Image
+              source={isPasswordVisible ? icons.eye : icons.eyeSlash}
+              style={{ height: 25, width: 25, tintColor: eyeIconColor }}
+              contentFit="contain"
+            />
           </TouchableOpacity>
         ) : null}
       </View>

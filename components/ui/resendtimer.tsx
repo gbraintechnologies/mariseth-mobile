@@ -3,18 +3,35 @@ import { Pressable, StyleSheet } from "react-native";
 
 import { useToast } from "react-native-toast-notifications";
 
+import { endpoints } from "@/constants/endpoints";
+import useAuthMutation from "@/hooks/usemutation";
+import { handleAuthApiError } from "@/utils/commonmethods";
+import { FormikProps } from "formik";
 import AppText from "./apptext";
 
 interface ResendTimerProps {
   setOtp: () => void;
+  formik: FormikProps<any>;
 }
 
-const ResendTimer: React.FC<ResendTimerProps> = ({ setOtp }) => {
+const ResendTimer: React.FC<ResendTimerProps> = ({ setOtp, formik }) => {
   const [resendTimer, setResendTimer] = useState<number>(60);
-  const [resendLoader, setResendLoader] = useState<boolean>(false);
 
   const toast = useToast();
 
+  const { mutate, isLoading } = useAuthMutation(
+    endpoints.resendOtp,
+    "POST",
+    "resendotp",
+    {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: (error: any) => {
+        handleAuthApiError(error, formik, toast);
+      },
+    }
+  );
   useEffect(() => {
     const timerId = setInterval(() => {
       setResendTimer((prev) => {
@@ -28,25 +45,23 @@ const ResendTimer: React.FC<ResendTimerProps> = ({ setOtp }) => {
 
   const handleResendCode = async () => {
     if (resendTimer > 0) return;
-    setResendLoader(true);
-    setTimeout(() => {
-      setOtp();
-      setResendTimer(60);
-      setResendLoader(false);
-    }, 200);
+    formik.setFieldTouched("code", false);
+    setOtp();
+    mutate({ phone_number: formik?.values?.phone_number });
+    setResendTimer(60);
   };
 
   return (
     <Pressable
       style={styles.resendButton}
-      disabled={resendTimer > 0 || resendLoader}
+      disabled={resendTimer > 0 || isLoading}
       onPress={handleResendCode}
     >
       <AppText fontSize={14} fontFamily="Regular" color="textPrimary">
         Didn't receive a code?{" "}
       </AppText>
 
-      {resendLoader ? (
+      {isLoading ? (
         <AppText fontSize={14} fontFamily="Regular" color="textPrimary">
           Sending...
         </AppText>

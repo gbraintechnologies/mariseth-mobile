@@ -3,6 +3,7 @@ import InfoCard from "@/components/ui/infocard";
 import ProfileCard from "@/components/ui/profilecard";
 import { colors } from "@/constants/colors";
 import { icons } from "@/constants/icons";
+import { userStore } from "@/stores/userstore";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
@@ -12,6 +13,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const ProfileInformation = () => {
   const topInset = useSafeAreaInsets().top;
 
+  const user = userStore((state) => state.user);
+  const isLeaderFarmer = user?.farmer?.type === "lead";
   const basicProfileInfo = {
     headerTitle: "My Information",
     headerIcon: icons.user,
@@ -19,39 +22,39 @@ const ProfileInformation = () => {
     information: [
       {
         key: "Gender",
-        value: "Male",
+        value: user?.farmer?.gender === "m" ? "Male" : "Female",
       },
       {
         key: "Date of Birth",
-        value: "21st March, 1983",
+        value: user?.farmer?.date_of_birth as string,
       },
       {
         key: "National ID/Passport Number",
-        value: "GHA-33533-2443",
+        value: user?.farmer?.id_number as string,
       },
       {
         key: "Contact Number",
-        value: "+233 25 456 7889",
+        value: user?.farmer?.phone_number as string,
       },
       {
         key: "Email",
-        value: "kwame.ansah@gh.com",
+        value: user?.farmer?.email as string,
       },
       {
         key: "Address",
-        value: "Buluga, Northern Reg.",
+        value: user?.farmer?.address as string,
       },
       {
         key: "Village/Community",
-        value: "Sampaga",
+        value: user?.farmer?.village as string,
       },
       {
         key: "District",
-        value: "Sissala East",
+        value: user?.farmer?.district?.name as string,
       },
       {
         key: "Country",
-        value: "Ghana",
+        value: user?.farmer?.country as string,
       },
     ],
   };
@@ -63,7 +66,9 @@ const ProfileInformation = () => {
     information: [
       {
         key: "Are you currently mentoring other farmers?",
-        value: "Yes",
+        value: user?.farmer?.leadership_experience?.has_farming_membership
+          ? "Yes"
+          : "No",
       },
       {
         key: "If Yes, how many farmers are you mentoring",
@@ -71,14 +76,20 @@ const ProfileInformation = () => {
       },
       {
         key: "Membership in Farming Cooperatives/Associations",
-        value: "No",
+        value: user?.farmer?.leadership_experience?.has_farming_membership
+          ? "Yes"
+          : "No",
       },
       {
         key: "Have you received any leadership or agricultural training?",
-        value: "No",
+        value: user?.farmer?.leadership_experience
+          ?.has_received_farming_leadership_training
+          ? "Yes"
+          : "No",
       },
     ],
   };
+
   return (
     <ScrollView
       style={styles.profileInfoContainer}
@@ -88,7 +99,7 @@ const ProfileInformation = () => {
         paddingBottom: 60,
       }}
     >
-      <ProfileCard />
+      <ProfileCard item={user} />
       <Pressable
         style={styles.backButtonContainer}
         onPress={() => {
@@ -104,7 +115,7 @@ const ProfileInformation = () => {
       </Pressable>
 
       <InfoCard info={basicProfileInfo} />
-      <InfoCard info={leadershipExperienceInfo} />
+      {isLeaderFarmer ? <InfoCard info={leadershipExperienceInfo} /> : null}
     </ScrollView>
   );
 };

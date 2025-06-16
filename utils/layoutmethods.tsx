@@ -2,10 +2,12 @@ import AppText from "@/components/ui/apptext";
 import InitialsAvatar from "@/components/ui/initialsavatar";
 import { colors } from "@/constants/colors";
 import { icons } from "@/constants/icons";
+import { userStore } from "@/stores/userstore";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 
 import { Pressable, StyleSheet, View } from "react-native";
+import { useStore } from "zustand";
 
 export function headerHandler(route_label?: string): any {
   return {
@@ -88,6 +90,8 @@ export function tabScreenOptions(tabLabel: string) {
     },
 
     headerRight: () => {
+      const user = useStore(userStore, (state) => state.user);
+      const fullName = user?.first_name + " " + user?.last_name;
       return (
         <View
           style={{
@@ -100,7 +104,7 @@ export function tabScreenOptions(tabLabel: string) {
             source={icons.notification}
             style={{ height: 24, width: 24, marginRight: 20 }}
           />
-          <InitialsAvatar name="John Doe" />
+          <InitialsAvatar name={fullName} />
         </View>
       );
     },

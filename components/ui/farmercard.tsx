@@ -11,10 +11,11 @@ interface farmerCard {
   onPress?: () => void;
 }
 const FarmerCard: React.FC<farmerCard> = ({ type = "big", item, onPress }) => {
+  const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
   const cardTypes = {
     small: {
-      title: "Abena Bonsu",
-      phone: "+233 24 555 0124",
+      title: name,
+      phone: `+${item?.phone_number}`,
       count: "",
       subtitle: "Smallholder Farmer",
       abstractImage: images.otherLooper,
@@ -22,9 +23,9 @@ const FarmerCard: React.FC<farmerCard> = ({ type = "big", item, onPress }) => {
     },
     big: {
       title: "My Smallholder Farmers",
-      count: "25",
+      count: item?.length,
       phone: "",
-      subtitle: "Farmers",
+      subtitle: `Farmer${item?.length > 1 ? "s" : ""}`,
       abstractImage: images.looper,
       abtractStyle: styles.looper,
     },

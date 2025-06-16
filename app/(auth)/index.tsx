@@ -1,28 +1,22 @@
+import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
-import { colors } from "@/constants/colors";
 import { isIOS } from "@/constants/generalconstants";
 import { images } from "@/constants/images";
 import { authStyles } from "@/styles/auth";
 import { BlurView } from "expo-blur";
 import { ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const AuthLoading = () => {
+const Index = () => {
   const bottomInset = useSafeAreaInsets().bottom;
   return (
     <ImageBackground
       style={{ flex: 1 }}
       contentFit="cover"
-      source={images.authLoadingBg}
+      source={images.welcomeBg}
     >
-      <View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { backgroundColor: "#00000050" },
-        ]}
-      />
       <View
         style={[
           authStyles.welcomeContainer,
@@ -35,24 +29,33 @@ const AuthLoading = () => {
           intensity={isIOS ? 40 : 80}
           tint="dark"
           // experimentalBlurMethod="dimezisBlurView"
-          style={[authStyles.blur, { paddingVertical: 15 }]}
+          style={authStyles.blur}
         >
           <AppText
             fontFamily="Bold"
             fontSize={26}
             color="white"
-            style={{ lineHeight: 36, marginBottom: "10%", textAlign: "center" }}
+            style={{ lineHeight: 36, marginBottom: 6 }}
           >
-            Hang in there, we’re signing you in.
+            Our passion for agriculture is at the heart of everything we do.
           </AppText>
 
-          <ActivityIndicator size={"large"} color={colors.primary} />
+          <AppText fontFamily="Regular" fontSize={15} color="white">
+            Africa's Leading Farm
+          </AppText>
         </BlurView>
+        <AppButton
+          title="Get Started"
+          textColor="white"
+          btnColor="buttonSecondary"
+          style={{}}
+          onPress={() => {
+            router.navigate("/signup");
+          }}
+        />
       </View>
     </ImageBackground>
   );
 };
 
-export default AuthLoading;
-
-const styles = StyleSheet.create({});
+export default Index;

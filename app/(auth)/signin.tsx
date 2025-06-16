@@ -1,10 +1,15 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
 import AppTextInput from "@/components/ui/apptextinput";
+import AuthLoading from "@/components/ui/authloading";
 import FormErrorMessage from "@/components/ui/formerrormessage";
 import { colors } from "@/constants/colors";
+import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
+import useAuthMutation from "@/hooks/usemutation";
+import { userStore } from "@/stores/userstore";
 import { authStyles } from "@/styles/auth";
+import { handleAuthApiError } from "@/utils/commonmethods";
 import { signInSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -13,21 +18,41 @@ import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "react-native-toast-notifications";
 const SignIn = () => {
   const bottomInset = useSafeAreaInsets().bottom;
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const toast = useToast();
+
+  const { mutate, isLoading } = useAuthMutation(
+    endpoints.signIn,
+    "POST",
+    "signin",
+    {
+      onSuccess: (data) => {
+        // console.log(data);
+        userStore.setState({ user: data });
+        router.replace(`/(tabs)`);
+      },
+
+      onError: (error: any) => {
+        handleAuthApiError(error, formik, toast);
+      },
+    }
+  );
   const formik = useFormik({
     initialValues: { phone_number: "", pin: null },
     validationSchema: signInSchema,
-    onSubmit: async (values: any) => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+    onSubmit: async (values: { phone_number: string; pin: string | null }) => {
+      values.phone_number = `233${values.phone_number}`;
+
       console.log(values);
+
+      mutate(values);
     },
   });
   return (
     <>
+      <AuthLoading visible={isLoading} />
       <KeyboardAwareScrollView
         extraHeight={100}
         enableOnAndroid={true}
@@ -61,7 +86,7 @@ const SignIn = () => {
           error={formik.errors.phone_number}
           label="Phone Number"
           style={{
-            backgroundColor: loading
+            backgroundColor: isLoading
               ? colors.backgroundTertiary
               : colors.backgroundPrimary,
           }}
@@ -70,7 +95,7 @@ const SignIn = () => {
           textContentType="emailAddress"
           autoCorrect={false}
           phoneEntry={true}
-          editable={!loading}
+          editable={!isLoading}
           keyboardType="phone-pad"
           onBlur={() => formik.setFieldTouched("phone_number")}
           onChangeText={formik.handleChange("phone_number")}
@@ -82,14 +107,14 @@ const SignIn = () => {
           error={formik.touched.pin && formik.errors.pin}
           label="PIN"
           style={{
-            backgroundColor: loading
+            backgroundColor: isLoading
               ? colors.backgroundTertiary
               : colors.backgroundPrimary,
           }}
           autoCapitalize="none"
           autoCorrect={false}
           secureTextEntry={true}
-          editable={!loading}
+          editable={!isLoading}
           maxLength={4}
           keyboardType="numeric"
           onBlur={() => formik.setFieldTouched("pin")}
@@ -131,7 +156,7 @@ const SignIn = () => {
           btnColor="buttonPrimary"
           style={{}}
           onPress={formik.submitForm}
-          loading={loading}
+          // loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>

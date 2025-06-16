@@ -38,6 +38,7 @@ export const colors = {
   buttonActionSheet: "#F2F4F7",
 
   segmentedControlBg: "#E2E8F0",
+  skeletonPlaceholder: "#e4edf2",
 
   // Status
   success: "",

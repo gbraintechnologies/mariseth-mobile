@@ -1,11 +1,16 @@
 import { colors } from "@/constants/colors";
 import { largeScreen } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
+import { useCurrentWeather } from "@/hooks/usefetchquery";
+import { userStore } from "@/stores/userstore";
+import { getWeatherAssets } from "@/utils/commonmethods";
+import { format } from "date-fns";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
+
 interface weatherCondition {
   icon: string;
   description: string;
@@ -45,11 +50,50 @@ const WeatherCondition: React.FC<weatherCondition> = ({
 };
 const WeatherCard = () => {
   const weatherIconSize = largeScreen ? 133 : 113;
+  const { user } = userStore.getState();
+
+  const { data, isLoading, error } = useCurrentWeather(
+    user?.farmer?.village ?? "Accra"
+  );
+
+  if (isLoading) {
+    return (
+      <View
+        style={[
+          styles.weatherSkeletonPlaceholder,
+          { backgroundColor: colors.skeletonPlaceholder },
+        ]}
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={[
+          styles.weatherSkeletonPlaceholder,
+          {
+            backgroundColor: colors.skeletonPlaceholder,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <AppText fontFamily="SemiBold" fontSize={16} color="textPrimary">
+          {error?.message}
+        </AppText>
+      </View>
+    );
+  }
+  const { icon, gradient } = getWeatherAssets(
+    data?.current?.condition?.text as string
+  );
+
   return (
     <LinearGradient
-      colors={["#919191", "#4C5156"]}
-      start={{ x: 0.17, y: 0.24 }}
-      end={{ x: 0.83, y: 0.76 }}
+      colors={gradient?.colors as any}
+      start={gradient.start}
+      end={gradient.end}
       style={styles.weatherContainer}
     >
       <AppText
@@ -58,12 +102,12 @@ const WeatherCard = () => {
         color="white"
         style={{ textAlign: "center" }}
       >
-        Bolgatanga
+        {data?.location?.name}
       </AppText>
       <View style={styles.weatherHeaderContainer}>
         <View style={styles.headerIconContainer}>
           <Image
-            source={icons.cloudy}
+            source={icon}
             style={{ height: weatherIconSize, width: weatherIconSize }}
           />
         </View>
@@ -74,16 +118,16 @@ const WeatherCard = () => {
             color="white"
             style={{ textAlign: "center" }}
           >
-            Sunday | Nov 14
+            {format(new Date(), "EEEE | MMM d")}
           </AppText>
           <View style={styles.weatherTempContainer}>
             <AppText
               fontFamily="SemiBold"
-              fontSize={73}
+              fontSize={largeScreen ? 70 : 60}
               color="white"
               style={{ textAlign: "center", verticalAlign: "middle" }}
             >
-              24
+              {data?.current?.temp_c}
             </AppText>
             <AppText
               fontFamily="SemiBold"
@@ -103,7 +147,7 @@ const WeatherCard = () => {
             color="white"
             style={{ textAlign: "center" }}
           >
-            Cloudy
+            {data?.current?.condition?.text}
           </AppText>
         </View>
       </View>
@@ -112,28 +156,28 @@ const WeatherCard = () => {
           <WeatherCondition
             icon={icons.wind}
             description={"Wind"}
-            metric={"3.7 km/h"}
+            metric={`${data?.current?.wind_kph} km/h`}
             marginBottom={20}
           />
           <WeatherCondition
             icon={icons.pressure}
             description={"Pressure"}
-            metric={"1010 mbar"}
+            metric={`${data?.current?.pressure_mb} mbar`}
           />
         </View>
 
         <View style={{ flexDirection: "column" }}>
           <WeatherCondition
-            icon={icons.rainn}
-            description={"Chance of rain"}
-            metric={"74%"}
+            icon={icons.visibility}
+            description={"Visibility"}
+            metric={`${data?.current?.vis_km} kmph`}
             marginBottom={20}
           />
 
           <WeatherCondition
             icon={icons.humidity}
             description={"Humidity"}
-            metric={"83%"}
+            metric={`${data?.current?.humidity} %`}
           />
         </View>
       </View>
@@ -183,5 +227,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 21,
     gap: 40,
+  },
+  weatherSkeletonPlaceholder: {
+    width: "100%",
+    height: 344,
+    borderRadius: 16,
+    marginVertical: 32,
   },
 });

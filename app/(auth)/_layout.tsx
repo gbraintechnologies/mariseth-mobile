@@ -1,3 +1,4 @@
+import { headerHandler } from "@/utils/layoutmethods";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -11,16 +12,21 @@ export default function AuthLayout() {
       <Stack.Screen
         name="forgotpin"
         options={{
-          headerShown: false,
+          // headerShown: false,
           presentation: "modal",
           animation: "slide_from_bottom",
+          ...headerHandler(""),
         }}
       />
       <Stack.Screen name="otpverification" options={{ headerShown: false }} />
-      <Stack.Screen
+      <Stack.Screen name="resetpin" options={{ headerShown: false }} />
+
+      {/* <Stack.Screen
         name="authloading"
         options={{ headerShown: false, animation: "slide_from_bottom" }}
-      />
+      /> */}
+
+      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );
 }

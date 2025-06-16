@@ -3,8 +3,11 @@ import AppText from "@/components/ui/apptext";
 import AppTextInput from "@/components/ui/apptextinput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
 import { colors } from "@/constants/colors";
+import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
+import useAuthMutation from "@/hooks/usemutation";
 import { authStyles } from "@/styles/auth";
+import { dataEncoder, handleAuthApiError } from "@/utils/commonmethods";
 import { phoneNumberSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -13,18 +16,39 @@ import React from "react";
 import { Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useToast } from "react-native-toast-notifications";
 
 const SignUp = () => {
   const bottomInset = useSafeAreaInsets().bottom;
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const toast = useToast();
+  const { mutate, isLoading } = useAuthMutation(
+    endpoints.signup,
+    "POST",
+    "signup",
+    {
+      onSuccess: (data) => {
+        const number = formik.values.phone_number;
+        const item = {
+          phone_number: number,
+          action: "signup",
+        };
+        router.navigate(`/otpverification?data=${dataEncoder(item)}`);
+      },
+
+      onError: (error: any) => {
+        handleAuthApiError(error, formik, toast);
+      },
+    }
+  );
+
   const formik = useFormik({
     initialValues: { phone_number: "" },
     validationSchema: phoneNumberSchema,
-    onSubmit: async (values: any) => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-      console.log(values);
+    onSubmit: async (values: { phone_number: string }) => {
+      values.phone_number = `233${values.phone_number}`;
+
+      mutate(values);
+      // console.log(values);
     },
   });
   return (
@@ -63,7 +87,7 @@ const SignUp = () => {
           error={formik.errors.phone_number}
           label="Phone Number"
           style={{
-            backgroundColor: loading
+            backgroundColor: isLoading
               ? colors.backgroundTertiary
               : colors.backgroundPrimary,
           }}
@@ -72,7 +96,7 @@ const SignUp = () => {
           textContentType="emailAddress"
           autoCorrect={false}
           phoneEntry={true}
-          editable={!loading}
+          editable={!isLoading}
           keyboardType="phone-pad"
           onBlur={() => formik.setFieldTouched("phone_number")}
           onChangeText={formik.handleChange("phone_number")}
@@ -103,7 +127,7 @@ const SignUp = () => {
           btnColor="buttonPrimary"
           style={{}}
           onPress={formik.submitForm}
-          loading={loading}
+          loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>

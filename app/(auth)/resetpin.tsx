@@ -1,6 +1,6 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
-import AuthLoading from "@/components/ui/authloading";
+import AppTextInput from "@/components/ui/apptextinput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
 import OtpInput from "@/components/ui/otpinput";
 import { colors } from "@/constants/colors";
@@ -8,12 +8,8 @@ import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
 import useAuthMutation from "@/hooks/usemutation";
 import { authStyles } from "@/styles/auth";
-import {
-  dataDecoder,
-  handleAuthApiError,
-  handleToastShow,
-} from "@/utils/commonmethods";
-import { confirmPinSchema } from "@/utils/validationschema";
+import { handleAuthApiError, handleToastShow } from "@/utils/commonmethods";
+import { resetPinSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
@@ -23,34 +19,23 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "react-native-toast-notifications";
 
-const ConfirmPin = () => {
-  const params = useLocalSearchParams<{ data: string }>();
-  const paramsData: {
-    phone_number: string;
-    pin: string;
-    code: number | null;
-  } = dataDecoder(params?.data);
+const ResetPin = () => {
+  const params = useLocalSearchParams<{ phone_number: string }>();
+  const phoneNumber = params?.phone_number;
   const bottomInset = useSafeAreaInsets().bottom;
-  const isSignup = paramsData?.code === null;
-
   const [clearValue, setClearValue] = React.useState<boolean>(false);
   const toast = useToast();
 
   const { mutate, isLoading } = useAuthMutation(
-    isSignup ? endpoints.pinSetup : endpoints.resetPin,
+    endpoints.resetPin,
     "POST",
-    isSignup ? "confirmpin" : "resetpin",
+    "resetpin",
     {
       onSuccess: (data) => {
-        const toastMessage = isSignup
-          ? "Registration completed successfully."
-          : "All set — your new password is ready to use";
-
-        handleToastShow(toast, toastMessage);
+        handleToastShow(toast, "All set — your new password is ready to use");
         setTimeout(() => {
           router.replace(`/(auth)/signin`);
         }, 300);
-
         console.log(data);
       },
       onError: (error: any) => {
@@ -60,33 +45,23 @@ const ConfirmPin = () => {
   );
 
   const formik = useFormik({
-    initialValues: {
-      phone_number: paramsData?.phone_number || "",
-      pin: paramsData?.pin || "",
-      confirm_pin: "",
-    },
-    validationSchema: confirmPinSchema,
+    initialValues: { code: "", pin: "", new_pin: "" },
+    validationSchema: resetPinSchema,
     onSubmit: async (values: {
-      phone_number: string;
+      code: string;
       pin: string;
-      confirm_pin: string;
+      new_pin: string;
     }) => {
-      const signUpItem = {
-        phone_number: values?.phone_number,
-        pin: values?.pin,
+      const data = {
+        phone_number: phoneNumber,
+        code: values.code,
+        new_pin: values.new_pin,
       };
-
-      const resetPinItem = {
-        phone_number: values?.phone_number,
-        new_pin: values?.pin,
-        code: paramsData?.code,
-      };
-      mutate(isSignup ? signUpItem : resetPinItem);
+      mutate(data);
     },
   });
   return (
     <>
-      <AuthLoading visible={isLoading} />
       <KeyboardAwareScrollView
         extraHeight={100}
         enableOnAndroid={true}
@@ -106,31 +81,79 @@ const ConfirmPin = () => {
           color="textBold"
           style={{ marginBottom: 22 }}
         >
-          Confirm Pin
+          Reset Pin
         </AppText>
-
+        <AppText
+          fontSize={14}
+          fontFamily="SemiBold"
+          style={{ marginBottom: 8 }}
+        >
+          Verification Code
+        </AppText>
         <OtpInput
           onOtpEntered={(otp: string) => {
-            formik.setFieldValue("confirm_pin", otp);
+            formik.setFieldValue("cpde", otp);
           }}
-          borderColor={
-            formik.errors.confirm_pin ? colors.error : colors.formBorder
-          }
+          borderColor={formik.errors.code ? colors.error : colors.formBorder}
           clearValue={clearValue}
         />
 
         <View style={{ paddingTop: 10 }}>
-          <FormErrorMessage error={formik.errors.confirm_pin} />
+          <FormErrorMessage error={formik.errors.code} />
         </View>
+
+        <AppTextInput
+          error={formik.touched.pin && formik.errors.pin}
+          label="New Pin"
+          style={{
+            backgroundColor: isLoading
+              ? colors.backgroundTertiary
+              : colors.backgroundPrimary,
+          }}
+          autoCapitalize="none"
+          autoCorrect={false}
+          secureTextEntry={true}
+          editable={!isLoading}
+          maxLength={4}
+          keyboardType="numeric"
+          onBlur={() => formik.setFieldTouched("pin")}
+          onChangeText={formik.handleChange("pin")}
+        />
+
+        <FormErrorMessage
+          error={(formik.touched.pin && formik.errors.pin) as string}
+        />
+
+        <AppTextInput
+          error={formik.touched.new_pin && formik.errors.new_pin}
+          label="Confirm Pin"
+          style={{
+            backgroundColor: isLoading
+              ? colors.backgroundTertiary
+              : colors.backgroundPrimary,
+          }}
+          autoCapitalize="none"
+          autoCorrect={false}
+          secureTextEntry={true}
+          editable={!isLoading}
+          maxLength={4}
+          keyboardType="numeric"
+          onBlur={() => formik.setFieldTouched("new_pin")}
+          onChangeText={formik.handleChange("new_pin")}
+        />
+
+        <FormErrorMessage
+          error={(formik.touched.new_pin && formik.errors.new_pin) as string}
+        />
       </KeyboardAwareScrollView>
       <View style={[authStyles.buttonContainer, { bottom: bottomInset + 20 }]}>
         <AppButton
-          title="Sign In"
+          title="Reset"
           textColor="white"
           btnColor="buttonPrimary"
           style={{}}
           onPress={formik.submitForm}
-          // loading={loading}
+          loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>
@@ -138,6 +161,6 @@ const ConfirmPin = () => {
   );
 };
 
-export default ConfirmPin;
+export default ResetPin;
 
 const styles = StyleSheet.create({});

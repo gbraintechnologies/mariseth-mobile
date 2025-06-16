@@ -8,6 +8,9 @@ export const icons = {
   credits: require("@/assets/images/icons/credits.svg"),
   dialog: require("@/assets/images/icons/dialog.svg"),
   edit: require("@/assets/images/icons/edit.svg"),
+  eye: require("@/assets/images/icons/eye.svg"),
+  eyeSlash: require("@/assets/images/icons/eyeslash.svg"),
+
   farmers: require("@/assets/images/icons/farmers.svg"),
   farm: require("@/assets/images/icons/farm.svg"),
   farmer: require("@/assets/images/icons/farmer.svg"),
@@ -35,4 +38,5 @@ export const icons = {
   rainn: require("@/assets/images/icons/rainn.svg"),
   humidity: require("@/assets/images/icons/humidity.svg"),
   pressure: require("@/assets/images/icons/pressure.svg"),
+  visibility: require("@/assets/images/icons/visibility.svg"),
 };
