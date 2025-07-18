@@ -8,11 +8,8 @@ import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
 import useAuthMutation from "@/hooks/usemutation";
 import { authStyles } from "@/styles/auth";
-import {
-  dataDecoder,
-  handleAuthApiError,
-  handleToastShow,
-} from "@/utils/commonmethods";
+import { handleAuthApiError } from "@/utils/apierrorhandler";
+import { dataDecoder, handleToastShow } from "@/utils/commonmethods";
 import { confirmPinSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -88,6 +85,7 @@ const ConfirmPin = () => {
     <>
       <AuthLoading visible={isLoading} />
       <KeyboardAwareScrollView
+        extraScrollHeight={50}
         extraHeight={100}
         enableOnAndroid={true}
         bounces={false}

@@ -9,8 +9,16 @@ interface farmerCard {
   type: "small" | "big";
   item?: any;
   onPress?: () => void;
+  count?: number | string;
+  isLoading?: boolean;
 }
-const FarmerCard: React.FC<farmerCard> = ({ type = "big", item, onPress }) => {
+const FarmerCard: React.FC<farmerCard> = ({
+  type = "big",
+  item,
+  onPress,
+  count,
+  isLoading,
+}) => {
   const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
   const cardTypes = {
     small: {
@@ -23,7 +31,7 @@ const FarmerCard: React.FC<farmerCard> = ({ type = "big", item, onPress }) => {
     },
     big: {
       title: "My Smallholder Farmers",
-      count: item?.length,
+      count: isLoading ? "..." : count,
       phone: "",
       subtitle: `Farmer${item?.length > 1 ? "s" : ""}`,
       abstractImage: images.looper,

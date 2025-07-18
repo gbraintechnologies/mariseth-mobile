@@ -3,7 +3,8 @@ import { endpoints } from "@/constants/endpoints";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
-import { handleAuthApiError } from "@/utils/commonmethods";
+
+import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { router } from "expo-router";
 import React from "react";
 import { Modal, StyleSheet, View } from "react-native";
@@ -46,7 +47,7 @@ const LogoutModal = React.memo(() => {
         console.log(data);
         userStore.setState({ user: null });
         useUniversalStore.setState({ logoutModalVisible: false });
-        router.replace(`/(auth)/signin`);
+        router.replace(`/(auth)`);
       },
       onError: (error: any) => {
         handleAuthApiError(error, null, toast);

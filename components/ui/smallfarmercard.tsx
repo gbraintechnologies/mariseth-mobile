@@ -11,6 +11,7 @@ interface smallCardFarmer {
 }
 const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
   const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
+
   return (
     <Pressable
       style={styles.smallFarmerCardContainer}
@@ -40,7 +41,7 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
           </AppText>
 
           <AppText fontFamily="Medium" fontSize={13} color="primary">
-            {"" + item?.farm}
+            {` ${item?.farm?.name}`}
           </AppText>
         </View>
       </View>

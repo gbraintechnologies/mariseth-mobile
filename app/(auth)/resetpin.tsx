@@ -8,7 +8,8 @@ import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
 import useAuthMutation from "@/hooks/usemutation";
 import { authStyles } from "@/styles/auth";
-import { handleAuthApiError, handleToastShow } from "@/utils/commonmethods";
+import { handleAuthApiError } from "@/utils/apierrorhandler";
+import { handleToastShow } from "@/utils/commonmethods";
 import { resetPinSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -65,6 +66,7 @@ const ResetPin = () => {
       <KeyboardAwareScrollView
         extraHeight={100}
         enableOnAndroid={true}
+        extraScrollHeight={50}
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
         contentContainerStyle={authStyles.container}

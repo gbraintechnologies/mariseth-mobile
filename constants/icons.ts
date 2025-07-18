@@ -25,6 +25,18 @@ export const icons = {
 
   user: require("@/assets/images/icons/user.svg"),
   userAdd: require("@/assets/images/icons/useradd.svg"),
+  leadership: require("@/assets/images/icons/leadership.svg"),
+  male: require("@/assets/images/icons/male.svg"),
+  female: require("@/assets/images/icons/female.svg"),
+  checkmark: require("@/assets/images/icons/checkmark.svg"),
+  calendar: require("@/assets/images/icons/calendar.svg"),
+  arrowDown: require("@/assets/images/icons/arrowdown.svg"),
+  close: require("@/assets/images/icons/close.svg"),
+  closeSquare: require("@/assets/images/icons/closesquare.svg"),
+  tickSquare: require("@/assets/images/icons/ticksquare.svg"),
+  pending: require("@/assets/images/icons/pending.svg"),
+  unpaid: require("@/assets/images/icons/unpaid.svg"),
+  refresh: require("@/assets/images/icons/refresh.svg"),
 
   // WEATHER ICONS
   rainy: require("@/assets/images/icons/rain.png"),

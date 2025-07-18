@@ -1908,16 +1908,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-community/blur@npm:latest":
-  version: 4.4.1
-  resolution: "@react-native-community/blur@npm:4.4.1"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 1e47144b0c00dce562e72ea9f6c3e93d3bb392ec0ea001ce37ff801d9a496c9801927033ee4800bf92ea2ece9de0abe596715add3b7afe3c5d1533e260f5e09e
-  languageName: node
-  linkType: hard
-
 "@react-native/assets-registry@npm:0.79.3":
   version: 0.79.3
   resolution: "@react-native/assets-registry@npm:0.79.3"
@@ -3628,6 +3618,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clsx@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "clsx@npm:2.1.1"
+  checksum: acd3e1ab9d8a433ecb3cc2f6a05ab95fe50b4a3cfc5ba47abb6cbf3754585fcb87b84e90c822a1f256c4198e3b41c7f6c391577ffc8678ad587fc0976b24fd57
+  languageName: node
+  linkType: hard
+
 "color-convert@npm:^1.9.0":
   version: 1.9.3
   resolution: "color-convert@npm:1.9.3"
@@ -3880,6 +3877,13 @@ __metadata:
   version: 4.1.0
   resolution: "date-fns@npm:4.1.0"
   checksum: fb681b242cccabed45494468f64282a7d375ea970e0adbcc5dcc92dcb7aba49b2081c2c9739d41bf71ce89ed68dd73bebfe06ca35129490704775d091895710b
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:^1.11.13":
+  version: 1.11.13
+  resolution: "dayjs@npm:1.11.13"
+  checksum: f388db88a6aa93956c1f6121644e783391c7b738b73dbc54485578736565c8931bdfba4bb94e9b1535c6e509c97d5deb918bbe1ae6b34358d994de735055cca9
   languageName: node
   linkType: hard
 
@@ -5571,19 +5575,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconsax-react-native@npm:^0.0.8":
-  version: 0.0.8
-  resolution: "iconsax-react-native@npm:0.0.8"
-  dependencies:
-    prop-types: ^15.7.2
-  peerDependencies:
-    react: "*"
-    react-native: ">=0.46"
-    react-native-svg: ">=5.3"
-  checksum: 33f8ff0b447728581d1d415d13f0f69cd4b98eece2d591fc035173aec3366ba27271da1a5d75b6558af2ca350c6983eca5e9999de9dc3ef49c9ae8c99f943b16
-  languageName: node
-  linkType: hard
-
 "iconv-lite@npm:^0.6.2":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
@@ -6058,6 +6049,13 @@ __metadata:
     "@pkgjs/parseargs":
       optional: true
   checksum: be31027fc72e7cc726206b9f560395604b82e0fddb46c4cbf9f97d049bcef607491a5afc0699612eaa4213ca5be8fd3e1e7cd187b3040988b65c9489838a7c00
+  languageName: node
+  linkType: hard
+
+"jalali-plugin-dayjs@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "jalali-plugin-dayjs@npm:1.1.4"
+  checksum: 9096f72b77589c479a81ec26ba14c1a49188653e566713317bfb149147e8e4037d43be246e89fea4c68c1010090e18ec20dc8093e061ae5aa7c459b8f9b3fd85
   languageName: node
   linkType: hard
 
@@ -6607,7 +6605,6 @@ __metadata:
   resolution: "mariseth_farms@workspace:."
   dependencies:
     "@babel/core": ^7.25.2
-    "@react-native-community/blur": latest
     "@react-navigation/bottom-tabs": ^7.3.10
     "@react-navigation/elements": ^2.3.8
     "@react-navigation/native": ^7.1.6
@@ -6630,10 +6627,10 @@ __metadata:
     expo-splash-screen: ~0.30.8
     expo-status-bar: ~2.2.3
     formik: ^2.4.6
-    iconsax-react-native: ^0.0.8
     react: 19.0.0
     react-dom: 19.0.0
     react-native: 0.79.3
+    react-native-actions-sheet: ^0.9.7
     react-native-confirmation-code-field: ^7.6.1
     react-native-gesture-handler: ~2.24.0
     react-native-keyboard-aware-scroll-view: ^0.9.5
@@ -6643,6 +6640,7 @@ __metadata:
     react-native-screens: ~4.11.1
     react-native-svg: 15.11.2
     react-native-toast-notifications: ^3.4.0
+    react-native-ui-datepicker: ^3.1.2
     typescript: ~5.8.3
     yup: ^1.6.1
     zustand: ^5.0.5
@@ -7719,7 +7717,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:15.8.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -7874,6 +7872,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-actions-sheet@npm:^0.9.7":
+  version: 0.9.7
+  resolution: "react-native-actions-sheet@npm:0.9.7"
+  peerDependencies:
+    react-native: "*"
+    react-native-gesture-handler: "*"
+    react-native-safe-area-context: "*"
+  checksum: 48c6eeb7bf7e4607346dfaccdcbb09c6f74d306f9674941174475e54ec6ca0b9efab1c0dc250e19e1cd10b70afece013fc1758acf413c5cf33cfd73bbcf82431
+  languageName: node
+  linkType: hard
+
 "react-native-confirmation-code-field@npm:^7.6.1":
   version: 7.6.1
   resolution: "react-native-confirmation-code-field@npm:7.6.1"
@@ -8023,6 +8032,22 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 734a54111e3657859d3cca9505a197bc6eb486e473e655d8aa087157de8f5e8b819083963f28e5e9155110be9a17774296bbfd721749f670c5f4e093557bd88f
+  languageName: node
+  linkType: hard
+
+"react-native-ui-datepicker@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "react-native-ui-datepicker@npm:3.1.2"
+  dependencies:
+    clsx: ^2.1.1
+    dayjs: ^1.11.13
+    jalali-plugin-dayjs: ^1.1.4
+    lodash: ^4.17.21
+    tailwind-merge: ^3.0.1
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: cfc8295e6137ef9d29d569269da44b47efb7f2a2555d8f3cb79acbdf7d139526ef55df3f368ca1bcbcf76eee7e5ca7816035ae252763aba102ffa3aa1a928196
   languageName: node
   linkType: hard
 
@@ -9082,6 +9107,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 53b1e247e68e05db7b3808b99b892bd36fb096e6fba213a06da7fab22045e97597db425c724f2bbd6c99a3c295e1e73f3e4de78592289f38431049e1277ca0ae
+  languageName: node
+  linkType: hard
+
+"tailwind-merge@npm:^3.0.1":
+  version: 3.3.1
+  resolution: "tailwind-merge@npm:3.3.1"
+  checksum: ace3675227d86f1def95b25b7f6793268a6ab2f340b43ef64ad25646588d2b1d87714cd60db6947bfdb5bb85be3bb6ce1802021620c541ef7a9c3faa05915f2b
   languageName: node
   linkType: hard
 

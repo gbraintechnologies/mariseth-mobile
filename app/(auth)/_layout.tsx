@@ -4,7 +4,8 @@ import React from "react";
 
 export default function AuthLayout() {
   return (
-    <Stack>
+    <Stack initialRouteName="index">
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="signin" options={{ headerShown: false }} />
       <Stack.Screen name="signup" options={{ headerShown: false }} />
       <Stack.Screen name="confirmpin" options={{ headerShown: false }} />
@@ -25,8 +26,6 @@ export default function AuthLayout() {
         name="authloading"
         options={{ headerShown: false, animation: "slide_from_bottom" }}
       /> */}
-
-      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );
 }

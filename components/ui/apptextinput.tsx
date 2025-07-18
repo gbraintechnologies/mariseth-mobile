@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { colors } from "@/constants/colors";
 import { isIOS, largeScreen } from "@/constants/generalconstants";
@@ -7,14 +13,14 @@ import { icons } from "@/constants/icons";
 import { Image } from "expo-image";
 import AppText from "./apptext";
 
-interface AppTextInputProps {
+interface AppTextInputProps extends TextInputProps {
   color?: string;
   Inputstyle?: any;
   style?: any;
   marginLeft?: number;
 
   marginRight?: number;
-  Required?: boolean;
+  required?: boolean;
   Width?: string;
   placeholderTextColor?: string;
   placeholder?: string;
@@ -22,10 +28,11 @@ interface AppTextInputProps {
   secureTextEntry?: boolean;
   [key: string]: any;
   borderRadius?: number;
-  textAlignVertical?: string;
+  textAlignVertical?: "auto" | "top" | "bottom" | "center";
   label?: string;
   error?: any;
-  phoneEntry?: boolean;
+  // phoneEntry?: boolean;
+  leftComponent?: React.ReactNode;
 }
 
 const AppTextInput: React.FC<AppTextInputProps> = ({
@@ -34,7 +41,7 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
   style,
   marginLeft,
   marginRight,
-  Required,
+  required,
   Width = "100%",
   placeholderTextColor = colors.formInputText,
   placeholder = "",
@@ -43,13 +50,15 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
 
   borderRadius = 10,
   textAlignVertical,
-  phoneEntry,
+  // phoneEntry,
   label,
   error,
+  leftComponent,
   ...otherProps
 }) => {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!isPasswordVisible);
   };
@@ -62,13 +71,32 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
   return (
     <>
       {label ? (
-        <AppText
-          fontSize={14}
-          fontFamily="SemiBold"
-          style={{ marginBottom: 8 }}
+        <View
+          style={{
+            flexDirection: "row",
+            marginBottom: 8,
+          }}
         >
-          {label}
-        </AppText>
+          <AppText
+            fontSize={14}
+            fontFamily="SemiBold"
+            color="formLabelText"
+            style={{}}
+          >
+            {label}
+          </AppText>
+
+          {required && (
+            <AppText
+              fontSize={14}
+              color="error"
+              fontFamily="SemiBold"
+              style={{ marginLeft: 4 }}
+            >
+              *
+            </AppText>
+          )}
+        </View>
       ) : null}
 
       <View
@@ -81,12 +109,12 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
             height: TextinputHeight,
             borderColor: customColor,
             borderRadius: borderRadius,
-
-            // boxShadow: isFocused ? "0 0 0 3 #27FE792B" : undefined,
           },
         ]}
       >
-        {phoneEntry && (
+        {leftComponent}
+
+        {/* {phoneEntry && (
           <AppText
             color="formInputText"
             fontFamily="Regular"
@@ -95,7 +123,7 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
           >
             +233
           </AppText>
-        )}
+        )} */}
 
         <TextInput
           style={[

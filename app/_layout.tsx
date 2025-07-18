@@ -22,7 +22,6 @@ export default function RootLayout() {
   });
   const user = useStore(userStore, (state) => state.user);
   const [loaded] = useFonts({
-    Light: require("../assets/fonts/Inter-Light.ttf"),
     Regular: require("../assets/fonts/Inter-Regular.ttf"),
     Medium: require("../assets/fonts/Inter-Medium.ttf"),
     SemiBold: require("../assets/fonts/Inter-SemiBold.ttf"),

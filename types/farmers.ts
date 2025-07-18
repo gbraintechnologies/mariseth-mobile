@@ -1,3 +1,5 @@
+import { district, myFarm, region } from "./farm";
+
 type supportAssistance = {
   has_received_support: boolean;
   areas_of_needed_assistance: string;
@@ -17,10 +19,10 @@ export type smallHolder = {
   email: string;
   address: string;
   village: string;
-  region: number;
-  district: number;
+  region: region;
+  district: district;
   country: string;
-  farm: number;
+  farm: myFarm;
   lead_farmer: number;
   leadership_experience: string | null;
   support_assistance: supportAssistance;

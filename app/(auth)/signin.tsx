@@ -9,7 +9,8 @@ import { images } from "@/constants/images";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { authStyles } from "@/styles/auth";
-import { handleAuthApiError } from "@/utils/commonmethods";
+import { handleAuthApiError } from "@/utils/apierrorhandler";
+
 import { signInSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -55,6 +56,7 @@ const SignIn = () => {
       <AuthLoading visible={isLoading} />
       <KeyboardAwareScrollView
         extraHeight={100}
+        extraScrollHeight={50}
         enableOnAndroid={true}
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
@@ -92,9 +94,19 @@ const SignIn = () => {
           }}
           maxLength={10}
           autoCapitalize="none"
-          textContentType="emailAddress"
+          textContentType="telephoneNumber"
           autoCorrect={false}
-          phoneEntry={true}
+          // phoneEntry={true}
+          leftComponent={
+            <AppText
+              color="formInputText"
+              fontFamily="Regular"
+              fontSize={17}
+              style={{ marginRight: 10 }}
+            >
+              +233
+            </AppText>
+          }
           editable={!isLoading}
           keyboardType="phone-pad"
           onBlur={() => formik.setFieldTouched("phone_number")}

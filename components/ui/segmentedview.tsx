@@ -1,4 +1,3 @@
-// SegmentedScrollView.tsx
 import { SegmentedControl } from "@/components/ui/segmentedcontrol";
 import { useSegmentedScroll } from "@/hooks/usesegmentedscroll";
 import { SegmentedControlKey, SegmentedControlValue } from "@/types/universal";

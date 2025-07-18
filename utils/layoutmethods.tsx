@@ -30,7 +30,7 @@ export function headerHandler(route_label?: string): any {
       return (
         <Pressable
           style={styles.backButtonContainer}
-          onPress={() => {
+          onPressIn={() => {
             router.back();
           }}
         >
@@ -54,11 +54,11 @@ export function tabScreenOptions(tabLabel: string) {
     More: icons?.more,
   };
 
-  const isHome = tabLabel === "Home";
-  const isCredits = tabLabel === "Credits";
+  // const isHome = tabLabel === "Home";
+  // const isCredits = tabLabel === "Credits";
   const isMore = tabLabel === "More";
-  const isFarm = tabLabel === "My Farm";
-  const isFarmers = tabLabel === "My Farmers";
+  // const isFarm = tabLabel === "My Farm";
+  // const isFarmers = tabLabel === "My Farmers";
 
   return {
     headerShown: isMore ? false : true,
@@ -100,11 +100,19 @@ export function tabScreenOptions(tabLabel: string) {
             alignItems: "center",
           }}
         >
-          <Image
-            source={icons.notification}
-            style={{ height: 24, width: 24, marginRight: 20 }}
+          {/* <Pressable style={{ marginRight: 20 }}>
+            <Image
+              source={icons.notification}
+              style={{ height: 24, width: 24 }}
+            />
+          </Pressable> */}
+
+          <InitialsAvatar
+            name={fullName}
+            onPress={() => {
+              router.navigate("/more/profileinformation");
+            }}
           />
-          <InitialsAvatar name={fullName} />
         </View>
       );
     },

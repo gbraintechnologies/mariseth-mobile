@@ -1,15 +1,17 @@
 import AppText from "@/components/ui/apptext";
+import ErrorComponent from "@/components/ui/errorcomponent";
 import FarmDetails from "@/components/ui/farmdetails";
 import FarmProducts from "@/components/ui/farmproducts";
 import { SegmentedScrollView } from "@/components/ui/segmentedview";
 import MyFarmSP from "@/components/ui/skeletonplaceholders/myfarm";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
-import { universalBlurhash } from "@/constants/generalconstants";
+import { isIOS, universalBlurhash } from "@/constants/generalconstants";
 import { images } from "@/constants/images";
 import { useFetchQuery } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
 import { myFarm } from "@/types/farm";
+import { useQueryClient } from "@tanstack/react-query";
 import { ImageBackground } from "expo-image";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -25,13 +27,20 @@ const MyFarm = () => {
     endpoints.myFarm,
     "myfarm"
   );
-
+  const queryClient = useQueryClient();
   if (isLoading) return <MyFarmSP />;
+  if (error)
+    return (
+      <ErrorComponent
+        type={(error as any)?.problem}
+        refetch={() => queryClient.invalidateQueries({ queryKey: ["myfarm"] })}
+      />
+    );
 
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-      contentContainerStyle={{}}
+      contentContainerStyle={{ paddingBottom: isIOS ? "30%" : "20%" }}
     >
       <View style={{ paddingHorizontal: 16 }}>
         <ImageBackground
@@ -59,7 +68,7 @@ const MyFarm = () => {
         options={["Farm Details", "Farm Products"]}
       >
         <FarmDetails item={data} />
-        <FarmProducts products={data?.products} />
+        <FarmProducts products={data} />
       </SegmentedScrollView>
     </ScrollView>
   );

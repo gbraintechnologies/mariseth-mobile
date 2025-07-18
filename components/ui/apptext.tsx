@@ -2,7 +2,7 @@ import { colors } from "@/constants/colors";
 import React from "react";
 import { StyleSheet, Text, TextProps } from "react-native";
 export interface fontFamilyProps {
-  fontFamily: "Light" | "Regular" | "Medium" | "SemiBold" | "Bold";
+  fontFamily: "Regular" | "Medium" | "SemiBold" | "Bold";
 }
 interface AppTextProps extends TextProps {
   children: React.ReactNode;

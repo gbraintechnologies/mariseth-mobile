@@ -32,32 +32,69 @@ type leadershipExperience = {
   has_farming_membership: boolean;
   has_received_farming_leadership_training: boolean;
   is_mentoring_other_farmers: boolean;
+  number_of_farmers_mentoring: string;
 };
 
 type farm = {
-  areas_of_assistance: any[]; // Replace 'any' with specific type if available
-  created_by: any[]; // Replace if known
-  crops: any[]; // Replace if known
+  areas_of_assistance: any[];
+  created_by: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    gender: "m" | "f";
+    phone_number: string;
+    user_type: string;
+  };
+  crops: Array<{
+    id: number;
+    product: {
+      id: 1;
+      name: string;
+      type: string;
+      status: string;
+    };
+    is_main_product: boolean;
+  }>;
   date_created: string;
-  district: any[]; // Replace if known
+  district: {
+    id: number;
+    name: string;
+  };
   farm_id: string;
   farm_type: string;
-  farmer: any[] | null; // For lead farmer, this can be null
+  farmer: any[] | null;
   farming_methods: any[];
   government_ngo_support: boolean;
   has_access_to_market: boolean;
   id: number;
   irrigation: boolean;
   land_ownership: string;
-  livestock: any[];
+  livestock: Array<{
+    id: number;
+    product: {
+      id: number;
+      name: string;
+      type: string;
+      status: string;
+    };
+    is_main_product: true;
+  }>;
   livestock_kept: string | null;
   location: string;
   name: string;
   other_specification: string | null;
   provide_training: boolean;
-  region: any[]; // Replace if known
+  region: { id: number; name: string; code: string };
   size: number;
-  size_metric: string | null | object;
+  size_metric: {
+    id: number;
+    name: string;
+    category_name: string;
+    description: string;
+    category_type: string;
+    is_default: boolean;
+  };
   specify_support: string | null;
   type: string | null;
   use_of_fertilizers: any[];
@@ -103,6 +140,7 @@ type smallFarmer = {
   phone_number: string;
   refresh_token: string;
   status: string;
+  other_names: string;
   user_type: string;
 };
 
@@ -138,6 +176,7 @@ type leadFarmer = {
   id: number;
   is_verified: boolean;
   last_name: string;
+  other_names: string;
   phone_number: string;
   refresh_token: string;
   status: string;

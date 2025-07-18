@@ -1,43 +1,70 @@
 import { colors } from "@/constants/colors";
+import { statusTypes } from "@/constants/generalconstants";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { ActionSheetRef } from "react-native-actions-sheet";
 import AppText from "./apptext";
+import CreditActionSheet from "./creditactionsheet";
 interface creditHistoryCard {
   item?: any;
 }
+
 const CreditHistoryCard: React.FC<creditHistoryCard> = ({ item }) => {
+  const [selectedItem, setSelectedItem] = React.useState<any>(null);
+  const sheetRef = React.useRef<ActionSheetRef>(null);
+  const handlePress = () => {
+    setSelectedItem(item);
+    sheetRef.current?.show();
+  };
   return (
-    <View style={styles.creditHistoryCardContainer}>
-      <View style={{ flexDirection: "column", flex: 1 }}>
-        <AppText
-          fontFamily="SemiBold"
-          fontSize={15}
-          color="textBold"
-          style={{ marginBottom: 10 }}
+    <>
+      <CreditActionSheet sheetRef={sheetRef} item={selectedItem} />
+      <Pressable
+        style={styles.creditHistoryCardContainer}
+        onPress={handlePress}
+      >
+        <View style={{ flexDirection: "column", flex: 1 }}>
+          <AppText
+            fontFamily="SemiBold"
+            fontSize={15}
+            color="textBold"
+            style={{ marginBottom: 10 }}
+          >
+            {item?.input_credits}
+          </AppText>
+          <View style={{ flexDirection: "row" }}>
+            <AppText
+              fontFamily="Medium"
+              fontSize={13}
+              color="textPrimary"
+              style={{}}
+            >
+              {item?.credit_id} .
+            </AppText>
+
+            <AppText fontFamily="Medium" fontSize={13} color="primary">
+              {` GH₵ ${item?.credit_amount}`}
+            </AppText>
+          </View>
+        </View>
+        <View
+          style={[
+            styles.creditHistoryStatusContainer,
+            {
+              backgroundColor: statusTypes[item?.payment_status]?.bgColor,
+            },
+          ]}
         >
-          {item?.item}
-        </AppText>
-        <View style={{ flexDirection: "row" }}>
           <AppText
             fontFamily="Medium"
-            fontSize={13}
-            color="textPrimary"
-            style={{}}
+            fontSize={10}
+            color={statusTypes[item?.payment_status]?.textColor}
           >
-            {item?.code} .
-          </AppText>
-
-          <AppText fontFamily="Medium" fontSize={13} color="primary">
-            {`${item?.currency} ${item?.amount}`}
+            {statusTypes[item?.payment_status]?.text}
           </AppText>
         </View>
-      </View>
-      <View style={styles.creditHistoryStatusContainer}>
-        <AppText fontFamily="Medium" fontSize={10} color="primary">
-          {item?.status}
-        </AppText>
-      </View>
-    </View>
+      </Pressable>
+    </>
   );
 };
 
@@ -53,10 +80,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   creditHistoryStatusContainer: {
-    backgroundColor: colors.secondaryLight,
     paddingHorizontal: 12,
     paddingVertical: 3,
     borderRadius: 8,
     alignSelf: "center",
+  },
+
+  info: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });

@@ -18,7 +18,7 @@ const ProfileInformation = () => {
   const basicProfileInfo = {
     headerTitle: "My Information",
     headerIcon: icons.user,
-    onEditPress: () => router.navigate("/more/profileinformation"),
+    onEditPress: () => router.navigate("/more/profileedit"),
     information: [
       {
         key: "Gender",
@@ -58,32 +58,39 @@ const ProfileInformation = () => {
       },
     ],
   };
+  const leaderShipExperience = user?.farmer?.leadership_experience;
+  const isMentoring = leaderShipExperience?.is_mentoring_other_farmers;
 
   const leadershipExperienceInfo = {
     headerTitle: "Leadership & Experience",
-    headerIcon: null,
-    onEditPress: () => router.navigate("/more/profileinformation"),
+    headerIcon: icons.leadership,
+    onEditPress: () => router.navigate("/more/leadershipinfoedit"),
     information: [
       {
         key: "Are you currently mentoring other farmers?",
-        value: user?.farmer?.leadership_experience?.has_farming_membership
-          ? "Yes"
-          : "No",
+        value: isMentoring ? "Yes" : "No",
       },
-      {
-        key: "If Yes, how many farmers are you mentoring",
-        value: "12",
-      },
+      // {
+      //   key: "If Yes, how many farmers are you mentoring",
+      //   value: leaderShipExperience?.number_of_farmers_mentoring || "N/A",
+      // },
+      ...(isMentoring
+        ? [
+            {
+              key: "If Yes, how many farmers are you mentoring",
+              value:
+                user?.farmer?.leadership_experience
+                  ?.number_of_farmers_mentoring || "",
+            },
+          ]
+        : []),
       {
         key: "Membership in Farming Cooperatives/Associations",
-        value: user?.farmer?.leadership_experience?.has_farming_membership
-          ? "Yes"
-          : "No",
+        value: leaderShipExperience?.has_farming_membership ? "Yes" : "No",
       },
       {
         key: "Have you received any leadership or agricultural training?",
-        value: user?.farmer?.leadership_experience
-          ?.has_received_farming_leadership_training
+        value: leaderShipExperience?.has_received_farming_leadership_training
           ? "Yes"
           : "No",
       },

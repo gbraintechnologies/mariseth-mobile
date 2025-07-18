@@ -4,6 +4,11 @@ export const signInSchema = yup.object().shape({
   phone_number: yup
     .string()
     .matches(phoneRegExp, "Invalid Phone Number")
+    .test(
+      "no-leading-zero",
+      "Phone Number must not  start with 0",
+      (value) => !value?.startsWith("0")
+    )
     .required("Phone Number is required"),
 
   pin: yup
@@ -82,4 +87,143 @@ export const resetPinSchema = yup.object().shape({
     .required("Confirm pin is required")
     .oneOf([yup.ref("pin")], "Pins must match")
     .matches(/^\d{4}$/, "Confirm pin must be a 4-digit number"),
+});
+
+export const profileEditSchema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  type: yup.string().required("Type is required"),
+  gender: yup
+    .string()
+    .oneOf(["m", "f"], "Please select gender")
+    .required("Gender is required"),
+  date_of_birth: yup.string().required("Date of Birth is required"),
+  id_type: yup.string().required("This field is required"),
+  id_number: yup.string().required("This field is required"),
+  // phone_number: yup
+  //   .string()
+  //   .required("Contact Number is required")
+  //   .matches(phoneRegExp, "Contact Number must be at least 9 digits")
+  //   .test(
+  //     "no-leading-zero",
+  //     "Phone Number must not  start with 0",
+  //     (value) => !value?.startsWith("0")
+  //   ),
+  phone_number: yup.string().when("type", {
+    is: (type: string) => type !== "profile",
+    then: (schema) =>
+      schema
+        .required("Contact Number is required")
+        .matches(phoneRegExp, "Contact Number must be at least 9 digits")
+        .test(
+          "no-leading-zero",
+          "Phone Number must not start with 0",
+          (value) => !value?.startsWith("0")
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  address: yup.string().required("Address is required"),
+  village: yup.string().required("Village/Community is required"),
+  district: yup.string().required("District is required"),
+  region: yup.string().required("Region is required"),
+  // farm: yup.string().required("Farm is required"),
+
+  //  farm: yup.string().when("type", {
+  //   is: (type) => type !== "profile",
+  //   then: yup.string().required("Farm is required"),
+  //   otherwise: yup.string().notRequired(),
+  // }),
+
+  farm: yup.string().when("type", {
+    is: (type: string) => type !== "profile",
+    then: (schema) => schema.required("Farm is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  // areas_of_needed_assistance: yup.string().when("type", {
+  //   is: (type: string) => type !== "profile",
+  //   then: (schema) =>
+  //     schema.required("Please select area of needed assistance"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+
+  // has_received_support: yup.boolean().when("type", {
+  //   is: (type: string) => type !== "profile",
+  //   then: (schema) => schema.required("This is a required field"),
+  //   otherwise: (schema) => schema.notRequired(),
+  // }),
+});
+
+export const leadershipExperienceEditSchema = yup.object().shape({
+  is_mentoring_other_farmers: yup.boolean().required("This field is required"),
+  // number_of_farmers_mentoring: yup.string().required("This field is required"),
+
+  number_of_farmers_mentoring: yup.string().when("is_mentoring_other_farmers", {
+    is: true,
+    then: (schema) =>
+      schema.required("Please enter the number of farmers you are mentoring"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+
+  has_farming_membership: yup.boolean().required("This field is required"),
+
+  has_received_farming_leadership_training: yup
+    .boolean()
+    .required("This field is required"),
+});
+
+export const applyCreditSchema = yup.object().shape({
+  input_credits: yup.string().required("Input Credits is required"),
+  type: yup.string().required("Type is required"),
+  quantity: yup
+    .string()
+    .required("Quantity is required")
+    .matches(/^\d+$/, "Quantity must be a number"),
+  due_date: yup.string().required("Due Date is required"),
+  credit_amount: yup.string().required("Credit Amount is required"),
+  interest_rate: yup.string().required("Interest Rate is required"),
+  notes: yup.string(),
+  quantity_metric: yup.string(),
+});
+
+export const adddFarmerSchema = yup.object().shape({
+  farm_type: yup.string().required("Farm Type is required"),
+  name: yup.string().required("Farm Name  is required"),
+  location: yup.string().required("Farm Location is required"),
+  region: yup.string().required("Region is required"),
+  district: yup.string().required("District is required"),
+  size: yup
+    .string()
+    .required("Total Land Size is required")
+    .matches(/^\d+$/, "Total Land Size must be a number"),
+
+  size_metric: yup.string(),
+
+  land_ownership: yup.string().required("Land Owndership is required"),
+  // main_crops: yup.string().required("Main Crops is required"),
+  // livestock_kept: yup.string().required("This is a required field"),
+  crops: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, "Please select at least one crop")
+    .required("Main Crops is required"),
+
+  livestock: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, "Please select at least one livestock option")
+    .required("Livestock is required"),
+  use_of_fertilizers: yup
+    .array()
+    .of(yup.string().required())
+    .required("This is a required field"),
+  farming_methods: yup
+    .array()
+    .of(yup.string().required())
+    .required("This is a required field"),
+  irrigation: yup.boolean().required("This is a required field"),
+  has_access_to_market: yup.boolean().required("This is a required field"),
 });

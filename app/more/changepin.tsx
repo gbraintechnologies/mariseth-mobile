@@ -48,6 +48,7 @@ const ChangePassword = () => {
     <>
       <KeyboardAwareScrollView
         extraHeight={100}
+        extraScrollHeight={50}
         enableOnAndroid={true}
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}

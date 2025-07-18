@@ -6,7 +6,7 @@ import React from "react";
 
 export default function MyFarmersLayout() {
   const params = useLocalSearchParams<{ data: string }>();
-  const data: smallHolder = dataDecoder(params?.data);
+  const data: smallHolder = dataDecoder(params?.data) ?? "";
   const name = `${data?.first_name} ${data?.last_name} ${data?.other_names}`;
   return (
     <Stack>
@@ -14,6 +14,20 @@ export default function MyFarmersLayout() {
         name="farmerdetails"
         options={{
           ...headerHandler(name || "Farmer Details"),
+        }}
+      />
+
+      <Stack.Screen
+        name="addfarmer"
+        options={{
+          ...headerHandler("Add New Farmer"),
+        }}
+      />
+
+      <Stack.Screen
+        name="addfarm"
+        options={{
+          ...headerHandler("Add New Farm"),
         }}
       />
     </Stack>

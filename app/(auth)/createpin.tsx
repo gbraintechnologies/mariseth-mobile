@@ -38,6 +38,7 @@ const CreatePin = () => {
   return (
     <>
       <KeyboardAwareScrollView
+        extraScrollHeight={50}
         extraHeight={100}
         enableOnAndroid={true}
         bounces={false}

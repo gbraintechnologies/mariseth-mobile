@@ -6,7 +6,12 @@ export type SegmentedControlState = {
 
 export type universalStore = {
   logoutModalVisible: boolean;
+  datePickerVisible: boolean;
+  enabled: boolean;
   selectedSegmentedOption: SegmentedControlState;
+  selectModalVisible: {
+    [key: string]: boolean;
+  };
   setSegmentedOption: (
     key: keyof universalStore["selectedSegmentedOption"],
     option: universalStore["selectedSegmentedOption"][keyof universalStore["selectedSegmentedOption"]]

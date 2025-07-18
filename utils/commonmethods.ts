@@ -1,6 +1,10 @@
-import { weatherBackgrounds } from "@/constants/generalconstants";
+import {
+  cropTagColors,
+  weatherBackgrounds,
+} from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
 import { useUniversalStore } from "@/stores/useuniversalstore";
+import { format, parseISO } from "date-fns";
 
 export function getInitials(name: string): string {
   if (typeof name !== "string" || !name.trim()) return "";
@@ -34,49 +38,6 @@ export function handleToastShow(
     duration: async ? 10000 : 3500,
     animationType: "slide-in",
   });
-}
-
-export function handleAuthApiError(error: any, formik: any, toast: any) {
-  const { problem, message } = error;
-
-  console.log(JSON.stringify(error));
-
-  if ((formik && problem === "CLIENT_ERROR") || problem === "SERVER_ERROR") {
-    if (Array.isArray(message)) {
-      formik.setErrors({
-        phone_number: message[0],
-        pin: message[0],
-      });
-    }
-    if (message?.phone_number) {
-      formik.setErrors({ phone_number: message?.phone_number[0] });
-    }
-    if (message?.non_field_errors) {
-      formik.setErrors({
-        phone_number: message?.non_field_errors[0],
-        pin: message?.non_field_errors[0],
-        code: message?.non_field_errors[0],
-        old_pin: message?.non_field_errors[0],
-      });
-    }
-    if (message?.pin) {
-      formik.setErrors({
-        pin: message?.pin[0],
-      });
-    }
-  } else {
-    const errorMessages: Record<string, string> = {
-      CONNECTION_ERROR:
-        "Oops! You're offline. Check your internet and try again.",
-      NETWORK_ERROR: "Oops! You're offline. Check your internet and try again.",
-      TIMEOUT_ERROR: "Request timed out. Check your connection and try again",
-    };
-
-    const toastMessage =
-      errorMessages[problem] ||
-      "Oops! Something went wrong. Please try again in a moment.";
-    handleToastShow(toast, toastMessage);
-  }
 }
 
 export function dataEncoder<T>(data: T) {
@@ -133,10 +94,16 @@ export function getWeatherAssets(description: string) {
       gradient: weatherBackgrounds.cloudy,
     };
 
-  if (lowerDesc.includes("sun") || lowerDesc.includes("clear"))
+  if (lowerDesc.includes("sun"))
     return {
       icon: icons.sunny,
       gradient: weatherBackgrounds.sunny,
+    };
+
+  if (lowerDesc.includes("clear"))
+    return {
+      icon: icons.sunny,
+      gradient: weatherBackgrounds.rainy,
     };
 
   if (lowerDesc.includes("wind") || lowerDesc.includes("blowing"))
@@ -149,4 +116,14 @@ export function getWeatherAssets(description: string) {
     icon: icons.cloudy,
     gradient: weatherBackgrounds.cloudy,
   };
+}
+
+export function getColorForItem(item: string) {
+  const index = item.length % cropTagColors.length;
+  return cropTagColors[index];
+}
+
+export function dueDateFormat(date: string) {
+  if (!date) return "";
+  return format(parseISO(date), "do MMMM, yyyy");
 }

@@ -3,6 +3,7 @@ import InfoCard from "@/components/ui/infocard";
 import { SegmentedScrollView } from "@/components/ui/segmentedview";
 import { colors } from "@/constants/colors";
 import { width } from "@/constants/generalconstants";
+import { livestockKept, myFarm } from "@/types/farm";
 import { smallHolder } from "@/types/farmers";
 import { dataDecoder } from "@/utils/commonmethods";
 import { format, parseISO } from "date-fns";
@@ -13,6 +14,17 @@ import { ScrollView, StyleSheet, View } from "react-native";
 const FarmerDetails = () => {
   const params = useLocalSearchParams<{ data: string }>();
   const data: smallHolder = dataDecoder(params?.data);
+  const {
+    name: farmName,
+    location,
+    district,
+    size,
+    size_metric,
+    land_ownership,
+    livestock_kept,
+    livestock,
+  }: myFarm = data?.farm;
+
   const farmerPersonalInformation = {
     headerTitle: "Personal Information",
     information: [
@@ -29,7 +41,7 @@ const FarmerDetails = () => {
       { key: "Email", value: data?.email || "N/A" },
       { key: "Address", value: data?.address || "N/A" },
       { key: "Village/Community", value: data?.village || "N/A" },
-      { key: "District", value: data?.district || "N/A" },
+      { key: "District", value: data?.district?.name || "N/A" },
       { key: "Country", value: data?.country || "N/A" },
     ],
   };
@@ -37,12 +49,21 @@ const FarmerDetails = () => {
   const farmInformation = {
     headerTitle: "Farm Information",
     information: [
-      { key: "Farm Name", value: "Sunset Farms" },
-      { key: "Location", value: "GPS 7403-435" },
-      { key: "District", value: "Sissala East" },
-      { key: "Total Land Size", value: "3.5 acres" },
-      { key: "Land Ownership", value: "Other (Renting)" },
-      { key: "Livestock Kept", value: "N/A" },
+      { key: "Farm Name", value: farmName || "N/A" },
+      { key: "Location", value: location || "N/A" },
+      { key: "District", value: district?.name || "N/A" },
+      {
+        key: "Total Land Size",
+        value: (size || "N/A" + size_metric || "") as string,
+      },
+      { key: "Land Ownership", value: land_ownership || "N/A" },
+      {
+        key: "Livestock Kept",
+        value:
+          livestock
+            .map((item: livestockKept) => item.product.name)
+            .join(", ") || "N/A",
+      },
     ],
   };
   return (

@@ -1,5 +1,6 @@
 import { moreLink } from "@/types/more";
 import { Dimensions, Platform } from "react-native";
+import { colors } from "./colors";
 import { icons } from "./icons";
 export const isIOS = Platform.OS === "ios";
 
@@ -44,11 +45,11 @@ export const moreLinks: Array<moreLink> = [
     icon: icons.password,
     route: "/more/changepin",
   },
-  {
-    name: "Help & Support",
-    icon: icons.dialog,
-    route: "/(tabs)/more",
-  },
+  // {
+  //   name: "Help & Support",
+  //   icon: icons.dialog,
+  //   route: "/(tabs)/more",
+  // },
   {
     name: "Log out",
     icon: icons.logout,
@@ -88,3 +89,158 @@ export const weatherBackgrounds = {
     end: { x: 0.5, y: 1 }, // 180deg
   },
 };
+
+export const districts = [
+  "Greater Accra",
+  "Ashanti",
+  "Eastern",
+  "Western",
+  "Central",
+  "Volta",
+  "Northern",
+  "Upper East",
+  "Upper West",
+  "Bono",
+  "Bono East",
+  "Ahafo",
+  "Savannah",
+  "North East",
+  "Oti",
+  "Western North",
+];
+export const genderOptions = [
+  { label: "Male", value: "m", icon: icons.male },
+  { label: "Female", value: "f", icon: icons.female },
+];
+
+export const booleanOptions = [
+  { label: "Yes", value: true, icon: icons.tickSquare },
+  { label: "No", value: false, icon: icons.closeSquare },
+];
+export const cropTagColors = [
+  { bgColor: "#FFFBEB", textColor: "#D97706" },
+  { bgColor: "#EFF6FF", textColor: "#2563EB" },
+  { bgColor: "#FEF2F2", textColor: "#DC2626" },
+  { bgColor: "#F0FDF4", textColor: "#16A34A" },
+  { bgColor: "#F5F3FF", textColor: "#7C3AED" },
+  { bgColor: "#FFF7ED", textColor: "#F97316" },
+  { bgColor: "#ECFEFF", textColor: "#0891B2" },
+];
+
+export const cropsData = [
+  {
+    id: 1,
+    product: {
+      id: 1,
+      name: "Cassava",
+      type: "crop",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 2,
+    product: {
+      id: 2,
+      name: "Maize",
+      type: "crop",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 3,
+    product: {
+      id: 3,
+      name: "Yam",
+      type: "crop",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 4,
+    product: {
+      id: 4,
+      name: "Plantain",
+      type: "crop",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+];
+
+export const livestockData = [
+  {
+    id: 1,
+    product: {
+      id: 1,
+      name: "Honey",
+      type: "livestock",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 2,
+    product: {
+      id: 2,
+      name: "Cow",
+      type: "livestock",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 3,
+    product: {
+      id: 3,
+      name: "Goat",
+      type: "livestock",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+  {
+    id: 4,
+    product: {
+      id: 4,
+      name: "Chickens",
+      type: "livestock",
+      status: "active",
+    },
+    is_main_product: false,
+  },
+];
+
+export const statusTypes: Record<
+  string,
+  { text: string; textColor: keyof typeof colors; bgColor: string }
+> = {
+  paid: {
+    text: "Paid",
+    textColor: "primary",
+    bgColor: colors.secondaryLight,
+  },
+  partial: {
+    text: "Partial",
+    textColor: "partialText",
+    bgColor: colors.partialBg,
+  },
+  overdue: {
+    text: "Overdue",
+    textColor: "overdueText",
+    bgColor: colors.overdueBg,
+  },
+
+  active: {
+    text: "Active",
+    textColor: "activeText",
+    bgColor: colors.activeBg,
+  },
+};
+
+export const yesNoOptions = [
+  { label: "Yes", value: true, icon: null },
+  { label: "No", value: false, icon: null },
+];

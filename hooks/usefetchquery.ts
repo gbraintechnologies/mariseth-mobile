@@ -14,6 +14,7 @@ function useFetchQuery(
 ): any {
   const { data, isLoading, error } = useQuery({
     queryKey: [key],
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const response: ApiResponse<any> = await apiClient.get(endpoint);
       if (response.ok) {
@@ -22,6 +23,7 @@ function useFetchQuery(
         const error = {
           problem: response.problem,
           message: response.data,
+          status: response.status,
         };
         throw error;
       }
@@ -48,10 +50,14 @@ interface PaginatedResponse<T> {
 function usePaginatedInfiniteQuery<T>(
   endpoint: string,
   key: string,
-  params: object = {}
+  params: object = {},
+
+  options?: UseQueryOptions
 ) {
   const query = useInfiniteQuery<PaginatedResponse<T>>({
     queryKey: [key, params],
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     queryFn: async ({ pageParam = 1 }) => {
       const response: ApiResponse<PaginatedResponse<T>> = await apiClient.get(
         endpoint,
@@ -67,6 +73,7 @@ function usePaginatedInfiniteQuery<T>(
         throw {
           problem: response.problem,
           message: response.data,
+          status: response.status,
         };
       }
     },
@@ -80,6 +87,7 @@ function usePaginatedInfiniteQuery<T>(
 
   return {
     ...query,
+
     items: query.data?.pages.flatMap((page) => page.results) ?? [],
   };
 }
@@ -130,6 +138,7 @@ function useCurrentWeather(
   const { data, isLoading, error } = useQuery<CurrentWeatherResponse, ApiError>(
     {
       queryKey: ["current-weather", location],
+      staleTime: 5 * 60 * 1000,
       queryFn: async () => {
         const response = await fetch(url, {
           method: "GET",

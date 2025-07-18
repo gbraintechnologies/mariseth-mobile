@@ -18,7 +18,7 @@ type ButtonProps = {
   loading?: boolean;
   onPress?: () => void;
   borderWidth?: number;
-  borderColor?: string;
+  borderColor?: keyof typeof colors;
   height?: number;
   width?: any;
   borderRadius?: number;
@@ -51,7 +51,7 @@ const AppButton: FC<ButtonProps> = ({
           alignItems: "center",
           borderRadius: borderRadius,
           borderWidth: borderWidth,
-          borderColor: borderColor,
+          borderColor: borderColor && colors[borderColor],
           flexDirection: "row",
           opacity: disabled ? 0.6 : 1,
         },

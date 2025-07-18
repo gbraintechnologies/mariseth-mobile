@@ -16,6 +16,7 @@ export const colors = {
   backgroundSecondary: "#27FE792B",
   backgroundTertiary: "#FAFAFAFF",
   backgroundTransparent: "#00000040",
+  backgroundActionSheet: "#F8FAFC",
 
   // Border
   borderDefault: "#64627633",
@@ -49,13 +50,21 @@ export const colors = {
   warningBackground: "",
   info: "",
   infoBackground: "",
+
+  partialText: "#2563EB",
+  partialBg: "#EFF6FF",
+  overdueText: "#DC2626",
+  overdueBg: "#FEF2F2",
+  activeText: "#D97706",
+  activeBg: "#FFFBEB",
+
   // Tab Bar
   tabBarActive: "#4A8D34",
   tabBarInactive: "#64748B",
 
   // Overlay
   overlayLight: "",
-  overlayDark: "#00000080",
+  overlayDark: "#00000010",
 
   // Utility Colors
   white: "#FFFFFF",

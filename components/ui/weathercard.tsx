@@ -170,7 +170,7 @@ const WeatherCard = () => {
           <WeatherCondition
             icon={icons.visibility}
             description={"Visibility"}
-            metric={`${data?.current?.vis_km} kmph`}
+            metric={`${data?.current?.vis_km} km`}
             marginBottom={20}
           />
 

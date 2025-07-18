@@ -1,25 +1,42 @@
+const base = "consumer/mobile";
+const authBase = `${base}/auth`;
 export const endpoints = {
   // AUTH ENDPOINTS
-  signIn: "auth/login",
-  signup: "auth/register",
-  verify: "auth/verify-phone",
-  forgotPin: "auth/forgot-password",
-  resendOtp: "auth/resend-verification-code",
-  pinSetup: "auth/setup-pin",
-  updateAccount: "auth/update-account",
-  updatePin: "auth/update-pin",
-  logout: "auth/logout",
-  resetPin: "auth/reset-password",
+  signIn: `${authBase}/login`,
+  signup: `${authBase}/register`,
+  verify: `${authBase}/verify-phone`,
+  forgotPin: `${authBase}/forgot-password`,
+  resendOtp: `${authBase}/resend-verification-code`,
+  pinSetup: `${authBase}/setup-pin`,
+  updateAccount: `${authBase}/update-account`,
+  updatePin: `${authBase}/update-pin`,
+  logout: `${authBase}/logout`,
+  resetPin: `${authBase}/reset-password`,
+  updateMyFarmer: `${authBase}/update-my-farmer`,
+  getMyFamer: `${authBase}/me`,
 
   // CREDITS ENDPOINTS
-  activeCredit: "credit/active-credit",
-  creditHistory: "credit/credit-history",
-  paybackHistory: "credit/payback-history",
+  applyCredit: `${base}/credit/apply-for-credit`,
+  activeCredit: `${base}/credit/active-credit`,
+  creditHistory: `${base}/credit/credit-history`,
+  paybackHistory: `${base}/credit/payback-history`,
 
   // FARMS ENDPOINTS
-  myFarm: "farm/my-farm",
+  myFarm: `${base}/farm/my-farm`,
+
+  farmproducts: `${base}/farm/get-products`,
 
   // LEAD FARMER FARMS ENDPOINTS
-  leadFarmersFarms: "lead-farmer/farms",
-  myFarmers: "lead-farmer/smallholders",
+  leadFarmersFarms: `${base}/lead-farmer/farms`,
+  editMyFarmDetails: `${base}/lead-farmer/edit-farm`,
+  addNewFarm: `${base}/lead-farmer/add-new-farm`,
+  addNewFarmer: `${base}/lead-farmer/add-new-farmer`,
+
+  myFarmers: `${base}/lead-farmer/smallholders`,
+
+  // CUSTOM TYPES
+  customType: `custom-type`,
+
+  // REGIONS
+  regions: `regions`,
 };

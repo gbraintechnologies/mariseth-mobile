@@ -10,7 +10,14 @@ export default function MoreLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="changepin" options={headerHandler("Change Pin")} />
-      <Stack.Screen name="profileedit" options={{}} />
+      <Stack.Screen
+        name="profileedit"
+        options={headerHandler("Edit My Information")}
+      />
+      <Stack.Screen
+        name="leadershipinfoedit"
+        options={headerHandler("Edit Leadership & Experience")}
+      />
     </Stack>
   );
 }

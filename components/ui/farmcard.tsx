@@ -1,4 +1,6 @@
 import { colors } from "@/constants/colors";
+import { getColorForItem } from "@/utils/commonmethods";
+import { differenceInDays, parseISO } from "date-fns";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
@@ -6,6 +8,9 @@ interface farmCard {
   item?: any;
 }
 const FarmCard: React.FC<farmCard> = ({ item }) => {
+  const dateCreated = item?.date_created;
+  const isLessThanTwoWeeks =
+    differenceInDays(new Date(), parseISO(dateCreated)) < 14;
   return (
     <View style={styles.farmCardContainer}>
       <View style={styles.farmCardInfoContainer}>
@@ -15,7 +20,11 @@ const FarmCard: React.FC<farmCard> = ({ item }) => {
           color="textBold"
           style={{ marginBottom: 6 }}
         >
-          {`${item?.name} (${item?.owner})`}
+          {`${item?.name}${
+            item?.farmer?.first_name
+              ? ` (${item.farmer.first_name} ${item.farmer.last_name ?? ""})`
+              : ""
+          }`}
         </AppText>
 
         <View style={{ flexDirection: "row" }}>
@@ -25,31 +34,35 @@ const FarmCard: React.FC<farmCard> = ({ item }) => {
             color="textPrimary"
             style={{}}
           >
-            {"GPS " + item?.gps} .
+            {"GPS " + item?.location} .
           </AppText>
 
           <AppText fontFamily="Medium" fontSize={13} color="primary">
-            {`${item?.region}`}
+            {`${item?.region?.name ?? ""}`}
           </AppText>
         </View>
         <View style={styles.farmCropsContainer}>
-          {item?.crops.slice(0, 2).map((item: any, index: number) => (
-            <View
-              key={index}
-              style={[
-                styles.farmCropContainer,
-                { backgroundColor: item?.bgColor },
-              ]}
-            >
-              <AppText
-                fontFamily="SemiBold"
-                fontSize={10}
-                style={{ color: item?.textColor }}
-              >
-                {item?.name}
-              </AppText>
-            </View>
-          ))}
+          {item?.crops &&
+            item?.crops.slice(0, 2).map((item: any, index: number) => {
+              const { bgColor, textColor } = getColorForItem(item.product.name);
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.farmCropContainer,
+                    { backgroundColor: bgColor },
+                  ]}
+                >
+                  <AppText
+                    fontFamily="SemiBold"
+                    fontSize={10}
+                    style={{ color: textColor }}
+                  >
+                    {item?.product?.name}
+                  </AppText>
+                </View>
+              );
+            })}
 
           {item?.crops?.length > 3 && (
             <View
@@ -66,7 +79,7 @@ const FarmCard: React.FC<farmCard> = ({ item }) => {
         </View>
       </View>
 
-      {item?.status === "New" && (
+      {isLessThanTwoWeeks && (
         <View style={styles.farmCardStatusContainer}>
           <AppText fontFamily="Medium" fontSize={10} color="primary">
             New

@@ -8,11 +8,8 @@ import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
 import useAuthMutation from "@/hooks/usemutation";
 import { authStyles } from "@/styles/auth";
-import {
-  dataDecoder,
-  dataEncoder,
-  handleAuthApiError,
-} from "@/utils/commonmethods";
+import { handleAuthApiError } from "@/utils/apierrorhandler";
+import { dataDecoder, dataEncoder } from "@/utils/commonmethods";
 import { otpverificationSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";

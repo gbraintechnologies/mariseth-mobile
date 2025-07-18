@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import AppText from "./apptext";
-interface infoCard {
+interface infoCardProps {
   headerVisibility?: boolean;
   info: {
     headerTitle?: string;
@@ -13,7 +13,10 @@ interface infoCard {
     information: Array<{ key: string; value: string }>;
   };
 }
-const InfoCard: React.FC<infoCard> = ({ info, headerVisibility = true }) => {
+const InfoCard: React.FC<infoCardProps> = ({
+  info,
+  headerVisibility = true,
+}) => {
   return (
     <View style={styles.infoCardContainer}>
       {headerVisibility && (

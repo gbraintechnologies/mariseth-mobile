@@ -1,6 +1,13 @@
+import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
+import {
+  useFetchQuery,
+  usePaginatedInfiniteQuery,
+} from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
+import { useUniversalStore } from "@/stores/useuniversalstore";
 import { tabbarScreenOptions, tabScreenOptions } from "@/utils/layoutmethods";
+import { UseQueryOptions } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
@@ -12,8 +19,77 @@ const handleTabPress = async () => {
 };
 export default function TabsLayout() {
   const user = useStore(userStore, (state) => state.user);
+  const enabled = useStore(useUniversalStore, (state) => state.enabled);
+
   const isLeaderFarmer = user?.farmer?.type === "lead";
 
+  const regions = userStore((state) => state.regions);
+  const { data } = useFetchQuery(endpoints.regions, "regions", {
+    enabled: !regions?.length,
+  } as UseQueryOptions);
+
+  React.useEffect(() => {
+    if (data?.results) {
+      // console.log(JSON.stringify(data?.results));
+      userStore.setState({ regions: data?.results });
+    }
+  }, [data]);
+
+  const { data: userData } = useFetchQuery(endpoints.getMyFamer, "getprofile", {
+    enabled: enabled,
+  } as UseQueryOptions);
+  React.useEffect(() => {
+    if (userData) {
+      // console.log(JSON.stringify(userData));
+      userStore.setState({ user: userData });
+    }
+  }, [userData]);
+
+  const { items } = usePaginatedInfiniteQuery<any>(
+    endpoints.customType,
+    "custom-type",
+    {
+      page_size: 30,
+      query: "",
+    }
+  );
+  React.useEffect(() => {
+    if (items) {
+      userStore.setState({ metrics: items });
+    }
+  }, [items]);
+
+  const { items: products } = usePaginatedInfiniteQuery<any>(
+    endpoints.farmproducts,
+    "farm-products",
+    {
+      page_size: 30,
+      query: "",
+    }
+  );
+
+  React.useEffect(() => {
+    if (products) {
+      // console.log(JSON.stringify(products));
+      userStore.setState({ farmProducts: products });
+    }
+  }, [products]);
+
+  const { items: farms } = usePaginatedInfiniteQuery<any>(
+    endpoints.leadFarmersFarms,
+    "leadfarmersfarms",
+    {
+      page_size: 10,
+      query: "",
+    }
+  );
+
+  React.useEffect(() => {
+    if (farms) {
+      // console.log(JSON.stringify(farms));
+      userStore.setState({ farms: farms });
+    }
+  }, [farms]);
   function listener() {
     return {
       tabPress: async (e: any) => {
