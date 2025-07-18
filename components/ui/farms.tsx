@@ -69,6 +69,7 @@ const Farms = () => {
       /> */}
       <CustomList
         data={items}
+        bounces={false}
         fetchNextPage={fetchNextPage}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}

@@ -82,6 +82,7 @@ const SmallFarmers: React.FC<smallFarmersProps> = ({
 
       <CustomList
         data={data}
+        bounces={false}
         fetchNextPage={fetchNextPage}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}

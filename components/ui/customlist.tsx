@@ -26,6 +26,7 @@ interface customListprops<T> {
   contentContainerStyle?: ContentStyle;
   ListHeaderComponent?: React.ReactElement;
   style?: StyleProp<ViewStyle>;
+  bounces?: boolean;
 }
 const CustomList: React.FC<customListprops<any>> = ({
   data,
@@ -39,6 +40,7 @@ const CustomList: React.FC<customListprops<any>> = ({
   contentContainerStyle,
   ListHeaderComponent,
   style,
+  bounces = true,
 }) => {
   const RenderFooter = ({ type }: { type: types }) => {
     const types = {
@@ -77,6 +79,7 @@ const CustomList: React.FC<customListprops<any>> = ({
     <FlashList
       data={data}
       style={style}
+      bounces={bounces}
       contentContainerStyle={contentContainerStyle}
       ListHeaderComponent={ListHeaderComponent}
       keyExtractor={(item, index) => index.toString()}

@@ -16,9 +16,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const More = () => {
   const topInset = useSafeAreaInsets().top;
   const user = userStore((state) => state.user);
+  const logoutModalVisible = useUniversalStore(
+    (state) => state.logoutModalVisible
+  );
   return (
     <>
-      <LogoutModal />
+      {logoutModalVisible && <LogoutModal />}
       <View
         style={[
           styles.moreContainer,

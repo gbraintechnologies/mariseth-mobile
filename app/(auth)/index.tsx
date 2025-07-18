@@ -27,7 +27,7 @@ const Index = () => {
       >
         <BlurView
           intensity={isIOS ? 40 : 80}
-          tint="dark"
+          tint={isIOS ? "light" : "dark"}
           // experimentalBlurMethod="dimezisBlurView"
           style={authStyles.blur}
         >

@@ -115,8 +115,8 @@ export default function TabsLayout() {
               tabBarBackground: () =>
                 isIOS && (
                   <BlurView
-                    tint="systemChromeMaterial"
-                    intensity={60}
+                    tint="systemChromeMaterialLight"
+                    intensity={40}
                     style={StyleSheet.absoluteFill}
                   />
                 ),
