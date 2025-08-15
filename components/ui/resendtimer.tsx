@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
-
-import { useToast } from "react-native-toast-notifications";
-
 import { endpoints } from "@/constants/endpoints";
 import useAuthMutation from "@/hooks/usemutation";
-import { handleAuthApiError } from "@/utils/commonmethods";
+import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { FormikProps } from "formik";
+import React, { useEffect, useState } from "react";
+import { Pressable, StyleSheet } from "react-native";
+import { useToast } from "react-native-toast-notifications";
 import AppText from "./apptext";
 
 interface ResendTimerProps {

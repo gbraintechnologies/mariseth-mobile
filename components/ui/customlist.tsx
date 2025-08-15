@@ -102,6 +102,7 @@ const CustomList: React.FC<customListprops<any>> = ({
           refreshing={isRefetching}
           onRefresh={refetch}
           colors={[colors.primary]}
+          tintColor={colors.primary}
         />
       }
     />

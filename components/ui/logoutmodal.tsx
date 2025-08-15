@@ -45,7 +45,16 @@ const LogoutModal = React.memo(() => {
     {
       onSuccess: (data) => {
         console.log("LOGOUT", data);
-        userStore.setState({ user: null });
+        userStore.setState({
+          user: null,
+          notifications: [],
+          unreadNotificationCount: 0,
+          fcmToken: "",
+          metrics: [],
+          regions: [],
+          farmProducts: [],
+          farms: [],
+        });
         useUniversalStore.setState({ logoutModalVisible: false });
         router.replace(`/(auth)`);
       },
