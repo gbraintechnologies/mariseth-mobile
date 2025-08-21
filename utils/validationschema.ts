@@ -184,7 +184,7 @@ export const applyCreditSchema = yup.object().shape({
     .matches(/^\d+$/, "Quantity must be a number"),
   due_date: yup.string().required("Due Date is required"),
   credit_amount: yup.string().required("Credit Amount is required"),
-  interest_rate: yup.string().required("Interest Rate is required"),
+  interest_rate: yup.string(),
   notes: yup.string(),
   quantity_metric: yup.string(),
 });

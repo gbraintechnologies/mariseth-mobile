@@ -258,7 +258,7 @@ const ApplyCredit = () => {
               ? colors.backgroundTertiary
               : colors.backgroundPrimary,
           }}
-          required
+          // required
           value={formik.values.interest_rate}
           autoCapitalize="none"
           autoCorrect={false}
