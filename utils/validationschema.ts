@@ -176,17 +176,22 @@ export const leadershipExperienceEditSchema = yup.object().shape({
 });
 
 export const applyCreditSchema = yup.object().shape({
-  input_credits: yup.string().required("Input Credits is required"),
-  type: yup.string().required("Type is required"),
+  // input_credits: yup.string().required("Input Credits is required"),
+  // type: yup.string().required("Type is required"),
   quantity: yup
     .string()
     .required("Quantity is required")
     .matches(/^\d+$/, "Quantity must be a number"),
-  due_date: yup.string().required("Due Date is required"),
-  credit_amount: yup.string().required("Credit Amount is required"),
-  interest_rate: yup.string(),
+  // due_date: yup.string().required("Due Date is required"),
+  // credit_amount: yup.string().required("Credit Amount is required"),
+  // interest_rate: yup.string(),
   notes: yup.string(),
   quantity_metric: yup.string(),
+
+  input_credit_category: yup
+    .string()
+    .required("Input Credit Category is required"),
+  input_credit: yup.string().required("Input Credit is required"),
 });
 
 export const adddFarmerSchema = yup.object().shape({

@@ -1,14 +1,20 @@
-type region = {
-  code: string;
-  id: number;
-  name: string;
-};
+// type region = {
+//   code: string;
+//   id: number;
+//   name: string;
+// };
 
 type district = {
   id: number;
   name: string;
 };
 
+export interface region {
+  id: number;
+  name: string;
+  code: string;
+  districts: district[];
+}
 type createdBy = {
   avatar: string | null;
   date_created: string;
@@ -184,3 +190,12 @@ type leadFarmer = {
 };
 
 export type user = smallFarmer | leadFarmer;
+
+export type metrics = {
+  category_name: string;
+  category_type: string;
+  description: string | null;
+  id: number;
+  is_default: boolean;
+  name: string;
+}[];

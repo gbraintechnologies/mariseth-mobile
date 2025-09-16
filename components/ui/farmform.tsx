@@ -107,7 +107,7 @@ const FarmForm: React.FC<farmFormProps> = ({
         /> */}
         <RegionSelector
           label="Region"
-          placeholder="Select a region"
+          placeholder="Select region"
           data={regions}
           field="region"
           formik={formik}

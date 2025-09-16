@@ -1,3 +1,4 @@
+import { HapticTab } from "@/components/ui/haptictab";
 import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
 import {
@@ -9,14 +10,13 @@ import { useUniversalStore } from "@/stores/useuniversalstore";
 import { tabbarScreenOptions, tabScreenOptions } from "@/utils/layoutmethods";
 import { UseQueryOptions } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
-import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useStore } from "zustand";
-const handleTabPress = async () => {
-  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-};
+// const handleTabPress = async () => {
+//   await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+// };
 export default function TabsLayout() {
   const user = useStore(userStore, (state) => state.user);
   const enabled = useStore(useUniversalStore, (state) => state.enabled);
@@ -49,7 +49,7 @@ export default function TabsLayout() {
     endpoints.customType,
     "custom-type",
     {
-      page_size: 30,
+      page_size: 50,
       query: "",
     }
   );
@@ -63,7 +63,7 @@ export default function TabsLayout() {
     endpoints.farmproducts,
     "farm-products",
     {
-      page_size: 30,
+      page_size: 50,
       query: "",
     }
   );
@@ -90,14 +90,30 @@ export default function TabsLayout() {
       userStore.setState({ farms: farms });
     }
   }, [farms]);
-  function listener() {
-    return {
-      tabPress: async (e: any) => {
-        await handleTabPress();
-        e.preventDefault();
-      },
-    };
-  }
+
+  const { items: inputCredits } = usePaginatedInfiniteQuery<any>(
+    endpoints.inputCredits,
+    "input-credits-list",
+    {
+      page_size: 50,
+      query: "",
+    }
+  );
+  React.useEffect(() => {
+    if (inputCredits) {
+      // console.log(inputCredits);
+      userStore.setState({ inputCredits: inputCredits });
+    }
+  }, [items]);
+
+  // function listener() {
+  //   return {
+  //     tabPress: async (e: any) => {
+  //       await handleTabPress();
+  //       e.preventDefault();
+  //     },
+  //   };
+  // }
 
   return (
     <Tabs
@@ -105,7 +121,7 @@ export default function TabsLayout() {
       screenOptions={{
         ...tabbarScreenOptions(),
         animation: "none",
-        // tabBarButton: HapticTab,
+        tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
           ios: { position: "absolute" },
           default: {},
@@ -127,17 +143,17 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={tabScreenOptions("Home")}
-        listeners={listener()}
+        // listeners={listener()}
       />
       <Tabs.Screen
         name="credits"
         options={tabScreenOptions("Credits")}
-        listeners={listener()}
+        // listeners={listener()}
       />
       <Tabs.Screen
         name="myfarm"
         options={tabScreenOptions("My Farm")}
-        listeners={listener()}
+        // listeners={listener()}
       />
       <Tabs.Screen
         name="myfarmers"
@@ -145,12 +161,12 @@ export default function TabsLayout() {
           ...tabScreenOptions("My Farmers"),
           ...(isLeaderFarmer ? {} : { href: null }),
         }}
-        listeners={listener()}
+        // listeners={listener()}
       />
       <Tabs.Screen
         name="more"
         options={tabScreenOptions("More")}
-        listeners={listener()}
+        // listeners={listener()}
       />
     </Tabs>
   );

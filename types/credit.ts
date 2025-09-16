@@ -16,3 +16,43 @@ export interface credit {
   issue_date: string | null;
   days_overdue: number;
 }
+
+type category = {
+  id: number;
+  name: string;
+  category_name: string;
+  description: string;
+  category_type: string;
+  is_default: boolean;
+};
+
+type createdBy = {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  gender: string;
+  phone_number: string;
+  user_type: string;
+};
+
+export type inputCredit = {
+  id: number;
+  input_credit_id: string;
+  category: category;
+  name: string;
+  price: string;
+  weight: number;
+  quantity: number;
+  date_created: string;
+  created_by: createdBy;
+};
+
+export type inputCreditCategory = {
+  id: number;
+  name: string;
+  category_name: string;
+  description: string;
+  category_type: string;
+  is_default: boolean;
+};

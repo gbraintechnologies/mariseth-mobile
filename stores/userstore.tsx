@@ -1,5 +1,6 @@
+import { inputCredit } from "@/types/credit";
 import { farmProduct } from "@/types/farm";
-import { user } from "@/types/user";
+import { metrics, region, user } from "@/types/user";
 import { MMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -10,27 +11,6 @@ const storage = new MMKV({
   id: "auth-storage",
   encryptionKey: key,
 });
-
-type metrics = {
-  category_name: string;
-  category_type: string;
-  description: string | null;
-  id: number;
-  is_default: boolean;
-  name: string;
-}[];
-
-interface district {
-  id: number;
-  name: string;
-}
-
-interface region {
-  id: number;
-  name: string;
-  code: string;
-  districts: district[];
-}
 
 export interface userStoreProps {
   user: user | null;
@@ -43,6 +23,7 @@ export interface userStoreProps {
   regions: region[];
   farmProducts: farmProduct[];
   farms: any[];
+  inputCredits: inputCredit[];
 }
 
 const zustandStorage = {
@@ -70,6 +51,7 @@ export const userStore = create(
       regions: [],
       farmProducts: [],
       farms: [],
+      inputCredits: [],
     }),
     {
       name: "auth-storage",

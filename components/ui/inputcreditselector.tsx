@@ -2,7 +2,7 @@ import { colors } from "@/constants/colors";
 import { largeScreen } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
 import { useUniversalStore } from "@/stores/useuniversalstore";
-import { myFarm1 } from "@/types/farm";
+import { inputCredit, inputCreditCategory } from "@/types/credit";
 import { Image } from "expo-image";
 import { FormikProps } from "formik";
 import React from "react";
@@ -10,23 +10,16 @@ import { Pressable, StyleSheet, TouchableHighlight, View } from "react-native";
 import AppText from "./apptext";
 import ModalSelector from "./modalselector";
 
-interface region {
-  id: number;
-  name: string;
-  code: string;
-  districts: { id: number; name: string }[];
-}
-
-interface regionSelectorProps {
+interface inputCreditSelectorProps {
   label: string;
   placeholder: string;
-  data: region[] | region["districts"] | myFarm1[];
+  data: inputCredit[] | inputCreditCategory[];
   field: string;
   formik: FormikProps<any>;
   value: number | string;
 }
 
-const RegionSelector: React.FC<regionSelectorProps> = ({
+const InputCreditSelector: React.FC<inputCreditSelectorProps> = ({
   label,
   placeholder,
   data,
@@ -48,17 +41,17 @@ const RegionSelector: React.FC<regionSelectorProps> = ({
     }));
   };
 
-  const handleRegionSelect = (regionId: number) => {
-    formik.setFieldValue(field, regionId);
-    if (field === "region") {
-      formik.setFieldValue("district", "");
+  const handleSelection = (item: number) => {
+    formik.setFieldValue(field, item);
+    if (field === "input_credit_category") {
+      formik.setFieldValue("input_credit", "");
     }
     handleVisibility(false);
   };
 
   const selectedItem = React.useMemo(() => {
-    return data.find(
-      (item: region | { id: number; name: string } | myFarm1) =>
+    return data?.find(
+      (item: inputCredit | inputCreditCategory) =>
         item.id === formik.values[field]
     );
   }, [formik.values[field], data]);
@@ -86,7 +79,7 @@ const RegionSelector: React.FC<regionSelectorProps> = ({
                   backgroundColor: colors.buttonActionSheet,
                 },
               ]}
-              onPress={() => handleRegionSelect(item.id)}
+              onPress={() => handleSelection(item.id)}
             >
               <AppText
                 fontFamily="Medium"
@@ -167,7 +160,7 @@ const RegionSelector: React.FC<regionSelectorProps> = ({
   );
 };
 
-export default RegionSelector;
+export default InputCreditSelector;
 
 const styles = StyleSheet.create({
   selectButton: {

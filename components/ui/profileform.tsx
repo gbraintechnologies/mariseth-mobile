@@ -248,7 +248,7 @@ const ProfileForm: React.FC<profileFormProps> = ({
 
         <RegionSelector
           label="Region"
-          placeholder="Select a region"
+          placeholder="Select region"
           data={regions}
           field="region"
           formik={formik}
@@ -299,7 +299,7 @@ const ProfileForm: React.FC<profileFormProps> = ({
 
             <RegionSelector
               label="Select Farm Here"
-              placeholder="Select a farm"
+              placeholder="Select farm"
               data={farms}
               field="farm"
               formik={formik}

@@ -1,14 +1,13 @@
 import AppButton from "@/components/ui/appbutton";
-import AppDatePicker from "@/components/ui/appdatepicker";
-import AppText from "@/components/ui/apptext";
 import AppTextInput from "@/components/ui/apptextinput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
+import InputCreditSelector from "@/components/ui/inputcreditselector";
 import MetricSelector from "@/components/ui/metricselector";
-import SelectModal from "@/components/ui/selectmodal";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
+import { inputCredit, inputCreditCategory } from "@/types/credit";
 import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { handleToastShow } from "@/utils/commonmethods";
 import { applyCreditSchema } from "@/utils/validationschema";
@@ -21,12 +20,21 @@ import { StyleSheet, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "react-native-toast-notifications";
+import { useStore } from "zustand";
 
 const ApplyCredit = () => {
   const metrics = userStore.getState().metrics;
   const quantityMetrics = metrics.filter(
     (metric) => metric.category_name === "quantity_metric"
   );
+  const inputCredits = useStore(userStore, (state) => state.inputCredits);
+
+  const creditCategories = (metrics.filter(
+    (category) => category.category_name === "input_credits_category"
+  ) || []) as inputCreditCategory[];
+
+  // console.log(creditCategories);
+
   const bottomInset = useSafeAreaInsets().bottom;
   // const isLoading = false;
   const toast = useToast();
@@ -55,24 +63,44 @@ const ApplyCredit = () => {
   );
   const formik = useFormik({
     initialValues: {
-      input_credits: "",
-      type: "",
+      // input_credits: "",
+      // type: "",
+      input_credit_category: "",
+      input_credit: "",
       quantity: "",
-      due_date: "",
-      credit_amount: "",
-      interest_rate: "",
+      // due_date: "",
+      // credit_amount: "",
+      // interest_rate: "",
       notes: "",
       quantity_metric: quantityMetrics[0]?.id,
     },
     validationSchema: applyCreditSchema,
     onSubmit: async (values) => {
+      // const { interest_rate, ...rest } = values;
+      // const payload = {
+      //   ...rest,
+      //   type: values.type.toLowerCase(),
+      //   ...(interest_rate ? { interest_rate } : {}),
+      // };
+      // console.log(payload);
       console.log(values);
-      values.type = values.type.toLowerCase();
+
       mutate(values);
     },
   });
   const today = startOfDay(new Date());
   const tomorrow = addDays(today, 1);
+
+  const inputCreditsArray = React.useMemo(
+    () =>
+      inputCredits.filter(
+        (credit) =>
+          Number(credit?.category.id) ===
+          Number(formik.values.input_credit_category)
+      ) || [],
+    [formik.values.input_credit_category]
+  ) as inputCredit[];
+
   return (
     <>
       <KeyboardAwareScrollView
@@ -87,7 +115,36 @@ const ApplyCredit = () => {
           paddingBottom: 150,
         }}
       >
-        <AppTextInput
+        <InputCreditSelector
+          label={"Input Credit Category"}
+          placeholder={"Select"}
+          data={creditCategories}
+          field={"input_credit_category"}
+          formik={formik}
+          value={formik.values.input_credit_category}
+        />
+        <FormErrorMessage
+          error={
+            (formik.touched.input_credit_category &&
+              formik.errors.input_credit_category) as string
+          }
+        />
+
+        <InputCreditSelector
+          label={"Input Credit"}
+          placeholder={"Select"}
+          data={inputCreditsArray}
+          field={"input_credit"}
+          formik={formik}
+          value={formik.values.input_credit}
+        />
+        <FormErrorMessage
+          error={
+            (formik.touched.input_credit &&
+              formik.errors.input_credit) as string
+          }
+        />
+        {/* <AppTextInput
           error={formik.touched.input_credits && formik.errors.input_credits}
           label="Input Credits"
           style={{
@@ -110,7 +167,7 @@ const ApplyCredit = () => {
             (formik.touched.input_credits &&
               formik.errors.input_credits) as string
           }
-        />
+        /> */}
         {/* <SelectModal
           label={"Input Credits"}
           placeholder={"Select"}
@@ -152,7 +209,7 @@ const ApplyCredit = () => {
           error={(formik.touched.type && formik.errors.type) as string}
         /> */}
 
-        <SelectModal
+        {/* <SelectModal
           label={"Type"}
           placeholder={"Select"}
           data={[
@@ -167,7 +224,7 @@ const ApplyCredit = () => {
         />
         <FormErrorMessage
           error={(formik.touched.type && formik.errors.type) as string}
-        />
+        /> */}
         <AppTextInput
           error={formik.touched.quantity && formik.errors.quantity}
           label="Quantity"
@@ -199,7 +256,7 @@ const ApplyCredit = () => {
           error={(formik.touched.quantity && formik.errors.quantity) as string}
         />
 
-        <AppDatePicker
+        {/* <AppDatePicker
           formik={formik}
           label="Due Date"
           field="due_date"
@@ -283,7 +340,7 @@ const ApplyCredit = () => {
             (formik.touched.interest_rate &&
               formik.errors.interest_rate) as string
           }
-        />
+        /> */}
 
         <AppTextInput
           error={formik.touched.notes && formik.errors.notes}

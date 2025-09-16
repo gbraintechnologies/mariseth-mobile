@@ -20,6 +20,7 @@ export const endpoints = {
   activeCredit: `${base}/credit/active-credit`,
   creditHistory: `${base}/credit/credit-history`,
   paybackHistory: `${base}/credit/payback-history`,
+  inputCredits: `${base}/credit/list-input-credits`,
 
   // FARMS ENDPOINTS
   myFarm: `${base}/farm/my-farm`,
