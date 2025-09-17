@@ -14,9 +14,11 @@ type ErrorType =
 const ErrorComponent = ({
   type,
   refetch,
+  message,
 }: {
   type: ErrorType;
   refetch: () => void;
+  message?: string;
 }) => {
   const types: Record<
     ErrorType,
@@ -68,9 +70,10 @@ const ErrorComponent = ({
     },
 
     CLIENT_ERROR: {
-      title: "Connection Lost",
-      subtitle:
-        "Something went wrong while trying to connect to the server. Please check your internet connection and  try again.",
+      title: "Error",
+      subtitle: message
+        ? message
+        : "Something went wrong while trying to connect to the server.Try again later.",
       btnTitle: "Retry",
       btnAction: () => {
         refetch();

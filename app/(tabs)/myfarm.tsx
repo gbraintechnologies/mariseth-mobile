@@ -29,13 +29,15 @@ const MyFarm = () => {
   );
   const queryClient = useQueryClient();
   if (isLoading) return <MyFarmSP />;
-  if (error)
+  if (error) {
     return (
       <ErrorComponent
         type={(error as any)?.problem}
+        message={(error as any)?.message?.detail}
         refetch={() => queryClient.invalidateQueries({ queryKey: ["myfarm"] })}
       />
     );
+  }
 
   return (
     <ScrollView
