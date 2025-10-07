@@ -19,7 +19,7 @@ const CreditActionSheet: React.FC<creditActionSheetProps> = ({
   const creditInfo = [
     {
       key: "Input Credit",
-      value: item?.input_credits ?? "N/A",
+      value: item?.input_credit ?? "N/A",
     },
     {
       key: "Total amount",
@@ -57,7 +57,7 @@ const CreditActionSheet: React.FC<creditActionSheetProps> = ({
             style={{
               height: 24,
               width: 24,
-              tintColor: colors[statusTypes[item?.payment_status]?.textColor],
+              tintColor: colors[statusTypes[item?.approval_status]?.textColor],
             }}
             contentFit="contain"
           />
@@ -68,15 +68,15 @@ const CreditActionSheet: React.FC<creditActionSheetProps> = ({
               fontFamily="SemiBold"
               style={{ marginBottom: 4 }}
             >
-              {`${statusTypes[item?.payment_status]?.text} Credit`}
+              {`${statusTypes[item?.approval_status]?.text ?? ""} Credit`}
             </AppText>
             <AppText
               fontSize={10}
-              color={statusTypes[item?.payment_status]?.textColor}
+              color={statusTypes[item?.approval_status]?.textColor}
               fontFamily="Medium"
               style={{ marginBottom: 6 }}
             >
-              {`due ${dueDate}`}
+              {`due - ${dueDate}`}
             </AppText>
           </View>
         </View>

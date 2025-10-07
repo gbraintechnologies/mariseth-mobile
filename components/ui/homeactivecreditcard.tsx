@@ -41,6 +41,8 @@ const HomeActiveCreditCard = () => {
   if (data) {
     const dueDate = dueDateFormat(data?.due_date);
 
+    // console.log("Active Credit", data);
+
     return (
       <View
         style={{ paddingHorizontal: 16, marginTop: isLeaderFarmer ? 0 : 32 }}

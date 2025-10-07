@@ -186,7 +186,7 @@ const ProfileForm: React.FC<profileFormProps> = ({
               ? colors.backgroundTertiary
               : colors.backgroundPrimary,
           }}
-          required
+          // required
           textContentType="emailAddress"
           autoCapitalize="none"
           value={formik.values.email}

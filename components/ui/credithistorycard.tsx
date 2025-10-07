@@ -30,7 +30,7 @@ const CreditHistoryCard: React.FC<creditHistoryCard> = ({ item }) => {
             color="textBold"
             style={{ marginBottom: 10 }}
           >
-            {item?.input_credits}
+            {item?.input_credit}
           </AppText>
           <View style={{ flexDirection: "row" }}>
             <AppText
@@ -51,16 +51,16 @@ const CreditHistoryCard: React.FC<creditHistoryCard> = ({ item }) => {
           style={[
             styles.creditHistoryStatusContainer,
             {
-              backgroundColor: statusTypes[item?.payment_status]?.bgColor,
+              backgroundColor: statusTypes[item?.approval_status]?.bgColor,
             },
           ]}
         >
           <AppText
             fontFamily="Medium"
             fontSize={10}
-            color={statusTypes[item?.payment_status]?.textColor}
+            color={statusTypes[item?.approval_status]?.textColor}
           >
-            {statusTypes[item?.payment_status]?.text}
+            {statusTypes[item?.approval_status]?.text}
           </AppText>
         </View>
       </Pressable>

@@ -217,27 +217,46 @@ export const statusTypes: Record<
   string,
   { text: string; textColor: keyof typeof colors; bgColor: string }
 > = {
-  paid: {
-    text: "Paid",
+  //  | "pending" | "denied"
+
+  // paid: {
+  //   text: "Paid",
+  //   textColor: "primary",
+  //   bgColor: colors.secondaryLight,
+  // },
+  approved: {
+    text: "Approved",
     textColor: "primary",
     bgColor: colors.secondaryLight,
   },
-  partial: {
-    text: "Partial",
+  // partial: {
+  //   text: "Partial",
+  //   textColor: "partialText",
+  //   bgColor: colors.partialBg,
+  // },
+
+  pending: {
+    text: "Pending",
     textColor: "partialText",
     bgColor: colors.partialBg,
   },
-  overdue: {
-    text: "Overdue",
+  // overdue: {
+  //   text: "Overdue",
+  //   textColor: "overdueText",
+  //   bgColor: colors.overdueBg,
+  // },
+
+  denied: {
+    text: "Denied",
     textColor: "overdueText",
     bgColor: colors.overdueBg,
   },
 
-  active: {
-    text: "Active",
-    textColor: "activeText",
-    bgColor: colors.activeBg,
-  },
+  // active: {
+  //   text: "Active",
+  //   textColor: "activeText",
+  //   bgColor: colors.activeBg,
+  // },
 };
 
 export const yesNoOptions = [

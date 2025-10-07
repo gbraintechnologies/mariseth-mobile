@@ -2,12 +2,15 @@ import ActiveCreditCard from "@/components/ui/activecreditcard";
 import CreditHistoryCard from "@/components/ui/credithistorycard";
 import CustomList from "@/components/ui/customlist";
 import ErrorComponent from "@/components/ui/errorcomponent";
+import FloatingButton from "@/components/ui/floatingbutton";
 import SectionHeader from "@/components/ui/sectionheader";
 import CreditsSP from "@/components/ui/skeletonplaceholders/credits";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
+import { icons } from "@/constants/icons";
 import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
+import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -77,12 +80,12 @@ const Credits = () => {
         />
       </View>
 
-      {/* <FloatingButton
-        icon={icons.card}
+      <FloatingButton
+        icon={icons.cardAdd}
         onPress={() => {
-          console.log("card");
+          router.navigate("/credits/applycredit");
         }}
-      /> */}
+      />
     </>
   );
 };

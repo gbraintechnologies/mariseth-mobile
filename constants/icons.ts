@@ -5,6 +5,8 @@ export const icons = {
   bill: require("@/assets/images/icons/bill.svg"),
 
   card: require("@/assets/images/icons/card.svg"),
+  cardAdd: require("@/assets/images/icons/cardadd.svg"),
+
   credits: require("@/assets/images/icons/credits.svg"),
   dialog: require("@/assets/images/icons/dialog.svg"),
   edit: require("@/assets/images/icons/edit.svg"),

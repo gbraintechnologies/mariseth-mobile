@@ -121,10 +121,8 @@ export const profileEditSchema = yup.object().shape({
         ),
     otherwise: (schema) => schema.notRequired(),
   }),
-  email: yup
-    .string()
-    .email("Invalid email address")
-    .required("Email is required"),
+  email: yup.string().notRequired().email("Invalid email address"),
+  // .required("Email is required"),
   address: yup.string().required("Address is required"),
   village: yup.string().required("Village/Community is required"),
   district: yup.string().required("District is required"),
