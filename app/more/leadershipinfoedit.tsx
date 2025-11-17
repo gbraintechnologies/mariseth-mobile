@@ -7,9 +7,11 @@ import { endpoints } from "@/constants/endpoints";
 import { yesNoOptions } from "@/constants/generalconstants";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
+import { useUniversalStore } from "@/stores/useuniversalstore";
 import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { handleToastShow } from "@/utils/commonmethods";
 import { leadershipExperienceEditSchema } from "@/utils/validationschema";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
@@ -23,17 +25,30 @@ const LeadershipInfoEdit = () => {
   const farmerLeadership = user?.farmer?.leadership_experience;
   const bottomInset = useSafeAreaInsets().bottom;
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useAuthMutation(
     endpoints.updateMyFarmer,
     "PUT",
     "updatemyfarmer",
     {
-      onSuccess: (data) => {
-        console.log(JSON.stringify(data));
-        userStore.setState({ user: data });
+      onSuccess: async (data) => {
+        // console.log(JSON.stringify(data));
+        useUniversalStore.setState({ enabled: true });
+
+        await queryClient
+          .refetchQueries({
+            queryKey: ["getprofile"],
+            type: "all",
+            exact: true,
+          })
+          .then(() => {
+            useUniversalStore.setState({ enabled: false });
+          });
+
         const toastMessage = "Updated successful!";
         handleToastShow(toast, toastMessage);
+
         setTimeout(() => {
           router.back();
         }, 2000);

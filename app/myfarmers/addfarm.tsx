@@ -14,8 +14,7 @@ import { useToast } from "react-native-toast-notifications";
 
 const AddFarm = () => {
   const toast = useToast();
-
-  const metrics = userStore.getState().metrics;
+  const metrics = userStore((state) => state.metrics);
   const sizeMetrics = metrics.filter(
     (metric) => metric.category_name === "size_metric"
   );

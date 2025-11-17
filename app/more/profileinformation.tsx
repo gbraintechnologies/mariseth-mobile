@@ -38,7 +38,7 @@ const ProfileInformation = () => {
       },
       {
         key: "Email",
-        value: user?.farmer?.email as string,
+        value: (user?.farmer?.email as string) ?? "N/A",
       },
       {
         key: "Address",

@@ -1,4 +1,4 @@
-package com.marisethfarms.app.android
+package com.marisethfarms.android
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

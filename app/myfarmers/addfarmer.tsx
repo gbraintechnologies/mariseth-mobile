@@ -1,4 +1,3 @@
-import ListEmptyComponent from "@/components/ui/listemptycomponent";
 import ProfileForm from "@/components/ui/profileform";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
@@ -6,24 +5,17 @@ import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { handleToastShow } from "@/utils/commonmethods";
-import { profileEditSchema } from "@/utils/validationschema";
+import { addFarmerSchema } from "@/utils/validationschema";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 
 const AddFarmer = () => {
   const farms = userStore((state) => state.farms);
   const regions = userStore((state) => state.regions);
-  if (farms.length < 1) {
-    return (
-      <View style={styles.emptyContainer}>
-        <ListEmptyComponent type="new_farmer" />
-      </View>
-    );
-  }
 
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -71,15 +63,17 @@ const AddFarmer = () => {
       // has_received_support: false,
       // support_assistance: {},
     },
-    validationSchema: profileEditSchema,
+    validationSchema: addFarmerSchema,
     onSubmit: async (values) => {
       const {
         name,
         type,
+
         // areas_of_needed_assistance,
         // has_received_support,
         ...cleanedValues
       } = values;
+      cleanedValues.email = (cleanedValues.email.trim() || null) as any;
       cleanedValues.phone_number = `233${cleanedValues.phone_number}`;
       const fullName = name.trim().split(" ");
       cleanedValues.first_name = fullName.shift() || "";
@@ -100,6 +94,14 @@ const AddFarmer = () => {
         ?.districts || [],
     [formik.values.region]
   );
+
+  // if (farms.length < 1) {
+  //   return (
+  //     <View style={styles.emptyContainer}>
+  //       <ListEmptyComponent type="new_farmer" />
+  //     </View>
+  //   );
+  // }
   return (
     <ProfileForm
       formik={formik}
@@ -107,6 +109,7 @@ const AddFarmer = () => {
       type="farmer"
       districts={districts}
       farms={farms}
+      required={false}
     />
   );
 };

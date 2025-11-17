@@ -37,12 +37,14 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({ item }) => {
             color="textPrimary"
             style={{}}
           >
-            {item?.phone_number} .
+            {item?.phone_number}
           </AppText>
 
-          <AppText fontFamily="Medium" fontSize={13} color="primary">
-            {` ${item?.farm?.name}`}
-          </AppText>
+          {item?.farm?.name ? (
+            <AppText fontFamily="Medium" fontSize={13} color="primary">
+              {` . ${item?.farm?.name ?? ""}`}
+            </AppText>
+          ) : null}
         </View>
       </View>
 

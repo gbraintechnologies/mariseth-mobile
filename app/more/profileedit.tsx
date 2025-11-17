@@ -27,12 +27,22 @@ const ProfileEdit = () => {
     "PUT",
     "updatemyfarmer",
     {
-      onSuccess: async () => {
+      onSuccess: async (data) => {
+        // console.log(JSON.stringify(data));
         useUniversalStore.setState({ enabled: true });
-        await queryClient.invalidateQueries({ queryKey: ["getprofile"] });
+
+        await queryClient
+          .refetchQueries({
+            queryKey: ["getprofile"],
+            type: "all",
+            exact: true,
+          })
+          .then(() => {
+            useUniversalStore.setState({ enabled: false });
+          });
         const toastMessage = "Updated successful!";
         handleToastShow(toast, toastMessage);
-        useUniversalStore.setState({ enabled: false });
+
         setTimeout(() => {
           router.back();
         }, 2000);
@@ -69,6 +79,7 @@ const ProfileEdit = () => {
     validationSchema: profileEditSchema,
     onSubmit: async (values) => {
       const { name, type, ...cleanedValues } = values;
+      cleanedValues.email = (cleanedValues.email.trim() || null) as any;
       const fullName = values.name.trim().split(" ");
       cleanedValues.first_name = fullName.shift() || "";
       cleanedValues.last_name = fullName.shift() || "";

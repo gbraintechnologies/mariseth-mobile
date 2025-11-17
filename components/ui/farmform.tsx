@@ -38,7 +38,7 @@ const FarmForm: React.FC<farmFormProps> = ({
     (product) => product.type === "crop"
   );
   const livestockProducts = farmProducts.filter(
-    (product) => product.type === "livestock"
+    (product) => product.type === "other"
   );
 
   return (
@@ -204,6 +204,7 @@ const FarmForm: React.FC<farmFormProps> = ({
           field="crops"
           formik={formik}
           value={formik.values.crops}
+          required={false}
         />
 
         <FormErrorMessage
@@ -219,12 +220,13 @@ const FarmForm: React.FC<farmFormProps> = ({
           value={formik.values.livestock}
         /> */}
         <FarmProductsSelector
-          label="Livestock Kept"
+          label="Other Products"
           placeholder="Select"
           data={livestockProducts}
           field="livestock"
           formik={formik}
           value={formik.values.livestock}
+          required={false}
         />
 
         <FormErrorMessage

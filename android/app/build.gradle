@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.marisethfarms.app.android'
+    namespace 'com.marisethfarms.android'
     defaultConfig {
-        applicationId 'com.marisethfarms.app.android'
+        applicationId 'com.marisethfarms.android'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -12,9 +12,9 @@ function useFetchQuery(
   key: string,
   options?: UseQueryOptions<any>
 ): any {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: [key],
-    staleTime: 5 * 60 * 1000,
+    // staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const response: ApiResponse<any> = await apiClient.get(endpoint);
       if (response.ok) {
@@ -31,7 +31,7 @@ function useFetchQuery(
     ...options,
   });
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch };
 }
 
 interface Pagination {

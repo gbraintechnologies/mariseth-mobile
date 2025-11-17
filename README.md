@@ -5,7 +5,7 @@
 - Go to the project's root folder and run
 
 ```bash
-npm install
+yarn install
 ```
 
 - If you are using Xcode 12.5 or higher got to /ios and execute
@@ -14,24 +14,31 @@ npm install
 pod install
 ```
 
-- Run
+- Run the app for your preferred environment
+  Available environments:
+
+  - 🧩 Development → dev
+
+  - 🚀 Production → prod
+
+Run on Expo (development server)
 
 ```bash
-npm start
+yarn start:[env]
 ```
 
 ```bash
-npm run ios
+yarn ios
 ```
 
 OR
 
 ```bash
-npm start
+yarn start:[env]
 ```
 
 ```bash
-npm  run android
+yarn android:[env]
 ```
 
 to start the application!

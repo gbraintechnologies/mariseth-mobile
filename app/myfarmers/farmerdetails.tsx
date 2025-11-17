@@ -3,7 +3,7 @@ import InfoCard from "@/components/ui/infocard";
 import { SegmentedScrollView } from "@/components/ui/segmentedview";
 import { colors } from "@/constants/colors";
 import { width } from "@/constants/generalconstants";
-import { livestockKept, myFarm } from "@/types/farm";
+import { livestockKept } from "@/types/farm";
 import { smallHolder } from "@/types/farmers";
 import { dataDecoder } from "@/utils/commonmethods";
 import { format, parseISO } from "date-fns";
@@ -14,16 +14,16 @@ import { ScrollView, StyleSheet, View } from "react-native";
 const FarmerDetails = () => {
   const params = useLocalSearchParams<{ data: string }>();
   const data: smallHolder = dataDecoder(params?.data);
-  const {
-    name: farmName,
-    location,
-    district,
-    size,
-    size_metric,
-    land_ownership,
-    livestock_kept,
-    livestock,
-  }: myFarm = data?.farm;
+  // const {
+  //   name: farmName,
+  //   location,
+  //   district,
+  //   size,
+  //   size_metric,
+  //   land_ownership,
+  //   livestock_kept,
+  //   livestock,
+  // }: myFarm = data?.farm;
 
   const farmerPersonalInformation = {
     headerTitle: "Personal Information",
@@ -49,18 +49,19 @@ const FarmerDetails = () => {
   const farmInformation = {
     headerTitle: "Farm Information",
     information: [
-      { key: "Farm Name", value: farmName || "N/A" },
-      { key: "Location", value: location || "N/A" },
-      { key: "District", value: district?.name || "N/A" },
+      { key: "Farm Name", value: data?.farm?.name || "N/A" },
+      { key: "Location", value: data?.farm?.location || "N/A" },
+      { key: "District", value: data?.farm?.district?.name || "N/A" },
       {
         key: "Total Land Size",
-        value: (size || "N/A" + size_metric || "") as string,
+        value: (data?.farm?.size ||
+          "N/A" + (data?.farm?.size_metric || "")) as string,
       },
-      { key: "Land Ownership", value: land_ownership || "N/A" },
+      { key: "Land Ownership", value: data?.farm?.land_ownership || "N/A" },
       {
         key: "Livestock Kept",
         value:
-          livestock
+          data?.farm?.livestock
             .map((item: livestockKept) => item.product.name)
             .join(", ") || "N/A",
       },

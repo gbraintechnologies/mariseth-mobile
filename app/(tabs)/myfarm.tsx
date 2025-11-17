@@ -10,8 +10,6 @@ import { isIOS, universalBlurhash } from "@/constants/generalconstants";
 import { images } from "@/constants/images";
 import { useFetchQuery } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
-import { myFarm } from "@/types/farm";
-import { useQueryClient } from "@tanstack/react-query";
 import { ImageBackground } from "expo-image";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -19,22 +17,22 @@ import { useStore } from "zustand";
 
 const MyFarm = () => {
   const user = useStore(userStore, (state) => state.user);
-  const {
-    data,
-    isLoading,
-    error,
-  }: { data: myFarm; isLoading: boolean; error: unknown } = useFetchQuery(
+  const { data, isLoading, error, refetch } = useFetchQuery(
     endpoints.myFarm,
     "myfarm"
   );
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   if (isLoading) return <MyFarmSP />;
   if (error) {
+    const isEmpty = error.message?.detail === "No farm found for this user";
+    const message =
+      "We couldn’t find any farm linked to your account. Please refresh or add a new farm to continue.";
     return (
       <ErrorComponent
         type={(error as any)?.problem}
-        message={(error as any)?.message?.detail}
-        refetch={() => queryClient.invalidateQueries({ queryKey: ["myfarm"] })}
+        message={isEmpty ? message : (error as any)?.message?.detail}
+        refetch={() => refetch()}
+        {...(isEmpty ? { title: "No Farm Found", btnTitle: "Refresh" } : {})}
       />
     );
   }

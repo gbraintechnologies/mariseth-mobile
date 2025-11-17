@@ -22,6 +22,7 @@ interface profileFormProps {
   type?: "profile" | "farmer";
   districts?: { id: number; name: string }[];
   farms?: myFarm1[];
+  required?: boolean;
 }
 const ProfileForm: React.FC<profileFormProps> = ({
   formik,
@@ -29,6 +30,7 @@ const ProfileForm: React.FC<profileFormProps> = ({
   type = "profile",
   districts = [],
   farms = [],
+  required = true,
 }) => {
   const regions = userStore((state) => state.regions);
   //  const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -304,6 +306,7 @@ const ProfileForm: React.FC<profileFormProps> = ({
               field="farm"
               formik={formik}
               value={formik.values.farm}
+              required={required}
             />
 
             <FormErrorMessage

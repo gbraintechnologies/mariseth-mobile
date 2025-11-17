@@ -1,4 +1,4 @@
-package com.marisethfarms.app.android
+package com.marisethfarms.android
 
 import android.app.Application
 import android.content.res.Configuration

@@ -88,7 +88,7 @@ export interface farmProduct {
   name: string;
   description: string | null;
   product_id: string;
-  type: "crop" | "livestock";
+  type: "crop" | "livestock" | "other";
 
   status: "active" | "inactive";
   breed: string | null;

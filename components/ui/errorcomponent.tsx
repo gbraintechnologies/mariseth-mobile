@@ -15,10 +15,14 @@ const ErrorComponent = ({
   type,
   refetch,
   message,
+  title,
+  btnTitle,
 }: {
   type: ErrorType;
   refetch: () => void;
   message?: string;
+  title?: string;
+  btnTitle?: string;
 }) => {
   const types: Record<
     ErrorType,
@@ -70,11 +74,11 @@ const ErrorComponent = ({
     },
 
     CLIENT_ERROR: {
-      title: "Error",
+      title: title ? title : "Error",
       subtitle: message
         ? message
         : "Something went wrong while trying to connect to the server.Try again later.",
-      btnTitle: "Retry",
+      btnTitle: btnTitle ? btnTitle : "Retry",
       btnAction: () => {
         refetch();
       },
@@ -96,7 +100,7 @@ const ErrorComponent = ({
           color="formInputText"
           fontFamily="Medium"
           fontSize={14}
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", lineHeight: 22 }}
         >
           {types[type]?.subtitle}
         </AppText>

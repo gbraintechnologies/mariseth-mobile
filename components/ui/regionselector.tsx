@@ -24,6 +24,7 @@ interface regionSelectorProps {
   field: string;
   formik: FormikProps<any>;
   value: number | string;
+  required?: boolean;
 }
 
 const RegionSelector: React.FC<regionSelectorProps> = ({
@@ -32,6 +33,7 @@ const RegionSelector: React.FC<regionSelectorProps> = ({
   data,
   field,
   formik,
+  required = true,
 }) => {
   const selectModalVisible = useUniversalStore(
     (state) => state.selectModalVisible
@@ -126,14 +128,16 @@ const RegionSelector: React.FC<regionSelectorProps> = ({
             {label}
           </AppText>
 
-          <AppText
-            fontSize={14}
-            color="error"
-            fontFamily="SemiBold"
-            style={{ marginLeft: 4 }}
-          >
-            *
-          </AppText>
+          {required && (
+            <AppText
+              fontSize={14}
+              color="error"
+              fontFamily="SemiBold"
+              style={{ marginLeft: 4 }}
+            >
+              *
+            </AppText>
+          )}
         </View>
 
         <Pressable

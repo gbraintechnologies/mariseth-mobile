@@ -26,6 +26,7 @@ interface FarmProductsSelectorProps {
   field: string;
   formik: FormikProps<any>;
   value: number[];
+  required?: boolean;
 }
 
 const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
@@ -35,6 +36,7 @@ const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
   field,
   formik,
   value,
+  required = true,
 }) => {
   const selectModalVisible = useUniversalStore(
     (state) => state.selectModalVisible
@@ -202,7 +204,9 @@ const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
                       color="textBold"
                       style={{ paddingVertical: "10%", textAlign: "center" }}
                     >
-                      {`No ${field} data available`}
+                      {`No ${
+                        field === "livestock" ? "Other Products" : field
+                      } data available`}
                     </AppText>
                   )}
                 />
@@ -227,14 +231,16 @@ const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
             {label}
           </AppText>
 
-          <AppText
-            fontSize={14}
-            color="error"
-            fontFamily="SemiBold"
-            style={{ marginLeft: 4 }}
-          >
-            *
-          </AppText>
+          {required && (
+            <AppText
+              fontSize={14}
+              color="error"
+              fontFamily="SemiBold"
+              style={{ marginLeft: 4 }}
+            >
+              *
+            </AppText>
+          )}
         </View>
 
         <Pressable

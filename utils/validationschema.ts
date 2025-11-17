@@ -155,6 +155,40 @@ export const profileEditSchema = yup.object().shape({
   // }),
 });
 
+export const addFarmerSchema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  type: yup.string().required("Type is required"),
+  gender: yup
+    .string()
+    .oneOf(["m", "f"], "Please select gender")
+    .required("Gender is required"),
+  date_of_birth: yup.string().required("Date of Birth is required"),
+  id_type: yup.string().required("This field is required"),
+  id_number: yup.string().required("This field is required"),
+
+  phone_number: yup.string().when("type", {
+    is: (type: string) => type !== "profile",
+    then: (schema) =>
+      schema
+        .required("Contact Number is required")
+        .matches(phoneRegExp, "Contact Number must be at least 9 digits")
+        .test(
+          "no-leading-zero",
+          "Phone Number must not start with 0",
+          (value) => !value?.startsWith("0")
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  email: yup.string().notRequired().email("Invalid email address"),
+
+  address: yup.string().required("Address is required"),
+  village: yup.string().required("Village/Community is required"),
+  district: yup.string().required("District is required"),
+  region: yup.string().required("Region is required"),
+
+  farm: yup.string().notRequired(),
+});
+
 export const leadershipExperienceEditSchema = yup.object().shape({
   is_mentoring_other_farmers: yup.boolean().required("This field is required"),
   // number_of_farmers_mentoring: yup.string().required("This field is required"),
@@ -208,17 +242,20 @@ export const adddFarmerSchema = yup.object().shape({
   land_ownership: yup.string().required("Land Owndership is required"),
   // main_crops: yup.string().required("Main Crops is required"),
   // livestock_kept: yup.string().required("This is a required field"),
-  crops: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, "Please select at least one crop")
-    .required("Main Crops is required"),
+  crops: yup.array().of(yup.string().required()).optional(),
 
-  livestock: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, "Please select at least one livestock option")
-    .required("Livestock is required"),
+  //  crops: yup
+  // .array()
+  // .of(yup.string().required())
+  // .min(1, "Please select at least one crop")
+  // .required("Main Crops is required"),
+
+  livestock: yup.array().of(yup.string().required()).optional(),
+  // livestock: yup
+  //   .array()
+  //   .of(yup.string().required())
+  //   .min(1, "Please select at least one livestock option")
+  //   .required("Livestock is required"),
   use_of_fertilizers: yup
     .array()
     .of(yup.string().required())
