@@ -27,6 +27,7 @@ interface customListprops<T> {
   ListHeaderComponent?: React.ReactElement;
   style?: StyleProp<ViewStyle>;
   bounces?: boolean;
+  emptyVariant?: "default" | "inline";
 }
 const CustomList: React.FC<customListprops<any>> = ({
   data,
@@ -41,6 +42,7 @@ const CustomList: React.FC<customListprops<any>> = ({
   ListHeaderComponent,
   style,
   bounces = true,
+  emptyVariant = "default",
 }) => {
   const RenderFooter = ({ type }: { type: types }) => {
     const types = {
@@ -96,7 +98,9 @@ const CustomList: React.FC<customListprops<any>> = ({
       estimatedItemSize={100}
       ListFooterComponent={<RenderFooter type={type} />}
       refreshing={isRefetching}
-      ListEmptyComponent={<ListEmptyComponent type={type} />}
+      ListEmptyComponent={
+        <ListEmptyComponent type={type} variant={emptyVariant} />
+      }
       refreshControl={
         <RefreshControl
           refreshing={isRefetching}

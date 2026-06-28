@@ -45,15 +45,14 @@ export const moreLinks: Array<moreLink> = [
     icon: icons.password,
     route: "/more/changepin",
   },
-  // {
-  //   name: "Help & Support",
-  //   icon: icons.dialog,
-  //   route: "/(tabs)/more",
-  // },
+  {
+    name: "Help & Support",
+    icon: icons.dialog,
+  },
   {
     name: "Log out",
     icon: icons.logout,
-    route: "/(tabs)/more",
+    variant: "logout",
   },
 ];
 
@@ -247,7 +246,7 @@ export const statusTypes: Record<
   // },
 
   denied: {
-    text: "Denied",
+    text: "Rejected",
     textColor: "overdueText",
     bgColor: colors.overdueBg,
   },

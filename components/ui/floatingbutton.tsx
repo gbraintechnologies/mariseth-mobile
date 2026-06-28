@@ -22,7 +22,7 @@ export default FloatingButton;
 const styles = StyleSheet.create({
   floatingButton: {
     position: "absolute",
-    right: 20,
+    right: 27,
     bottom: 100,
     height: 61,
     width: 61,
@@ -30,5 +30,10 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
 });

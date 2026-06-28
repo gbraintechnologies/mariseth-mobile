@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Platform,
   StyleSheet,
   TextInput,
   TextInputProps,
@@ -14,156 +15,159 @@ import { Image } from "expo-image";
 import AppText from "./apptext";
 
 interface AppTextInputProps extends TextInputProps {
-  color?: string;
-  Inputstyle?: any;
-  style?: any;
+  Inputstyle?: TextInputProps["style"];
+  style?: View["props"]["style"];
   marginLeft?: number;
-
   marginRight?: number;
   required?: boolean;
-  Width?: string;
-  placeholderTextColor?: string;
-  placeholder?: string;
-  TextinputHeight?: any;
-  secureTextEntry?: boolean;
-  [key: string]: any;
+  TextinputHeight?: number;
   borderRadius?: number;
-  textAlignVertical?: "auto" | "top" | "bottom" | "center";
   label?: string;
-  error?: any;
-  // phoneEntry?: boolean;
+  error?: unknown;
   leftComponent?: React.ReactNode;
 }
 
+const ANDROID_INPUT_COLOR = "#101828";
+
 const AppTextInput: React.FC<AppTextInputProps> = ({
-  color,
   Inputstyle,
   style,
   marginLeft,
   marginRight,
   required,
-  Width = "100%",
-  placeholderTextColor = colors.formInputText,
+  placeholderTextColor = colors.formPlaceholderText,
   placeholder = "",
-  secureTextEntry,
-  TextinputHeight = largeScreen ? 54 : 49,
-
-  borderRadius = 10,
+  secureTextEntry = false,
+  TextinputHeight = largeScreen ? 54 : 54,
+  borderRadius = 8,
   textAlignVertical,
-  // phoneEntry,
   label,
   error,
   leftComponent,
-  ...otherProps
+  onFocus,
+  onBlur,
+  onChangeText,
+  onEndEditing,
+  showSoftInputOnFocus = true,
+  value,
+  editable = true,
+  keyboardType,
+  ...textInputProps
 }) => {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!isPasswordVisible);
-  };
-  const eyeIconColor = error ? colors.error : colors.primary;
-  const customColor = error
+  const isNumericKeyboard =
+    keyboardType === "number-pad" || keyboardType === "numeric";
+  const useSecureEntry =
+    Boolean(secureTextEntry && !isPasswordVisible) &&
+    (isIOS || !isNumericKeyboard);
+
+  const borderColor = error
     ? colors.error
     : isFocused
     ? colors.primary
     : colors.formBorder;
+
+  const inputStyle = Platform.select({
+    ios: {
+      flex: 1,
+      height: "100%" as const,
+      fontFamily: "Regular",
+      color: ANDROID_INPUT_COLOR,
+      fontSize: 17,
+      textAlignVertical: textAlignVertical ?? "center",
+    },
+    android: {
+      flex: 1,
+      minHeight: 48,
+      color: ANDROID_INPUT_COLOR,
+      fontSize: 17,
+      paddingVertical: 12,
+      paddingHorizontal: 0,
+      includeFontPadding: false,
+      textAlignVertical: textAlignVertical ?? "center",
+    },
+    default: {
+      flex: 1,
+      color: ANDROID_INPUT_COLOR,
+      fontSize: 17,
+    },
+  });
+
   return (
     <>
       {label ? (
-        <View
-          style={{
-            flexDirection: "row",
-            marginBottom: 8,
-          }}
-        >
-          <AppText
-            fontSize={14}
-            fontFamily="SemiBold"
-            color="formLabelText"
-            style={{}}
-          >
+        <View style={styles.labelRow}>
+          <AppText fontSize={14} fontFamily="SemiBold" color="formLabelText">
             {label}
           </AppText>
-
-          {required && (
-            <AppText
-              fontSize={14}
-              color="error"
-              fontFamily="SemiBold"
-              style={{ marginLeft: 4 }}
-            >
+          {required ? (
+            <AppText fontSize={14} color="error" fontFamily="SemiBold">
               *
             </AppText>
-          )}
+          ) : null}
         </View>
       ) : null}
 
       <View
         style={[
-          styles.Container,
+          styles.container,
           style,
           {
             marginLeft,
             marginRight,
-            height: TextinputHeight,
-            borderColor: customColor,
-            borderRadius: borderRadius,
+            minHeight: TextinputHeight,
+            borderColor,
+            borderRadius,
           },
+          isFocused && isIOS && styles.focusedContainer,
         ]}
       >
         {leftComponent}
 
-        {/* {phoneEntry && (
-          <AppText
-            color="formInputText"
-            fontFamily="Regular"
-            fontSize={17}
-            style={{ marginRight: 10 }}
-          >
-            +233
-          </AppText>
-        )} */}
-
         <TextInput
-          style={[
-            Inputstyle,
-            {
-              flex: 1,
-              height: "100%",
-              fontFamily: "Regular",
-              color: colors.formInputText,
-              fontSize: 17,
-              // backgroundColor: "red",
-              justifyContent: "center",
-              textAlignVertical: textAlignVertical
-                ? textAlignVertical
-                : "center",
-            },
-          ]}
+          {...textInputProps}
+          style={[inputStyle, Inputstyle]}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          keyboardType={keyboardType}
+          value={value ?? ""}
+          editable={editable}
+          secureTextEntry={useSecureEntry}
+          autoCapitalize="none"
+          autoCorrect={false}
+          underlineColorAndroid="transparent"
+          showSoftInputOnFocus={showSoftInputOnFocus}
+          onChangeText={onChangeText}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
+          onEndEditing={(event) => {
+            setIsFocused(false);
+            onEndEditing?.(event);
+          }}
           {...(isIOS
             ? {}
             : {
-                selectionColor: colors.backgroundSecondary,
-                selectionHandleColor: colors.primary,
-                cursorColor: colors?.formInputText,
+                selectionColor: colors.primary,
+                cursorColor: ANDROID_INPUT_COLOR,
               })}
-          secureTextEntry={secureTextEntry && !isPasswordVisible}
-          placeholder={placeholder}
-          placeholderTextColor={placeholderTextColor}
-          autoCapitalize="none"
-          {...otherProps}
-          onFocus={() => setIsFocused(true)}
-          onEndEditing={() => setIsFocused(false)}
         />
-        {secureTextEntry ? (
+
+        {secureTextEntry && useSecureEntry ? (
           <TouchableOpacity
-            onPress={togglePasswordVisibility}
-            style={styles.iconContainer2}
+            onPress={() => setPasswordVisible((visible) => !visible)}
+            style={styles.iconContainer}
           >
             <Image
               source={isPasswordVisible ? icons.eye : icons.eyeSlash}
-              style={{ height: 25, width: 25, tintColor: eyeIconColor }}
+              style={styles.eyeIcon}
               contentFit="contain"
             />
           </TouchableOpacity>
@@ -174,26 +178,35 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  Container: {
+  labelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 4,
+  },
+  container: {
     borderWidth: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    justifyContent: "center",
+  },
+  focusedContainer: {
+    shadowColor: colors.formShadow,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
   },
   iconContainer: {
-    // backgroundColor: 'blue',
-    height: "100%",
     justifyContent: "center",
-    alignItems: "flex-start",
-    marginRight: 10,
+    alignItems: "center",
+    marginLeft: 8,
   },
-
-  iconContainer2: {
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "flex-start",
+  eyeIcon: {
+    height: 25,
+    width: 25,
+    tintColor: colors.primary,
   },
 });
 

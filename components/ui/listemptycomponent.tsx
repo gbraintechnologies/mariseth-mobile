@@ -6,30 +6,36 @@ import AppText from "./apptext";
 
 const ListEmptyComponent = ({
   type,
+  variant = "default",
+  btnTitle,
+  onPress,
 }: {
   type: "farmers" | "crops" | "farms" | "credits" | "new_farmer";
+  variant?: "default" | "inline";
+  btnTitle?: string;
+  onPress?: () => void;
 }) => {
   const types = {
     farmers: {
       title: "No farmers here yet",
       subtitle:
         "There is nothing to view right now. Click the button below to add a farmer and it to show up here.",
-      btnTitle: "",
-      btnAction: null,
+      btnTitle: "Add Farmer",
+      btnAction: () => router.navigate(`/myfarmers/addfarmer?data=""`),
     },
     crops: {
       title: "No crops here yet",
       subtitle:
         "There is nothing to view right now. Add some crops and it to show up here.",
-      btnTitle: "Edit Farm Details",
-      btnAction: () => router.navigate(`/myfarm/editfarmdetails`),
+      btnTitle: "Add Crops",
+      btnAction: null,
     },
     farms: {
       title: "No farms here yet",
       subtitle:
         "There is nothing to view right now. Click the button below to add a new farm and it to show up here.",
-      btnTitle: "",
-      btnAction: null,
+      btnTitle: "Add Farm",
+      btnAction: () => router.navigate(`/myfarmers/addfarm`),
     },
     credits: {
       title: "No Information to show yet",
@@ -47,12 +53,21 @@ const ListEmptyComponent = ({
       btnAction: () => router.navigate(`/myfarmers/addfarm`),
     },
   };
+  const isInline = variant === "inline";
+  const actionTitle = btnTitle ?? types[type].btnTitle;
+  const actionHandler = onPress ?? types[type].btnAction;
+
   return (
-    <View style={styles.listEmptyContainer}>
+    <View
+      style={[
+        styles.listEmptyContainer,
+        isInline && styles.listEmptyContainerInline,
+      ]}
+    >
       <AppText
         color="formLabelText"
         fontFamily="Medium"
-        fontSize={15}
+        fontSize={isInline ? 18 : 15}
         style={{ marginBottom: 12, textAlign: "center" }}
       >
         {types[type].title}
@@ -67,17 +82,18 @@ const ListEmptyComponent = ({
         {types[type].subtitle}
       </AppText>
 
-      {types[type].btnTitle && (
+      {actionTitle && actionHandler ? (
         <AppButton
-          title={types[type].btnTitle}
+          title={actionTitle}
           textColor="white"
-          style={{ marginTop: 36 }}
+          style={isInline ? styles.inlineButton : { marginTop: 36 }}
           btnColor="buttonPrimary"
-          width={"50%"}
-          height={43}
-          onPress={() => types[type].btnAction?.()}
+          width={isInline ? 157 : "50%"}
+          height={isInline ? 40 : 43}
+          borderRadius={isInline ? 8 : 10}
+          onPress={actionHandler}
         />
-      )}
+      ) : null}
     </View>
   );
 };
@@ -90,5 +106,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: "20%",
+  },
+  listEmptyContainerInline: {
+    paddingTop: 32,
+    paddingBottom: 24,
+    paddingHorizontal: 0,
+    maxWidth: 267,
+    alignSelf: "center",
+  },
+  inlineButton: {
+    marginTop: 36,
+    alignSelf: "center",
   },
 });

@@ -9,10 +9,7 @@ const MyFarmersSP = () => {
       <View style={styles.farmerCountCard} />
       <View style={skeletonStyles.segmentedControl} />
 
-      <View style={skeletonStyles.rowContainer}>
-        <View style={skeletonStyles.titleText} />
-        <View style={skeletonStyles.editBtn} />
-      </View>
+      <View style={skeletonStyles.titleText} />
       {Array(10)
         .fill(null)
         .map((_, index) => (

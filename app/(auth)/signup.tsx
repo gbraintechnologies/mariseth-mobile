@@ -1,6 +1,5 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
-import AppTextInput from "@/components/ui/apptextinput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
@@ -12,68 +11,86 @@ import { dataEncoder } from "@/utils/commonmethods";
 import { phoneNumberSchema } from "@/utils/validationschema";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useFormik } from "formik";
-import React from "react";
-import { Pressable, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, { useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "react-native-toast-notifications";
 
 const SignUp = () => {
   const bottomInset = useSafeAreaInsets().bottom;
   const toast = useToast();
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [errors, setErrors] = useState<{ phone_number?: string }>({});
+
   const { mutate, isLoading } = useAuthMutation(
     endpoints.signup,
     "POST",
     "signup",
     {
-      onSuccess: (data) => {
-        const number = formik.values.phone_number;
+      onSuccess: () => {
         const item = {
-          phone_number: number,
+          phone_number: `233${phoneNumber}`,
           action: "signup",
         };
         router.navigate(`/otpverification?data=${dataEncoder(item)}`);
       },
-
       onError: (error: any) => {
-        handleAuthApiError(error, formik, toast);
+        handleAuthApiError(error, { setErrors }, toast);
       },
     }
   );
 
-  const formik = useFormik({
-    initialValues: { phone_number: "" },
-    validationSchema: phoneNumberSchema,
-    onSubmit: async (values: { phone_number: string }) => {
-      values.phone_number = `233${values.phone_number}`;
+  const handleSubmit = async () => {
+    try {
+      await phoneNumberSchema.validate(
+        { phone_number: phoneNumber },
+        { abortEarly: false }
+      );
+      setErrors({});
+      mutate({ phone_number: `233${phoneNumber}` });
+    } catch (validationError: any) {
+      const nextErrors: { phone_number?: string } = {};
+      validationError?.inner?.forEach((issue: any) => {
+        if (issue.path === "phone_number") {
+          nextErrors.phone_number = issue.message;
+        }
+      });
+      setErrors(nextErrors);
+    }
+  };
 
-      mutate(values);
-      // console.log(values);
-    },
-  });
+  const inputBackground = isLoading
+    ? colors.backgroundTertiary
+    : colors.backgroundPrimary;
+
   return (
     <>
-      <KeyboardAwareScrollView
-        extraHeight={100}
-        extraScrollHeight={50}
-        enableOnAndroid={true}
-        bounces={false}
-        style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
+      <ScrollView
+        style={styles.screen}
         contentContainerStyle={authStyles.container}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
       >
         <Image
           source={images.logo}
           style={authStyles.logo}
           contentFit="contain"
         />
+
         <AppText
           fontSize={22}
-          fontFamily="Medium"
+          fontFamily="SemiBold"
           color="textBold"
           style={{ marginBottom: 6 }}
         >
-          Welcome to Mariseth Farms.
+          Welcome to Mariseth Farms
         </AppText>
 
         <AppText
@@ -82,66 +99,61 @@ const SignUp = () => {
           color="textPrimary"
           style={{ marginBottom: 22, lineHeight: 22 }}
         >
-          Enter your phone number and we’ll send you a PIN to verify your phone
-          number
+          Enter your phone number and we&apos;ll send you a code to verify it
         </AppText>
-        <AppTextInput
-          error={formik.errors.phone_number}
-          label="Phone Number"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          maxLength={10}
-          autoCapitalize="none"
-          textContentType="telephoneNumber"
-          autoCorrect={false}
-          // phoneEntry={true}
 
-          leftComponent={
-            <AppText
-              color="formInputText"
-              fontFamily="Regular"
-              fontSize={17}
-              style={{ marginRight: 10 }}
-            >
-              +233
-            </AppText>
-          }
-          editable={!isLoading}
-          keyboardType="phone-pad"
-          onBlur={() => formik.setFieldTouched("phone_number")}
-          onChangeText={formik.handleChange("phone_number")}
-        />
+        <Text style={styles.fieldLabel}>Phone Number</Text>
+        <View
+          style={[
+            styles.inputBox,
+            { backgroundColor: inputBackground, marginBottom: 4 },
+          ]}
+        >
+          <Text style={styles.prefix}>+233</Text>
+          <TextInput
+            style={styles.textInput}
+            value={phoneNumber}
+            onChangeText={(text) =>
+              setPhoneNumber(text.replace(/\D/g, "").slice(0, 9))
+            }
+            keyboardType="phone-pad"
+            returnKeyType="done"
+            maxLength={9}
+            placeholder="Phone number"
+            placeholderTextColor={colors.formPlaceholderText}
+            editable={!isLoading}
+            autoCorrect={false}
+            autoCapitalize="none"
+            underlineColorAndroid="transparent"
+          />
+        </View>
+        <FormErrorMessage error={errors.phone_number} />
 
-        <FormErrorMessage error={formik.errors.phone_number as string} />
         <Pressable
           onPress={() => router.push("/(auth)/signin")}
-          style={{ flexDirection: "row" }}
+          style={authStyles.authFooter}
         >
-          <AppText fontFamily="Regular" color="textPrimary" fontSize={14}>
-            Already having an account?
+          <AppText fontFamily="Regular" color="formLabelText" fontSize={14}>
+            Already have an account?
           </AppText>
-          <AppText
-            fontFamily="Bold"
-            color="buttonPrimary"
-            fontSize={14}
-            style={{ marginLeft: 5 }}
-          >
-            Sign In
+          <AppText fontFamily="SemiBold" color="buttonPrimary" fontSize={14}>
+            Sign in
           </AppText>
         </Pressable>
-      </KeyboardAwareScrollView>
+      </ScrollView>
+
       <View style={[authStyles.buttonContainer, { bottom: bottomInset + 20 }]}>
         <AppButton
           title="Continue"
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
-          onPress={formik.submitForm}
+          height={48}
+          borderRadius={8}
+          fontSize={16}
+          style={authStyles.authButton}
+          onPress={handleSubmit}
           loading={isLoading}
-          disabled={!(formik.isValid && formik.dirty)}
+          disabled={isLoading || !phoneNumber}
         />
       </View>
     </>
@@ -149,3 +161,38 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.backgroundPrimary,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.formLabelText,
+    marginBottom: 12,
+  },
+  inputBox: {
+    borderWidth: 1,
+    borderColor: colors.formBorder,
+    borderRadius: 8,
+    minHeight: 54,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  prefix: {
+    fontSize: 17,
+    color: colors.formInputText,
+    marginRight: 8,
+  },
+  textInput: {
+    flex: 1,
+    minHeight: 48,
+    fontSize: 17,
+    color: "#101828",
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+  },
+});

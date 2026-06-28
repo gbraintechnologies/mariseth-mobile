@@ -1,7 +1,7 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
 import FormErrorMessage from "@/components/ui/formerrormessage";
-import OtpInput from "@/components/ui/otpinput";
+import PinInput from "@/components/ui/pininput";
 import { colors } from "@/constants/colors";
 import { images } from "@/constants/images";
 import { authStyles } from "@/styles/auth";
@@ -11,7 +11,7 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -22,7 +22,7 @@ const CreatePin = () => {
   );
   const phoneNumber = paramData?.phone_number;
   const bottomInset = useSafeAreaInsets().bottom;
-  const [clearValue, setClearValue] = React.useState<boolean>(false);
+
   const formik = useFormik({
     initialValues: { pin: "" },
     validationSchema: createPinSchema,
@@ -35,15 +35,18 @@ const CreatePin = () => {
       router.navigate(`/confirmpin?data=${dataEncoder(data)}`);
     },
   });
+
   return (
     <>
       <KeyboardAwareScrollView
         extraScrollHeight={50}
         extraHeight={100}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={authStyles.container}
+        contentContainerStyle={authStyles.pinContainer}
       >
         <Image
           source={images.logo}
@@ -57,29 +60,44 @@ const CreatePin = () => {
           color="textBold"
           style={{ marginBottom: 22 }}
         >
-          Create a Pin
+          Create New Pin
         </AppText>
 
-        <OtpInput
-          onOtpEntered={(otp: string) => {
-            formik.setFieldValue("pin", otp);
-          }}
-          borderColor={formik.errors.pin ? colors.error : colors.formBorder}
-          clearValue={clearValue}
+        <PinInput
+          autoFocus
+          value={formik.values.pin}
+          onChangeText={(pin) => formik.setFieldValue("pin", pin)}
+          onBlur={() => formik.setFieldTouched("pin", true)}
+          error={formik.touched.pin && formik.errors.pin}
         />
 
         <View style={{ paddingTop: 10 }}>
           <FormErrorMessage error={formik.errors.pin} />
         </View>
+
+        <Pressable
+          onPress={() => router.navigate("/signin")}
+          style={authStyles.authFooter}
+        >
+          <AppText fontFamily="Regular" color="formLabelText" fontSize={14}>
+            Already have an account?
+          </AppText>
+          <AppText fontFamily="SemiBold" color="formLabelText" fontSize={14}>
+            Sign in
+          </AppText>
+        </Pressable>
       </KeyboardAwareScrollView>
+
       <View style={[authStyles.buttonContainer, { bottom: bottomInset + 20 }]}>
         <AppButton
           title="Continue"
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          height={48}
+          borderRadius={8}
+          fontSize={16}
+          style={authStyles.authButton}
           onPress={formik.handleSubmit}
-          // loading={loading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>
@@ -88,5 +106,3 @@ const CreatePin = () => {
 };
 
 export default CreatePin;
-
-const styles = StyleSheet.create({});

@@ -1,8 +1,8 @@
 import { width } from "@/constants/generalconstants";
 import React from "react";
 import { View } from "react-native";
+import AppText from "./apptext";
 import CustomList from "./customlist";
-import SectionHeader from "./sectionheader";
 import SmallFarmerCard from "./smallfarmercard";
 interface smallFarmersProps {
   data: any;
@@ -45,15 +45,20 @@ const SmallFarmers: React.FC<smallFarmersProps> = ({
 
   //   return null;
   // };
+  const hasFarmers = (data?.length ?? 0) > 0;
+
   return (
     <View style={{ width: width, paddingHorizontal: 16 }}>
-      <SectionHeader
-        title="Smallholder Farmers"
-        btnIcon="refresh"
-        btnTitle="Refresh"
-        marginBottom={6}
-        onPress={() => refetch()}
-      />
+      {hasFarmers ? (
+        <AppText
+          fontFamily="SemiBold"
+          fontSize={16}
+          color="primary"
+          style={{ marginBottom: 7 }}
+        >
+          Smallholder Farmers
+        </AppText>
+      ) : null}
 
       {/* <FlashList
         data={data}
@@ -88,8 +93,14 @@ const SmallFarmers: React.FC<smallFarmersProps> = ({
         isFetchingNextPage={isFetchingNextPage}
         refetch={refetch}
         isRefetching={isRefetching}
-        renderItem={({ item }: any) => <SmallFarmerCard item={item} />}
+        renderItem={({ item }: any) => (
+          <SmallFarmerCard item={item} showNewBadge />
+        )}
         type={"farmers"}
+        emptyVariant="inline"
+        contentContainerStyle={
+          hasFarmers ? undefined : { minHeight: 220, flexGrow: 1 }
+        }
       />
     </View>
   );

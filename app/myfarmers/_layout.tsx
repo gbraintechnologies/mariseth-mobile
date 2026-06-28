@@ -1,6 +1,10 @@
 import { smallHolder } from "@/types/farmers";
 import { dataDecoder } from "@/utils/commonmethods";
-import { headerHandler } from "@/utils/layoutmethods";
+import {
+  addFarmHeaderHandler,
+  addFarmerHeaderHandler,
+  headerHandler,
+} from "@/utils/layoutmethods";
 import { Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 
@@ -19,17 +23,10 @@ export default function MyFarmersLayout() {
 
       <Stack.Screen
         name="addfarmer"
-        options={{
-          ...headerHandler("Add New Farmer"),
-        }}
+        options={addFarmerHeaderHandler()}
       />
 
-      <Stack.Screen
-        name="addfarm"
-        options={{
-          ...headerHandler("Add New Farm"),
-        }}
-      />
+      <Stack.Screen name="addfarm" options={addFarmHeaderHandler()} />
     </Stack>
   );
 }

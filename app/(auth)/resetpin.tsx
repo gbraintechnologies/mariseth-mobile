@@ -1,8 +1,7 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
-import AppTextInput from "@/components/ui/apptextinput";
+import PinInput from "@/components/ui/pininput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
-import OtpInput from "@/components/ui/otpinput";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
@@ -24,7 +23,6 @@ const ResetPin = () => {
   const params = useLocalSearchParams<{ phone_number: string }>();
   const phoneNumber = params?.phone_number;
   const bottomInset = useSafeAreaInsets().bottom;
-  const [clearValue, setClearValue] = React.useState<boolean>(false);
   const toast = useToast();
 
   const { mutate, isLoading } = useAuthMutation(
@@ -67,6 +65,8 @@ const ResetPin = () => {
         extraHeight={100}
         enableOnAndroid={true}
         extraScrollHeight={50}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
         contentContainerStyle={authStyles.container}
@@ -85,63 +85,41 @@ const ResetPin = () => {
         >
           Reset Pin
         </AppText>
-        <AppText
-          fontSize={14}
-          fontFamily="SemiBold"
-          style={{ marginBottom: 8 }}
-        >
-          Verification Code
-        </AppText>
-        <OtpInput
-          onOtpEntered={(otp: string) => {
-            formik.setFieldValue("cpde", otp);
-          }}
-          borderColor={formik.errors.code ? colors.error : colors.formBorder}
-          clearValue={clearValue}
+        <PinInput
+          autoFocus
+          label="Verification Code"
+          value={formik.values.code}
+          onChangeText={(code) => formik.setFieldValue("code", code)}
+          onBlur={() => formik.setFieldTouched("code", true)}
+          error={formik.touched.code && formik.errors.code}
+          placeholder="Enter code"
+          editable={!isLoading}
         />
 
         <View style={{ paddingTop: 10 }}>
           <FormErrorMessage error={formik.errors.code} />
         </View>
 
-        <AppTextInput
-          error={formik.touched.pin && formik.errors.pin}
+        <PinInput
           label="New Pin"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          autoCapitalize="none"
-          autoCorrect={false}
-          secureTextEntry={true}
+          value={formik.values.pin}
+          onChangeText={(pin) => formik.setFieldValue("pin", pin)}
+          onBlur={() => formik.setFieldTouched("pin", true)}
+          error={formik.touched.pin && formik.errors.pin}
           editable={!isLoading}
-          maxLength={4}
-          keyboardType="numeric"
-          onBlur={() => formik.setFieldTouched("pin")}
-          onChangeText={formik.handleChange("pin")}
         />
 
         <FormErrorMessage
           error={(formik.touched.pin && formik.errors.pin) as string}
         />
 
-        <AppTextInput
-          error={formik.touched.new_pin && formik.errors.new_pin}
+        <PinInput
           label="Confirm Pin"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          autoCapitalize="none"
-          autoCorrect={false}
-          secureTextEntry={true}
+          value={formik.values.new_pin}
+          onChangeText={(pin) => formik.setFieldValue("new_pin", pin)}
+          onBlur={() => formik.setFieldTouched("new_pin", true)}
+          error={formik.touched.new_pin && formik.errors.new_pin}
           editable={!isLoading}
-          maxLength={4}
-          keyboardType="numeric"
-          onBlur={() => formik.setFieldTouched("new_pin")}
-          onChangeText={formik.handleChange("new_pin")}
         />
 
         <FormErrorMessage

@@ -3,39 +3,21 @@ import { endpoints } from "@/constants/endpoints";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
-
 import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { router } from "expo-router";
 import React from "react";
 import { Modal, StyleSheet, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
 import { useToast } from "react-native-toast-notifications";
 import { useStore } from "zustand";
 import AppButton from "./appbutton";
 import AppText from "./apptext";
+
 const LogoutModal = React.memo(() => {
   const logoutModalVisible = useStore(
     useUniversalStore,
     (state) => state.logoutModalVisible
   );
   const user = useStore(userStore, (state) => state.user);
-
-  const translateY = useSharedValue(300);
-
-  React.useEffect(() => {
-    translateY.value = logoutModalVisible
-      ? withSpring(0, { damping: 50, stiffness: 400 })
-      : withSpring(80, { damping: 50, stiffness: 400 });
-  }, [logoutModalVisible]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
-
   const toast = useToast();
 
   const { mutate, isLoading } = useAuthMutation(
@@ -63,6 +45,7 @@ const LogoutModal = React.memo(() => {
       },
     }
   );
+
   return (
     <Modal
       visible={logoutModalVisible}
@@ -71,79 +54,64 @@ const LogoutModal = React.memo(() => {
       transparent
       navigationBarTranslucent
     >
-      <View style={[styles.loadingContainer, StyleSheet.absoluteFill]}>
-        <Animated.View
-          style={[
-            {
-              backgroundColor: colors.backgroundPrimary,
-              paddingVertical: 24,
-              borderRadius: 20,
-              paddingHorizontal: 30,
-            },
-            animatedStyle,
-          ]}
-        >
-          <AppText
-            fontFamily="SemiBold"
-            fontSize={17}
-            color="textBold"
-            style={{ textAlign: "center", marginBottom: 10 }}
-          >
-            Logout?
-          </AppText>
+      <View style={styles.overlay}>
+        <View style={styles.card}>
+          <View style={styles.textSection}>
+            <AppText
+              fontFamily="SemiBold"
+              fontSize={16}
+              color="formLabelText"
+              style={styles.title}
+            >
+              Logout?
+            </AppText>
 
-          <AppText
-            fontFamily="Regular"
-            fontSize={14}
-            color="textPrimary"
-            style={{ textAlign: "center", marginBottom: 8 }}
-          >
-            You are about to log out of this account. You will have to log back
-            in to access your information and use the app.
-          </AppText>
-
-          <AppText
-            fontFamily="SemiBold"
-            fontSize={15}
-            color="textBold"
-            style={{ textAlign: "center" }}
-          >
-            Proceed?
-          </AppText>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-              marginTop: 20,
-            }}
-          >
-            <AppButton
-              title="Log out"
-              textColor="white"
-              btnColor="error"
-              width={"46%"}
-              style={{}}
-              loading={isLoading}
-              onPress={() => {
-                mutate({ refresh_token: user?.refresh_token });
-              }}
-            />
-
-            <AppButton
-              title="Cancel"
-              textColor="textPrimary"
-              btnColor="white"
-              borderColor="formBorder"
-              borderWidth={1}
-              width={"46%"}
-              style={{}}
-              onPress={() => {
-                useUniversalStore.setState({ logoutModalVisible: false });
-              }}
-            />
+            <AppText
+              fontFamily="Regular"
+              fontSize={14}
+              color="tabBarInactive"
+              style={styles.message}
+            >
+              You are about to log out of this account. You will have to log back
+              in to access your information and use the app.
+            </AppText>
           </View>
-        </Animated.View>
+
+          <View style={styles.buttonRow}>
+            <View style={styles.buttonWrapper}>
+              <AppButton
+                title="Log out"
+                textColor="white"
+                btnColor="error"
+                height={38}
+                borderRadius={8}
+                borderWidth={1.2}
+                borderColor="error"
+                loading={isLoading}
+                style={styles.buttonShadow}
+                onPress={() => {
+                  mutate({ refresh_token: user?.refresh_token });
+                }}
+              />
+            </View>
+
+            <View style={styles.buttonWrapper}>
+              <AppButton
+                title="Cancel"
+                textColor="formLabelText"
+                btnColor="backgroundPrimary"
+                height={38}
+                borderRadius={8}
+                borderWidth={1.2}
+                borderColor="formBorder"
+                style={styles.buttonShadow}
+                onPress={() => {
+                  useUniversalStore.setState({ logoutModalVisible: false });
+                }}
+              />
+            </View>
+          </View>
+        </View>
       </View>
     </Modal>
   );
@@ -152,15 +120,46 @@ const LogoutModal = React.memo(() => {
 export default LogoutModal;
 
 const styles = StyleSheet.create({
-  loadingContainer: {
+  overlay: {
     flex: 1,
     justifyContent: "center",
-    // alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     backgroundColor: colors.backgroundTransparent,
-    // position: "absolute",
-    // width: "100%",
-    // height: "100%",
-    zIndex: 1,
+  },
+  card: {
+    backgroundColor: colors.backgroundPrimary,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    paddingHorizontal: 46,
+    paddingTop: 28,
+    paddingBottom: 24,
+  },
+  textSection: {
+    alignItems: "center",
+    gap: 8,
+  },
+  title: {
+    textAlign: "center",
+    lineHeight: 19,
+  },
+  message: {
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 25,
+  },
+  buttonWrapper: {
+    flex: 1,
+  },
+  buttonShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 19,
+    elevation: 2,
   },
 });

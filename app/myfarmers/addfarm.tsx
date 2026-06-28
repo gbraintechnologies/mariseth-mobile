@@ -1,51 +1,71 @@
 import FarmForm from "@/components/ui/farmform";
 import { endpoints } from "@/constants/endpoints";
+import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
+import { smallHolder } from "@/types/farmers";
 import { handleAuthApiError } from "@/utils/apierrorhandler";
-import { handleToastShow } from "@/utils/commonmethods";
-import { adddFarmerSchema } from "@/utils/validationschema";
+import { dataDecoder, handleToastShow } from "@/utils/commonmethods";
+import { addFarmSchema } from "@/utils/validationschema";
 import { useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
-import { StyleSheet } from "react-native";
 import { useToast } from "react-native-toast-notifications";
+import { useStore } from "zustand";
 
 const AddFarm = () => {
-  const toast = useToast();
+  const params = useLocalSearchParams<{ data: string }>();
+  const preselectedFarmer: smallHolder | null = params?.data
+    ? dataDecoder(params.data)
+    : null;
+
+  const user = useStore(userStore, (state) => state.user);
+  const isLeaderFarmer = user?.farmer?.type === "lead";
   const metrics = userStore((state) => state.metrics);
   const sizeMetrics = metrics.filter(
     (metric) => metric.category_name === "size_metric"
   );
   const regions = userStore((state) => state.regions);
 
+  const { items: farmers } = usePaginatedInfiniteQuery<any>(
+    endpoints.myFarmers,
+    "smallholders",
+    {
+      page_size: 10,
+      query: "",
+    }
+  );
+
+  const recentlyAddedFarmers = farmers?.slice(0, 7) ?? [];
+
+  const toast = useToast();
   const queryClient = useQueryClient();
   const { mutate, isLoading } = useAuthMutation(
     `${endpoints.addNewFarm}`,
     "POST",
     "addfarm",
     {
-      onSuccess: (data) => {
-        console.log(JSON.stringify(data));
-        const toastMessage = "Farm has been added successfully!";
-        handleToastShow(toast, toastMessage);
+      onSuccess: () => {
+        handleToastShow(toast, "Farm has been added successfully!");
         queryClient
           .invalidateQueries({ queryKey: ["leadfarmersfarms"] })
           .then(() => {
-            // userStore.setState({ user: { ...user  } });
+            queryClient.invalidateQueries({ queryKey: ["smallholders"] });
             router.back();
           });
       },
 
       onError: (error: any) => {
-        console.log(error);
         handleAuthApiError(error, formik, toast);
       },
     }
   );
+
   const formik = useFormik({
     initialValues: {
+      apply_for: preselectedFarmer ? "my_farmer" : "myself",
+      farmer_ids: preselectedFarmer ? [preselectedFarmer.id] : ([] as number[]),
       farm_type: "external",
       name: "",
       location: "",
@@ -61,10 +81,8 @@ const AddFarm = () => {
       irrigation: false,
       has_access_to_market: false,
     },
-    validationSchema: adddFarmerSchema,
+    validationSchema: addFarmSchema,
     onSubmit: async (values) => {
-      // console.log(values);
-
       mutate(values);
     },
   });
@@ -73,18 +91,19 @@ const AddFarm = () => {
     () =>
       regions.find((region) => region.id === Number(formik.values.region))
         ?.districts || [],
-    [formik.values.region]
+    [formik.values.region, regions]
   );
+
   return (
     <FarmForm
       formik={formik}
       isLoading={isLoading}
       type="add"
       districts={districts}
+      isLeaderFarmer={isLeaderFarmer}
+      recentlyAddedFarmers={recentlyAddedFarmers}
     />
   );
 };
 
 export default AddFarm;
-
-const styles = StyleSheet.create({});

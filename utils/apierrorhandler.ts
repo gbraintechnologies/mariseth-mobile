@@ -29,45 +29,101 @@ export function getErrorMessage(status: number, body: string): string {
     : body || "Failed to fetch current weather data.";
 }
 
-export function handleAuthApiError(error: any, formik: any, toast: any) {
+type AuthFieldErrors = Record<string, string | undefined>;
+type AuthErrorTarget = { setErrors: (errors: AuthFieldErrors) => void } | null;
+
+function isHtmlNotFoundResponse(message: unknown): boolean {
+  if (typeof message !== "string") return false;
+  return (
+    message.includes("<!doctype") ||
+    message.includes("<html") ||
+    message.includes("Not Found")
+  );
+}
+
+function extractAuthFieldErrors(message: unknown): AuthFieldErrors {
+  const fieldErrors: AuthFieldErrors = {};
+
+  if (Array.isArray(message) && message[0]) {
+    fieldErrors.phone_number = String(message[0]);
+    fieldErrors.pin = String(message[0]);
+    return fieldErrors;
+  }
+
+  if (!message || typeof message !== "object") {
+    return fieldErrors;
+  }
+
+  const payload = message as Record<string, string[] | string | undefined>;
+
+  if (payload.phone_number) {
+    fieldErrors.phone_number = Array.isArray(payload.phone_number)
+      ? payload.phone_number[0]
+      : String(payload.phone_number);
+  }
+
+  if (payload.pin) {
+    fieldErrors.pin = Array.isArray(payload.pin)
+      ? payload.pin[0]
+      : String(payload.pin);
+  }
+
+  if (payload.non_field_errors) {
+    const apiMessage = Array.isArray(payload.non_field_errors)
+      ? payload.non_field_errors[0]
+      : String(payload.non_field_errors);
+    fieldErrors.phone_number = apiMessage;
+    fieldErrors.pin = apiMessage;
+    fieldErrors.code = apiMessage;
+    fieldErrors.old_pin = apiMessage;
+  }
+
+  return fieldErrors;
+}
+
+export function handleAuthApiError(
+  error: any,
+  formik: AuthErrorTarget,
+  toast: any
+) {
   const { problem, message } = error;
 
   console.log(JSON.stringify(error));
 
-  if ((formik && problem === "CLIENT_ERROR") || problem === "SERVER_ERROR") {
-    if (Array.isArray(message)) {
-      formik.setErrors({
-        phone_number: message[0],
-        pin: message[0],
-      });
+  if (problem === "CLIENT_ERROR" || problem === "SERVER_ERROR") {
+    if (isHtmlNotFoundResponse(message)) {
+      handleToastShow(
+        toast,
+        "Login service not found. The API URL in .env may be wrong — ask your backend team for the correct mobile API address."
+      );
+      return;
     }
-    if (message?.phone_number) {
-      formik.setErrors({ phone_number: message?.phone_number[0] });
-    }
-    if (message?.non_field_errors) {
-      formik.setErrors({
-        phone_number: message?.non_field_errors[0],
-        pin: message?.non_field_errors[0],
-        code: message?.non_field_errors[0],
-        old_pin: message?.non_field_errors[0],
-      });
-    }
-    if (message?.pin) {
-      formik.setErrors({
-        pin: message?.pin[0],
-      });
-    }
-  } else {
-    const errorMessages: Record<string, string> = {
-      CONNECTION_ERROR:
-        "Oops! You're offline. Check your internet and try again.",
-      NETWORK_ERROR: "Oops! You're offline. Check your internet and try again.",
-      TIMEOUT_ERROR: "Request timed out. Check your connection and try again",
-    };
 
-    const toastMessage =
-      errorMessages[problem] ||
-      "Oops! Something went wrong. Please try again in a moment.";
-    handleToastShow(toast, toastMessage);
+    const fieldErrors = extractAuthFieldErrors(message);
+    const firstFieldError = Object.values(fieldErrors).find(Boolean);
+
+    if (formik && Object.keys(fieldErrors).length > 0) {
+      formik.setErrors(fieldErrors);
+      return;
+    }
+
+    handleToastShow(
+      toast,
+      firstFieldError ||
+        "Invalid phone number or PIN. Please check your details and try again."
+    );
+    return;
   }
+
+  const networkErrorMessages: Record<string, string> = {
+    CONNECTION_ERROR:
+      "Oops! You're offline. Check your internet and try again.",
+    NETWORK_ERROR: "Oops! You're offline. Check your internet and try again.",
+    TIMEOUT_ERROR: "Request timed out. Check your connection and try again",
+  };
+
+  const toastMessage =
+    networkErrorMessages[problem] ||
+    "Oops! Something went wrong. Please try again in a moment.";
+  handleToastShow(toast, toastMessage);
 }

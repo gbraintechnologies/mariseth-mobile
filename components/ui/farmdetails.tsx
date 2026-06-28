@@ -10,17 +10,30 @@ import SectionHeader from "./sectionheader";
 interface farmDetailsProps {
   item: myFarm;
 }
+const emptyValue = "-";
+
+const displayValue = (value?: string | number | null) => {
+  if (value == null || value === "") return emptyValue;
+  return String(value);
+};
+
 const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
   const user = userStore((state) => state.user);
   const isLeaderFarmer = user?.farmer?.type === "lead";
   const farmingMethods = Array.isArray(item?.farming_methods)
-    ? item?.farming_methods?.map((method: any) => method).join(", ") ?? "N/A"
-    : "N/A";
+    ? item?.farming_methods?.map((method: any) => method).join(", ") || emptyValue
+    : emptyValue;
+
+  const fertilizers = Array.isArray(item?.use_of_fertilizers)
+    ? item.use_of_fertilizers.join(", ") || emptyValue
+    : displayValue(item?.use_of_fertilizers as string | undefined);
 
   const liveStock =
-    item?.livestock.length > 0
-      ? item?.livestock?.map((item: any) => item.product?.name).join(", ")
-      : "N/A";
+    item?.livestock?.length > 0
+      ? item.livestock.map((item: any) => item.product?.name).join(", ")
+      : emptyValue;
+
+  const landSize = [item?.size, item?.size_metric?.name].filter(Boolean).join(" ");
 
   // console.log('FARMING METHODS',farmingMethods);
 
@@ -36,27 +49,27 @@ const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
     information: [
       {
         key: "Farm Name",
-        value: item?.name ?? "N/A",
+        value: displayValue(item?.name),
       },
       {
         key: "Location",
-        value: item?.location ?? "N/A",
+        value: displayValue(item?.location),
       },
       {
         key: "District",
-        value: item?.district?.name ?? "N/A",
+        value: displayValue(item?.district?.name),
       },
       {
         key: "Total Land Size",
-        value: `${item?.size ?? "N/A"} ${item?.size_metric?.name ?? ""} `,
+        value: landSize || emptyValue,
       },
       {
         key: "Land Ownership",
-        value: item?.land_ownership ?? "N/A",
+        value: displayValue(item?.land_ownership),
       },
       {
         key: "Livestock Kept",
-        value: liveStock as any,
+        value: liveStock,
       },
     ],
   };
@@ -66,7 +79,7 @@ const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
     information: [
       {
         key: "Use of Fertilizers",
-        value: item?.use_of_fertilizers ?? "N/A",
+        value: fertilizers as string,
       },
       {
         key: "Farming Methods",
@@ -80,15 +93,20 @@ const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
         key: "Access to Market",
         value: (item?.has_access_to_market ? "Yes" : "No") as any,
       },
+      {
+        key: "Do you provide training to other farmers?",
+        value: (item?.provide_training ? "Yes" : "No") as any,
+      },
     ],
   };
   return (
     <View style={{ width, paddingHorizontal: 16 }}>
       <SectionHeader
-        title="Farms"
+        title="Farm Details"
         btnIcon="edit"
         btnTitle="Edit"
-        titleColor="textBold"
+        titleColor="black"
+        dualEdit={isLeaderFarmer}
         {...(isLeaderFarmer
           ? {
               onPress: () =>
@@ -98,7 +116,11 @@ const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
             }
           : {})}
       />
-      <InfoCard headerVisibility={false} info={farmDetails} />
+      <InfoCard
+        headerVisibility={false}
+        previewLabel="Preview"
+        info={farmDetails}
+      />
 
       <InfoCard headerVisibility={true} info={agriculturalDetails} />
     </View>

@@ -4,47 +4,63 @@ import { differenceInDays, parseISO } from "date-fns";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
+import InitialsAvatar from "./initialsavatar";
+
 interface farmCard {
   item?: any;
+  variant?: "full" | "compact";
+  showNewBadge?: boolean;
 }
-const FarmCard: React.FC<farmCard> = ({ item }) => {
+
+const FarmCard: React.FC<farmCard> = ({
+  item,
+  variant = "full",
+  showNewBadge,
+}) => {
   const dateCreated = item?.date_created;
   const isLessThanTwoWeeks =
+    dateCreated &&
     differenceInDays(new Date(), parseISO(dateCreated)) < 14;
+  const shouldShowNewBadge = showNewBadge ?? isLessThanTwoWeeks;
+  const crops = item?.crops ?? [];
+  const visibleCrops = crops.slice(0, 2);
+  const overflowCount = crops.length - visibleCrops.length;
+  const locationParts = [
+    item?.location ? `GPS ${item.location}` : null,
+    item?.region?.name ?? null,
+  ].filter(Boolean);
+
   return (
     <View style={styles.farmCardContainer}>
+      <InitialsAvatar
+        name={item?.name ?? ""}
+        containerSize={40}
+        fontSize={12}
+      />
+
       <View style={styles.farmCardInfoContainer}>
-        <AppText
-          fontFamily="SemiBold"
-          fontSize={14}
-          color="textBold"
-          style={{ marginBottom: 6 }}
-        >
-          {`${item?.name}${
-            item?.farmer?.first_name
-              ? ` (${item.farmer.first_name} ${item.farmer.last_name ?? ""})`
-              : ""
-          }`}
+        <AppText fontFamily="SemiBold" fontSize={14} color="textBold">
+          {item?.name}
         </AppText>
 
-        <View style={{ flexDirection: "row" }}>
+        {locationParts.length > 0 ? (
           <AppText
             fontFamily="Medium"
             fontSize={13}
             color="textPrimary"
-            style={{}}
+            style={variant === "full" ? styles.supportingText : undefined}
           >
-            {"GPS " + item?.location} .
+            {locationParts.join(" · ")}
           </AppText>
+        ) : null}
 
-          <AppText fontFamily="Medium" fontSize={13} color="primary">
-            {`${item?.region?.name ?? ""}`}
-          </AppText>
-        </View>
-        <View style={styles.farmCropsContainer}>
-          {item?.crops &&
-            item?.crops.slice(0, 2).map((item: any, index: number) => {
-              const { bgColor, textColor } = getColorForItem(item.product.name);
+        {variant === "full" && visibleCrops.length > 0 ? (
+          <View style={styles.farmCropsContainer}>
+            {visibleCrops.map((crop: any, index: number) => {
+              const { bgColor, textColor } = getColorForItem(
+                crop.product.name
+              );
+
               return (
                 <View
                   key={index}
@@ -58,34 +74,34 @@ const FarmCard: React.FC<farmCard> = ({ item }) => {
                     fontSize={10}
                     style={{ color: textColor }}
                   >
-                    {item?.product?.name}
+                    {crop?.product?.name}
                   </AppText>
                 </View>
               );
             })}
 
-          {item?.crops?.length > 3 && (
-            <View
-              style={[
-                styles.farmCropContainer,
-                { backgroundColor: colors.light },
-              ]}
-            >
-              <AppText fontFamily="SemiBold" fontSize={10} color="textPrimary">
-                +{item?.crops?.length - 2} more
-              </AppText>
-            </View>
-          )}
-        </View>
+            {overflowCount > 0 ? (
+              <View style={styles.overflowCropContainer}>
+                <AppText
+                  fontFamily="SemiBold"
+                  fontSize={10}
+                  color="tabBarInactive"
+                >
+                  +{overflowCount}
+                </AppText>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
-      {isLessThanTwoWeeks && (
+      {shouldShowNewBadge ? (
         <View style={styles.farmCardStatusContainer}>
-          <AppText fontFamily="Medium" fontSize={10} color="primary">
+          <AppText fontFamily="Medium" fontSize={10} style={styles.newBadgeText}>
             New
           </AppText>
         </View>
-      )}
+      ) : null}
     </View>
   );
 };
@@ -102,26 +118,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   farmCardInfoContainer: {
-    flexDirection: "column",
     flex: 1,
     marginLeft: 12,
+    justifyContent: "center",
+  },
+  supportingText: {
+    marginTop: 2,
   },
   farmCropContainer: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 11,
     paddingVertical: 4,
     borderRadius: 10,
+  },
+  overflowCropContainer: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: colors.buttonActionSheet,
   },
   farmCropsContainer: {
     flexDirection: "row",
     gap: 5,
-    marginTop: 5,
+    marginTop: 6,
     flexWrap: "wrap",
   },
   farmCardStatusContainer: {
     backgroundColor: colors.secondaryLight,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderRadius: 8,
+    paddingHorizontal: 11,
+    paddingVertical: 2,
+    borderRadius: 6,
     alignSelf: "center",
+  },
+  newBadgeText: {
+    color: "#14803D",
   },
 });

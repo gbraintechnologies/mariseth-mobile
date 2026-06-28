@@ -2,11 +2,29 @@ import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import { icons } from "@/constants/icons";
 import { useFetchQuery } from "@/hooks/usefetchquery";
-import { dueDateFormat } from "@/utils/commonmethods";
+import { dataEncoder, dueDateFormat } from "@/utils/commonmethods";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "./apptext";
+
+const DetailColumn = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <View style={styles.detailColumn}>
+    <AppText fontFamily="Medium" fontSize={12} color="primary" style={styles.label}>
+      {label}
+    </AppText>
+    <AppText fontFamily="SemiBold" fontSize={12} color="formLabelText">
+      {value}
+    </AppText>
+  </View>
+);
 
 const ActiveCreditCard = () => {
   const { data, isLoading, error } = useFetchQuery(
@@ -14,7 +32,6 @@ const ActiveCreditCard = () => {
     "activecredit"
   );
 
-  // console.log("ERROR", data);
   if (error?.status === 404) {
     return null;
   }
@@ -23,7 +40,7 @@ const ActiveCreditCard = () => {
       <View
         style={{
           backgroundColor: colors.skeletonPlaceholder,
-          height: 305,
+          height: 302,
           borderRadius: 16,
           width: "100%",
         }}
@@ -32,127 +49,104 @@ const ActiveCreditCard = () => {
   }
   if (data) {
     const dueDate = dueDateFormat(data?.due_date);
+    const issueDate = dueDateFormat(data?.issue_date) || "-";
+    const bagsLabel =
+      data?.quantity_metric_name?.toLowerCase().includes("bag")
+        ? "Number of Bags"
+        : "Quantity";
+
     return (
       <View style={styles.activeCreditContainer}>
         <View style={styles.activeCreditHeaderContainer}>
-          <Image source={icons.arrowCorner} style={{ height: 30, width: 30 }} />
+          <Image source={icons.arrowCorner} style={{ height: 24, width: 24 }} />
           <View style={styles.activeCreditHeaderTextContainer}>
-            <AppText
-              fontFamily="SemiBold"
-              fontSize={14}
-              color="textBold"
-              style={{}}
-            >
-              Active Credits
+            <AppText fontFamily="SemiBold" fontSize={14} color="textBold">
+              Active Credit
             </AppText>
-
             <AppText
               fontFamily="Medium"
               fontSize={10}
               color="primary"
-              style={{}}
+              style={{ opacity: 0.75 }}
             >
-              {`due ${dueDate}`}
+              {dueDate ? `due ${dueDate}` : "due -"}
             </AppText>
           </View>
-          {/* <TouchableOpacity style={styles.payCreditButton}>
+          <TouchableOpacity
+            style={styles.payCreditButton}
+            onPress={() =>
+              router.navigate(
+                `/credits/viewpaybacklog?data=${dataEncoder(data)}`
+              )
+            }
+          >
             <Image
               source={icons.money}
               style={{ width: 20, height: 20, marginRight: 8 }}
+              tintColor={colors.white}
             />
-            <AppText
-              fontFamily="SemiBold"
-              fontSize={12}
-              color="white"
-              style={{}}
-            >
+            <AppText fontFamily="SemiBold" fontSize={12} color="white">
               Pay Credit
             </AppText>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
-        <View style={styles.inputCreditContainer}>
-          <View style={{ flexDirection: "column", flex: 0.7 }}>
+
+        <View style={styles.twoColumnRow}>
+          <DetailColumn label="Input Credit" value={data?.input_credits ?? "-"} />
+          <View style={styles.detailColumn}>
             <AppText
               fontFamily="Medium"
               fontSize={12}
               color="primary"
-              style={{ marginBottom: 7 }}
-            >
-              Input Credit
-            </AppText>
-            <AppText fontFamily="SemiBold" fontSize={16} color="formLabelText">
-              {data?.input_credits}
-            </AppText>
-          </View>
-          <View style={{ flexDirection: "column" }}>
-            <AppText
-              fontFamily="Medium"
-              fontSize={12}
-              color="primary"
-              style={{ marginBottom: 7 }}
+              style={styles.label}
             >
               Total amount
             </AppText>
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            <View style={styles.amountRow}>
               <AppText
                 fontFamily="Medium"
                 fontSize={10}
                 color="formLabelText"
-                style={{ marginBottom: 2 }}
+                style={{ marginBottom: 2, marginRight: 6 }}
               >
                 GHC
               </AppText>
-              <AppText
-                fontFamily="SemiBold"
-                fontSize={16}
-                color="formLabelText"
-              >
-                {data?.credit_amount}
+              <AppText fontFamily="SemiBold" fontSize={12} color="formLabelText">
+                {data?.credit_amount ?? "-"}
               </AppText>
             </View>
           </View>
         </View>
 
-        <View style={styles.interestRateContainer}>
-          <View style={{ flexDirection: "column", flex: 0.7 }}>
-            <AppText
-              fontFamily="Medium"
-              fontSize={12}
-              color="primary"
-              style={{ marginBottom: 7 }}
-            >
-              Quantity
-            </AppText>
-            <AppText fontFamily="SemiBold" fontSize={16} color="formLabelText">
-              {`${data?.quantity} ${data?.quantity_metric_name}`}
-            </AppText>
-          </View>
-          <View style={{ flexDirection: "column" }}>
-            <AppText
-              fontFamily="Medium"
-              fontSize={12}
-              color="primary"
-              style={{ marginBottom: 7 }}
-            >
-              Interest Rate
-            </AppText>
+        <View style={styles.divider} />
 
-            <AppText fontFamily="SemiBold" fontSize={16} color="formLabelText">
-              {`${data?.interest_rate}%`}
-            </AppText>
-          </View>
+        <View style={styles.twoColumnRow}>
+          <DetailColumn label="Issue Date" value={issueDate} />
+          <DetailColumn label="Due Date" value={dueDate || "-"} />
         </View>
-        <View style={{ flexDirection: "column" }}>
+
+        <View style={styles.twoColumnRow}>
+          <DetailColumn
+            label={bagsLabel}
+            value={String(data?.quantity ?? "-")}
+          />
+          <DetailColumn
+            label="Interest Rate"
+            value={data?.interest_rate ? `${data.interest_rate}%` : "-"}
+          />
+        </View>
+
+        <View style={styles.notesSection}>
           <AppText
             fontFamily="Medium"
             fontSize={12}
             color="primary"
-            style={{ marginBottom: 7 }}
+            style={styles.label}
           >
             Extra Information/Notes
           </AppText>
-          <AppText fontFamily="SemiBold" fontSize={15} color="formLabelText">
-            {data?.notes ?? "N/A"}
+          <AppText fontFamily="SemiBold" fontSize={12} color="formLabelText">
+            {data?.notes?.trim() ? data.notes : "-"}
           </AppText>
         </View>
       </View>
@@ -170,36 +164,47 @@ const styles = StyleSheet.create({
     boxShadow: "0px 4px 19px 0px rgba(63, 30, 87, 0.10)",
     marginTop: 32,
     borderRadius: 16,
+    gap: 20,
   },
   activeCreditHeaderContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
   },
   activeCreditHeaderTextContainer: {
     flexDirection: "column",
     marginLeft: 12,
     flex: 1,
+    gap: 6,
   },
-
   payCreditButton: {
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     backgroundColor: colors.primary,
-    borderRadius: 50,
+    borderRadius: 49,
     flexDirection: "row",
     alignItems: "center",
   },
-  inputCreditContainer: {
+  twoColumnRow: {
     flexDirection: "row",
-    width: "100%",
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.activeCreditBorder,
-    marginBottom: 20,
+    justifyContent: "space-between",
+    gap: 16,
   },
-  interestRateContainer: {
+  detailColumn: {
+    flex: 1,
+    gap: 11,
+  },
+  label: {
+    marginBottom: 0,
+  },
+  amountRow: {
     flexDirection: "row",
-    width: "100%",
-    paddingBottom: 20,
+    alignItems: "flex-end",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.activeCreditBorder,
+  },
+  notesSection: {
+    gap: 11,
   },
 });

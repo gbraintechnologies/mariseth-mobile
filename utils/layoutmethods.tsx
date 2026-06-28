@@ -45,23 +45,106 @@ export function headerHandler(route_label?: string): any {
     },
   };
 }
-export function tabScreenOptions(tabLabel: string) {
+
+export function formScreenHeaderHandler(title: string) {
+  return {
+    headerBackVisible: false,
+    headerShadowVisible: false,
+    headerStyle: {
+      backgroundColor: colors.backgroundPrimary,
+    },
+    headerTitle: () => null,
+    headerLeft: () => {
+      return (
+        <Pressable
+          style={styles.applyCreditHeaderLeft}
+          onPress={() => router.back()}
+        >
+          <View style={styles.applyCreditBackButton}>
+            <Image
+              source={icons.arrowLeft}
+              style={{ width: 24, height: 24, tintColor: colors.primary }}
+            />
+          </View>
+          <AppText fontFamily="SemiBold" fontSize={16} color="textBold">
+            {title}
+          </AppText>
+        </Pressable>
+      );
+    },
+    headerRight: () => {
+      const user = useStore(userStore, (state) => state.user);
+      const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
+
+      return (
+        <View style={styles.applyCreditHeaderRight}>
+          <Pressable style={styles.notificationButton}>
+            <Image
+              source={icons.notification}
+              style={{ height: 24, width: 24, tintColor: colors.primary }}
+            />
+            <View style={styles.notificationBadge} />
+          </Pressable>
+
+          <Pressable
+            onPress={() => router.navigate("/more/profileinformation")}
+          >
+            <InitialsAvatar
+              name={fullName}
+              containerSize={34}
+              fontSize={12}
+            />
+          </Pressable>
+        </View>
+      );
+    },
+  };
+}
+
+export function applyCreditHeaderHandler() {
+  return formScreenHeaderHandler("Apply for Credit");
+}
+
+export function addFarmerHeaderHandler() {
+  return formScreenHeaderHandler("Add New Farmer");
+}
+
+export function addFarmHeaderHandler() {
+  return formScreenHeaderHandler("Add New Farm");
+}
+
+export function editProfileHeaderHandler() {
+  return formScreenHeaderHandler("Edit My Information");
+}
+
+export function editLeadershipHeaderHandler() {
+  return formScreenHeaderHandler("Edit Leadership & Experience");
+}
+
+export function changePinHeaderHandler() {
+  return formScreenHeaderHandler("Change Pin");
+}
+
+export function tabScreenOptions(
+  tabLabel: string,
+  roleOptions?: { isAdmin?: boolean; isLeaderFarmer?: boolean }
+) {
   const tabIcons: Record<string, string> = {
     Home: icons?.home,
     Credits: icons?.credits,
     "My Farm": icons?.farm,
     "My Farmers": icons?.farmers,
+    Finance: icons?.money,
     More: icons?.more,
   };
 
-  // const isHome = tabLabel === "Home";
-  // const isCredits = tabLabel === "Credits";
   const isMore = tabLabel === "More";
-  // const isFarm = tabLabel === "My Farm";
-  // const isFarmers = tabLabel === "My Farmers";
+  const isAdminHome = tabLabel === "Home" && roleOptions?.isAdmin;
+  const isLeadFarmerHome =
+    tabLabel === "Home" && roleOptions?.isLeaderFarmer && !roleOptions?.isAdmin;
 
   return {
-    headerShown: isMore ? false : true,
+    headerShown: isMore || isAdminHome ? false : true,
     title: "",
     headerShadowVisible: false,
 
@@ -77,6 +160,25 @@ export function tabScreenOptions(tabLabel: string) {
     ),
 
     headerLeft: () => {
+      if (isLeadFarmerHome) {
+        return (
+          <View style={styles.homeHeaderLeft}>
+            <Pressable
+              style={styles.menuButton}
+              onPress={() => router.navigate("/more")}
+            >
+              <Image
+                source={icons.more}
+                style={{ width: 20, height: 20, tintColor: colors.textBold }}
+              />
+            </Pressable>
+            <AppText fontFamily="SemiBold" fontSize={18} color="textBold">
+              Home
+            </AppText>
+          </View>
+        );
+      }
+
       return (
         <AppText
           fontFamily="SemiBold"
@@ -91,22 +193,44 @@ export function tabScreenOptions(tabLabel: string) {
 
     headerRight: () => {
       const user = useStore(userStore, (state) => state.user);
-      const fullName = user?.first_name + " " + user?.last_name;
-      return (
-        <View
-          style={{
-            marginRight: 16,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          {/* <Pressable style={{ marginRight: 20 }}>
-            <Image
-              source={icons.notification}
-              style={{ height: 24, width: 24 }}
-            />
-          </Pressable> */}
+      const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
 
+      if (isLeadFarmerHome) {
+        return (
+          <View style={styles.homeHeaderRight}>
+            <Pressable style={styles.notificationButton}>
+              <Image
+                source={icons.notification}
+                style={{ height: 24, width: 24, tintColor: colors.primary }}
+              />
+              <View style={styles.notificationBadge} />
+            </Pressable>
+
+            <Pressable
+              style={styles.homeProfileButton}
+              onPress={() => router.navigate("/more/profileinformation")}
+            >
+              <InitialsAvatar
+                name={fullName}
+                containerSize={34}
+                fontSize={12}
+              />
+              <AppText
+                fontFamily="Regular"
+                fontSize={14}
+                color="black"
+                numberOfLines={1}
+                style={{ maxWidth: 103 }}
+              >
+                {fullName}
+              </AppText>
+            </Pressable>
+          </View>
+        );
+      }
+
+      return (
+        <View style={styles.defaultHeaderRight}>
           <InitialsAvatar
             name={fullName}
             onPress={() => {
@@ -149,5 +273,82 @@ const styles = StyleSheet.create({
     borderColor: colors.formBorder,
     padding: 5,
     marginRight: 9,
+  },
+
+  homeHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 16,
+    gap: 10,
+  },
+
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+    backgroundColor: colors.white,
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0px 4px 12px 0px rgba(0, 0, 0, 0.03)",
+  },
+
+  homeHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 16,
+    gap: 20,
+  },
+
+  defaultHeaderRight: {
+    marginRight: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  notificationButton: {
+    position: "relative",
+  },
+
+  notificationBadge: {
+    position: "absolute",
+    top: 2,
+    right: 0,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: "#ED0D6B",
+    borderWidth: 1,
+    borderColor: colors.white,
+  },
+
+  homeProfileButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+
+  applyCreditHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 17,
+    marginLeft: 16,
+  },
+
+  applyCreditBackButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 90,
+    backgroundColor: colors.secondaryLight,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  applyCreditHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 16,
+    gap: 20,
   },
 });

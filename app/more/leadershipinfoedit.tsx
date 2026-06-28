@@ -1,10 +1,9 @@
 import AppButton from "@/components/ui/appbutton";
 import AppTextInput from "@/components/ui/apptextinput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
-import Select from "@/components/ui/select";
+import YesNoSelector from "@/components/ui/yesnoselector";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
-import { yesNoOptions } from "@/constants/generalconstants";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
@@ -32,8 +31,7 @@ const LeadershipInfoEdit = () => {
     "PUT",
     "updatemyfarmer",
     {
-      onSuccess: async (data) => {
-        // console.log(JSON.stringify(data));
+      onSuccess: async () => {
         useUniversalStore.setState({ enabled: true });
 
         await queryClient
@@ -46,8 +44,7 @@ const LeadershipInfoEdit = () => {
             useUniversalStore.setState({ enabled: false });
           });
 
-        const toastMessage = "Updated successful!";
-        handleToastShow(toast, toastMessage);
+        handleToastShow(toast, "Updated successful!");
 
         setTimeout(() => {
           router.back();
@@ -73,7 +70,7 @@ const LeadershipInfoEdit = () => {
     },
     validationSchema: leadershipExperienceEditSchema,
     onSubmit: async (values) => {
-      const payload = {
+      mutate({
         leadership_experience: {
           is_mentoring_other_farmers: values.is_mentoring_other_farmers,
           number_of_farmers_mentoring: values.number_of_farmers_mentoring,
@@ -81,32 +78,28 @@ const LeadershipInfoEdit = () => {
           has_received_farming_leadership_training:
             values.has_received_farming_leadership_training,
         },
-      };
-      console.log(payload);
-
-      mutate(payload);
+      });
     },
   });
 
   return (
-    <>
+    <View style={styles.screen}>
       <KeyboardAwareScrollView
         extraHeight={100}
         extraScrollHeight={50}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
-        style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 150,
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
       >
-        <Select
+        <YesNoSelector
           label="Are you currently mentoring other farmers?"
-          data={yesNoOptions}
-          formik={formik}
-          field="is_mentoring_other_farmers"
+          value={formik.values.is_mentoring_other_farmers}
+          onChange={(value) =>
+            formik.setFieldValue("is_mentoring_other_farmers", value)
+          }
         />
 
         <FormErrorMessage
@@ -124,7 +117,7 @@ const LeadershipInfoEdit = () => {
                 formik.errors.number_of_farmers_mentoring
               }
               label="If Yes, how many farmers are you mentoring"
-              // placeholder="0"
+              placeholder="Enter number of farmers"
               style={{
                 backgroundColor: isLoading
                   ? colors.backgroundTertiary
@@ -150,11 +143,12 @@ const LeadershipInfoEdit = () => {
           </>
         ) : null}
 
-        <Select
+        <YesNoSelector
           label="Membership in Farming Cooperatives/Associations"
-          data={yesNoOptions}
-          formik={formik}
-          field="has_farming_membership"
+          value={formik.values.has_farming_membership}
+          onChange={(value) =>
+            formik.setFieldValue("has_farming_membership", value)
+          }
         />
 
         <FormErrorMessage
@@ -164,11 +158,15 @@ const LeadershipInfoEdit = () => {
           }
         />
 
-        <Select
+        <YesNoSelector
           label="Have you received any leadership or agricultural training?"
-          data={yesNoOptions}
-          formik={formik}
-          field="has_received_farming_leadership_training"
+          value={formik.values.has_received_farming_leadership_training}
+          onChange={(value) =>
+            formik.setFieldValue(
+              "has_received_farming_leadership_training",
+              value
+            )
+          }
         />
 
         <FormErrorMessage
@@ -178,31 +176,46 @@ const LeadershipInfoEdit = () => {
           }
         />
       </KeyboardAwareScrollView>
-      <View
-        style={[
-          {
-            position: "absolute",
 
-            width: "100%",
-            paddingHorizontal: 18,
-          },
-          { bottom: bottomInset + 20 },
-        ]}
-      >
+      <View style={[styles.formFooter, { paddingBottom: bottomInset + 23 }]}>
         <AppButton
           title="Save Changes"
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          borderRadius={8}
+          height={48}
           onPress={formik.submitForm}
           loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>
-    </>
+    </View>
   );
 };
 
 export default LeadershipInfoEdit;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.backgroundPrimary,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 120,
+    gap: 32,
+  },
+  formFooter: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    paddingTop: 23,
+    paddingHorizontal: 18,
+  },
+});

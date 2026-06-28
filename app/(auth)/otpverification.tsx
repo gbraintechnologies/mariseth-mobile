@@ -1,7 +1,7 @@
 import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
+import PinInput from "@/components/ui/pininput";
 import FormErrorMessage from "@/components/ui/formerrormessage";
-import OtpInput from "@/components/ui/otpinput";
 import ResendTimer from "@/components/ui/resendtimer";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
@@ -15,7 +15,7 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "react-native-toast-notifications";
@@ -29,20 +29,17 @@ const OtpVerification = () => {
   const bottomInset = useSafeAreaInsets().bottom;
   const toast = useToast();
 
-  const [clearValue, setClearValue] = React.useState<boolean>(false);
-
   const { mutate, isLoading } = useAuthMutation(
     endpoints.verify,
     "POST",
     "otpverification",
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         const item = {
           phone_number: phoneNumber,
           code: isSignup ? null : formik.values.code,
         };
         router.replace(`/createpin?data=${dataEncoder(item)}`);
-        // console.log(data);
       },
       onError: (error: any) => {
         handleAuthApiError(error, formik, toast);
@@ -57,14 +54,22 @@ const OtpVerification = () => {
       mutate(values);
     },
   });
+
+  const buttonTitle =
+    paramData?.action === "signup" || paramData?.action === "pinreset"
+      ? "Continue"
+      : "Sign In";
+
   return (
     <>
       <KeyboardAwareScrollView
         extraHeight={100}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={authStyles.container}
+        contentContainerStyle={authStyles.pinContainer}
       >
         <Image
           source={images.logo}
@@ -72,55 +77,63 @@ const OtpVerification = () => {
           contentFit="contain"
         />
 
-        <AppText
-          fontSize={22}
-          fontFamily="SemiBold"
-          color="textBold"
-          style={{ marginBottom: 6 }}
-        >
-          We just sent you an SMS
+        <AppText fontSize={22} fontFamily="SemiBold" color="textBold">
+          Please check your SMS
         </AppText>
-        <View style={{ flexDirection: "row", marginBottom: 22 }}>
-          <AppText
-            fontSize={14}
-            fontFamily="Regular"
-            color="textPrimary"
-            style={{ lineHeight: 22 }}
-          >
-            Enter the PIN we sent to
-          </AppText>
 
-          <AppText
-            fontSize={14}
-            fontFamily="Medium"
-            color="textBold"
-            style={{ lineHeight: 22, marginLeft: 5 }}
-          >
-            {phoneNumber}
-          </AppText>
-        </View>
+        <AppText
+          fontSize={14}
+          fontFamily="Regular"
+          color="textPrimary"
+          style={{ marginTop: 8, marginBottom: 22, lineHeight: 22 }}
+        >
+          We sent you a temporary pin to gain access to your account. Please
+          check and enter that password here.
+        </AppText>
 
-        <OtpInput
-          onOtpEntered={(otp: string) => {
-            formik.setFieldValue("code", otp);
-          }}
-          borderColor={formik.errors.code ? colors.error : colors.formBorder}
-          clearValue={clearValue}
+        <PinInput
+          autoFocus
+          value={formik.values.code}
+          onChangeText={(code) => formik.setFieldValue("code", code)}
+          onBlur={() => formik.setFieldTouched("code", true)}
+          error={formik.touched.code && formik.errors.code}
+          placeholder="Enter temporary pin"
+          editable={!isLoading}
         />
 
         <View style={{ paddingTop: 10 }}>
           <FormErrorMessage error={formik.errors.code as string} />
         </View>
 
-        <ResendTimer setOtp={() => setClearValue(true)} formik={formik} />
+        <View style={{ marginTop: 10 }}>
+          <ResendTimer
+            setOtp={() => formik.setFieldValue("code", "")}
+            formik={formik}
+          />
+        </View>
+
+        <Pressable
+          onPress={() => router.navigate("/signin")}
+          style={authStyles.authFooter}
+        >
+          <AppText fontFamily="Regular" color="formLabelText" fontSize={14}>
+            Already have an account?
+          </AppText>
+          <AppText fontFamily="SemiBold" color="formLabelText" fontSize={14}>
+            Sign in
+          </AppText>
+        </Pressable>
       </KeyboardAwareScrollView>
 
       <View style={[authStyles.buttonContainer, { bottom: bottomInset + 20 }]}>
         <AppButton
-          title="Continue"
+          title={buttonTitle}
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          height={48}
+          borderRadius={8}
+          fontSize={16}
+          style={authStyles.authButton}
           onPress={formik.submitForm}
           loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
@@ -131,5 +144,3 @@ const OtpVerification = () => {
 };
 
 export default OtpVerification;
-
-const styles = StyleSheet.create({});

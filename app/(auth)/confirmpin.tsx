@@ -2,7 +2,7 @@ import AppButton from "@/components/ui/appbutton";
 import AppText from "@/components/ui/apptext";
 import AuthLoading from "@/components/ui/authloading";
 import FormErrorMessage from "@/components/ui/formerrormessage";
-import OtpInput from "@/components/ui/otpinput";
+import PinInput from "@/components/ui/pininput";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import { images } from "@/constants/images";
@@ -15,7 +15,7 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "react-native-toast-notifications";
@@ -30,7 +30,6 @@ const ConfirmPin = () => {
   const bottomInset = useSafeAreaInsets().bottom;
   const isSignup = paramsData?.code === null;
 
-  const [clearValue, setClearValue] = React.useState<boolean>(false);
   const toast = useToast();
 
   const { mutate, isLoading } = useAuthMutation(
@@ -81,6 +80,7 @@ const ConfirmPin = () => {
       mutate(isSignup ? signUpItem : resetPinItem);
     },
   });
+
   return (
     <>
       <AuthLoading visible={isLoading} />
@@ -88,9 +88,11 @@ const ConfirmPin = () => {
         extraScrollHeight={50}
         extraHeight={100}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
         style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={authStyles.container}
+        contentContainerStyle={authStyles.pinContainer}
       >
         <Image
           source={images.logo}
@@ -107,29 +109,43 @@ const ConfirmPin = () => {
           Confirm Pin
         </AppText>
 
-        <OtpInput
-          onOtpEntered={(otp: string) => {
-            formik.setFieldValue("confirm_pin", otp);
-          }}
-          borderColor={
-            formik.errors.confirm_pin ? colors.error : colors.formBorder
-          }
-          clearValue={clearValue}
+        <PinInput
+          autoFocus
+          value={formik.values.confirm_pin}
+          onChangeText={(pin) => formik.setFieldValue("confirm_pin", pin)}
+          onBlur={() => formik.setFieldTouched("confirm_pin", true)}
+          error={formik.touched.confirm_pin && formik.errors.confirm_pin}
+          placeholder="Confirm PIN"
         />
 
         <View style={{ paddingTop: 10 }}>
           <FormErrorMessage error={formik.errors.confirm_pin} />
         </View>
+
+        <Pressable
+          onPress={() => router.navigate("/signin")}
+          style={authStyles.authFooter}
+        >
+          <AppText fontFamily="Regular" color="formLabelText" fontSize={14}>
+            Already have an account?
+          </AppText>
+          <AppText fontFamily="SemiBold" color="formLabelText" fontSize={14}>
+            Sign in
+          </AppText>
+        </Pressable>
       </KeyboardAwareScrollView>
+
       <View style={[authStyles.buttonContainer, { bottom: bottomInset + 20 }]}>
         <AppButton
-          title="Sign In"
+          title="Sign in"
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          height={48}
+          borderRadius={8}
+          fontSize={16}
+          style={authStyles.authButton}
           onPress={formik.submitForm}
-          // loading={loading}
-          disabled={!(formik.isValid && formik.dirty)}
+          disabled={!(formik.isValid && formik.dirty) || isLoading}
         />
       </View>
     </>
@@ -137,5 +153,3 @@ const ConfirmPin = () => {
 };
 
 export default ConfirmPin;
-
-const styles = StyleSheet.create({});

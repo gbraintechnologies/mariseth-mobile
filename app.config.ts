@@ -1,4 +1,4 @@
-import { ConfigContext, ExpoConfig } from "@expo/config";
+import type { ConfigContext, ExpoConfig } from "@expo/config";
 
 const appVariant = process.env.EXPO_PUBLIC_APP_ENV || "production";
 
@@ -57,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       monochromeImage: "./assets/images/appicons/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    edgeToEdgeEnabled: true,
+    edgeToEdgeEnabled: false,
     package: app?.bundleIdAndroid,
     version: "1.0.0",
     versionCode: 1,
@@ -73,7 +73,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-splash-screen",
       {
         image: "./assets/images/appicons/splash-icon-light.png",
-        imageWidth: 200,
+        imageWidth: 166,
         resizeMode: "contain",
         backgroundColor: "#ffffff",
         dark: {
@@ -86,6 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-build-properties",
       {
         android: {
+          newArchEnabled: true,
           enableProguardInReleaseBuilds: true,
           enableShrinkResourcesInReleaseBuilds: true,
           useLegacyPackaging: true,

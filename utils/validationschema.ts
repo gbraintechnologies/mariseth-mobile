@@ -69,6 +69,11 @@ export const pinUpdateSchema = yup.object().shape({
     .string()
     .required("New pin is required")
     .matches(/^\d{4}$/, "New pin must be a 4-digit number"),
+  confirm_new_pin: yup
+    .string()
+    .required("Confirm new pin is required")
+    .oneOf([yup.ref("new_pin")], "Pins must match")
+    .matches(/^\d{4}$/, "Confirm pin must be a 4-digit number"),
 });
 
 export const resetPinSchema = yup.object().shape({
@@ -208,8 +213,18 @@ export const leadershipExperienceEditSchema = yup.object().shape({
 });
 
 export const applyCreditSchema = yup.object().shape({
-  // input_credits: yup.string().required("Input Credits is required"),
-  // type: yup.string().required("Type is required"),
+  apply_for: yup
+    .string()
+    .oneOf(["myself", "my_farmer"])
+    .required("Apply for is required"),
+  farmer_ids: yup.array().when("apply_for", {
+    is: "my_farmer",
+    then: (schema) =>
+      schema
+        .min(1, "Select at least one farmer")
+        .required("Select at least one farmer"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   quantity: yup
     .string()
     .required("Quantity is required")
@@ -226,7 +241,19 @@ export const applyCreditSchema = yup.object().shape({
   input_credit: yup.string().required("Input Credit is required"),
 });
 
-export const adddFarmerSchema = yup.object().shape({
+export const addFarmSchema = yup.object().shape({
+  apply_for: yup
+    .string()
+    .oneOf(["myself", "my_farmer"])
+    .required("Apply for is required"),
+  farmer_ids: yup.array().when("apply_for", {
+    is: "my_farmer",
+    then: (schema) =>
+      schema
+        .min(1, "Select at least one farmer")
+        .required("Select at least one farmer"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   farm_type: yup.string().required("Farm Type is required"),
   name: yup.string().required("Farm Name  is required"),
   location: yup.string().required("Farm Location is required"),
@@ -256,6 +283,34 @@ export const adddFarmerSchema = yup.object().shape({
   //   .of(yup.string().required())
   //   .min(1, "Please select at least one livestock option")
   //   .required("Livestock is required"),
+  use_of_fertilizers: yup
+    .array()
+    .of(yup.string().required())
+    .required("This is a required field"),
+  farming_methods: yup
+    .array()
+    .of(yup.string().required())
+    .required("This is a required field"),
+  irrigation: yup.boolean().required("This is a required field"),
+  has_access_to_market: yup.boolean().required("This is a required field"),
+});
+
+export const adddFarmerSchema = yup.object().shape({
+  farm_type: yup.string().required("Farm Type is required"),
+  name: yup.string().required("Farm Name  is required"),
+  location: yup.string().required("Farm Location is required"),
+  region: yup.string().required("Region is required"),
+  district: yup.string().required("District is required"),
+  size: yup
+    .string()
+    .required("Total Land Size is required")
+    .matches(/^\d+$/, "Total Land Size must be a number"),
+
+  size_metric: yup.string(),
+
+  land_ownership: yup.string().required("Land Owndership is required"),
+  crops: yup.array().of(yup.string().required()).optional(),
+  livestock: yup.array().of(yup.string().required()).optional(),
   use_of_fertilizers: yup
     .array()
     .of(yup.string().required())

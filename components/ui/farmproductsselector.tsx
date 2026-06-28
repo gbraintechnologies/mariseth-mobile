@@ -1,5 +1,4 @@
 import { colors } from "@/constants/colors";
-import { largeScreen } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
 import { useUniversalStore } from "@/stores/useuniversalstore";
 import { getColorForItem } from "@/utils/commonmethods";
@@ -9,7 +8,6 @@ import React from "react";
 import {
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   TouchableHighlight,
   TouchableOpacity,
@@ -259,28 +257,14 @@ const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
             }));
           }}
         >
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={true}
-            contentContainerStyle={{
-              flexGrow: 1,
-              flexDirection: "row",
-              gap: 8,
-            }}
-            keyboardShouldPersistTaps="handled"
-          >
+          <View style={styles.chipsContainer}>
             {value.length > 0 ? (
               value.map((itemId) => {
                 const selectedItem = data.find((item) => item.id === itemId);
                 if (!selectedItem) return null;
-                const { bgColor, textColor } = getColorForItem(
-                  selectedItem.name
-                );
+                const { textColor } = getColorForItem(selectedItem.name);
                 return (
-                  <View
-                    key={itemId}
-                    style={[styles.tag, { backgroundColor: bgColor }]}
-                  >
+                  <View key={itemId} style={styles.tag}>
                     <AppText
                       fontSize={12}
                       fontFamily="SemiBold"
@@ -308,7 +292,14 @@ const FarmProductsSelector: React.FC<FarmProductsSelectorProps> = ({
                 {placeholder}
               </AppText>
             )}
-          </ScrollView>
+          </View>
+          <Image
+            source={icons.arrowDown}
+            style={[
+              styles.chevron,
+              { tintColor: hasError ? colors.error : colors.primary },
+            ]}
+          />
         </Pressable>
       </View>
     </>
@@ -320,12 +311,26 @@ export default FarmProductsSelector;
 const styles = StyleSheet.create({
   selectButton: {
     width: "100%",
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
-    height: largeScreen ? 54 : 49,
+    minHeight: 54,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: colors.white,
+    gap: 10,
+  },
+  chipsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+  },
+  chevron: {
+    width: 20,
+    height: 20,
   },
 
   modalBgOverlay: {
@@ -341,8 +346,11 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 15,
-    paddingHorizontal: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.formBorder,
+    backgroundColor: colors.white,
+    paddingHorizontal: 8,
     paddingVertical: 6,
   },
 

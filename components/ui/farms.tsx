@@ -1,24 +1,27 @@
 import { endpoints } from "@/constants/endpoints";
 import { width } from "@/constants/generalconstants";
 import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
-import React from "react";
+import { differenceInDays, parseISO } from "date-fns";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
+import AppText from "./apptext";
 import CustomList from "./customlist";
 import FarmCard from "./farmcard";
-import SectionHeader from "./sectionheader";
+
+const isRecentlyAddedFarm = (farm: any) => {
+  if (!farm?.date_created) return false;
+
+  return differenceInDays(new Date(), parseISO(farm.date_created)) < 14;
+};
 
 const Farms = () => {
   const {
-    data,
-    isLoading,
-    isError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     items,
     refetch,
     isRefetching,
-    error,
   } = usePaginatedInfiniteQuery<any>(
     endpoints.leadFarmersFarms,
     "leadfarmersfarms",
@@ -28,45 +31,26 @@ const Farms = () => {
     }
   );
 
-  // console.log(JSON.stringify(items));
+  const hasFarms = (items?.length ?? 0) > 0;
 
-  // if (isLoading) return <ActivityIndicator />;
-  // if (isError) return <Text>Error loading farms.</Text>;
+  const recentlyAddedFarms = useMemo(
+    () => (hasFarms ? items.filter(isRecentlyAddedFarm).slice(0, 5) : []),
+    [hasFarms, items]
+  );
 
   return (
-    <View style={{ width: width, paddingHorizontal: 16 }}>
-      <SectionHeader
-        title="Farms"
-        btnIcon="refresh"
-        btnTitle="Refresh"
-        marginBottom={0}
-        onPress={() => refetch()}
-      />
+    <View style={styles.container}>
+      {hasFarms ? (
+        <AppText
+          fontFamily="SemiBold"
+          fontSize={16}
+          color="primary"
+          style={styles.sectionTitle}
+        >
+          Farms
+        </AppText>
+      ) : null}
 
-      {/* <FlashList
-        data={farms}
-        keyExtractor={(item, index) => index.toString()}
-        onEndReachedThreshold={1}
-        estimatedListSize={{ height, width }}
-        removeClippedSubviews={true}
-        getItemType={(item: any) => {
-          return item?.id;
-        }}
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-        }}
-        renderItem={({ item }) => <FarmCard item={item} />}
-        estimatedItemSize={200}
-        ListFooterComponent={<RenderFooter />}
-        refreshing={isRefetching}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={refetch}
-            colors={[colors.primary]}
-          />
-        }
-      /> */}
       <CustomList
         data={items}
         bounces={false}
@@ -77,11 +61,49 @@ const Farms = () => {
         isRefetching={isRefetching}
         renderItem={({ item }: any) => <FarmCard item={item} />}
         type={"farms"}
+        emptyVariant="inline"
+        contentContainerStyle={
+          hasFarms ? undefined : { minHeight: 220, flexGrow: 1 }
+        }
       />
+
+      {recentlyAddedFarms.length > 0 ? (
+        <View style={styles.recentlyAddedSection}>
+          <AppText fontFamily="SemiBold" fontSize={16} color="black">
+            Recently Added
+          </AppText>
+
+          <View style={styles.recentlyAddedList}>
+            {recentlyAddedFarms.map((item) => (
+              <FarmCard
+                key={item.id}
+                item={item}
+                variant="compact"
+                showNewBadge
+              />
+            ))}
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 };
 
 export default Farms;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    width: width,
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    marginBottom: 7,
+  },
+  recentlyAddedSection: {
+    gap: 12,
+    marginTop: 12,
+  },
+  recentlyAddedList: {
+    width: "100%",
+  },
+});

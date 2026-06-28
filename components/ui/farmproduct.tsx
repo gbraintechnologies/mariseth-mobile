@@ -6,9 +6,11 @@ import AppText from "./apptext";
 const FarmProduct = ({
   products,
   type,
+  showTitle = true,
 }: {
   products: farmProduct[];
   type: "livestock" | "crop";
+  showTitle?: boolean;
 }) => {
   if (!products) return null;
   const types = {
@@ -19,14 +21,16 @@ const FarmProduct = ({
   };
   return (
     <>
-      <AppText
-        fontFamily="SemiBold"
-        fontSize={16}
-        color="textBold"
-        style={{ marginBottom: 12 }}
-      >
-        {types[type].title}
-      </AppText>
+      {showTitle ? (
+        <AppText
+          fontFamily="SemiBold"
+          fontSize={16}
+          color="textBold"
+          style={{ marginBottom: 12 }}
+        >
+          {types[type].title}
+        </AppText>
+      ) : null}
       <View style={styles.productsContainer}>
         {products.map((product) => (
           <View style={styles.cropCard} key={product?.id}>

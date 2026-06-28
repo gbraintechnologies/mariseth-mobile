@@ -7,10 +7,24 @@ import { BlurView } from "expo-blur";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const WelcomeGlassCard = ({ children }: { children: React.ReactNode }) => {
+  if (isIOS) {
+    return (
+      <BlurView intensity={42} tint="dark" style={authStyles.blur}>
+        {children}
+      </BlurView>
+    );
+  }
+
+  return <View style={[authStyles.blur, authStyles.androidGlass]}>{children}</View>;
+};
+
 const Index = () => {
   const bottomInset = useSafeAreaInsets().bottom;
+
   return (
     <ImageBackground
       style={{ flex: 1 }}
@@ -20,39 +34,48 @@ const Index = () => {
       <View
         style={[
           authStyles.welcomeContainer,
-          {
-            paddingBottom: bottomInset + 25,
-          },
+          { paddingBottom: bottomInset + 25 },
         ]}
       >
-        <BlurView
-          intensity={isIOS ? 40 : 80}
-          tint={isIOS ? "light" : "dark"}
-          // experimentalBlurMethod="dimezisBlurView"
-          style={authStyles.blur}
-        >
+        <WelcomeGlassCard>
           <AppText
             fontFamily="Bold"
             fontSize={26}
             color="white"
-            style={{ lineHeight: 36, marginBottom: 6 }}
+            style={{ lineHeight: 36, marginBottom: 4 }}
           >
             Our passion for agriculture is at the heart of everything we do.
           </AppText>
 
           <AppText fontFamily="Regular" fontSize={15} color="white">
-            Africa's Leading Farm
+            Africa&apos;s Leading Farm
           </AppText>
-        </BlurView>
+        </WelcomeGlassCard>
+
         <AppButton
           title="Get Started"
           textColor="white"
           btnColor="buttonSecondary"
-          style={{}}
+          height={48}
+          borderRadius={8}
+          fontSize={16}
+          style={authStyles.welcomeButton}
           onPress={() => {
             router.navigate("/signup");
           }}
         />
+
+        <Pressable
+          onPress={() => router.navigate("/signin")}
+          style={authStyles.welcomeFooter}
+        >
+          <AppText fontFamily="Regular" color="formLabelText" fontSize={14}>
+            Already have an account?
+          </AppText>
+          <AppText fontFamily="SemiBold" color="formLabelText" fontSize={14}>
+            Sign in
+          </AppText>
+        </Pressable>
       </View>
     </ImageBackground>
   );

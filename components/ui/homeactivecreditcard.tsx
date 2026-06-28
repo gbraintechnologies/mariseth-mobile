@@ -2,7 +2,6 @@ import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
 import { icons } from "@/constants/icons";
 import { useFetchQuery } from "@/hooks/usefetchquery";
-import { userStore } from "@/stores/userstore";
 import { dueDateFormat } from "@/utils/commonmethods";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -11,8 +10,6 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "./apptext";
 
 const HomeActiveCreditCard = () => {
-  const user = userStore((state) => state.user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
   const { data, isLoading, error } = useFetchQuery(
     endpoints.activeCredit,
     "activecredit"
@@ -24,9 +21,7 @@ const HomeActiveCreditCard = () => {
   }
   if (isLoading) {
     return (
-      <View
-        style={{ paddingHorizontal: 16, marginTop: isLeaderFarmer ? 0 : 32 }}
-      >
+      <View style={{ paddingHorizontal: 16 }}>
         <View
           style={{
             backgroundColor: colors.skeletonPlaceholder,
@@ -44,9 +39,7 @@ const HomeActiveCreditCard = () => {
     // console.log("Active Credit", data);
 
     return (
-      <View
-        style={{ paddingHorizontal: 16, marginTop: isLeaderFarmer ? 0 : 32 }}
-      >
+      <View style={{ paddingHorizontal: 16 }}>
         <View style={styles.activeCreditContainer}>
           <View
             style={{
@@ -66,7 +59,7 @@ const HomeActiveCreditCard = () => {
                 color="textBold"
                 style={{}}
               >
-                Active Credits
+                Active Credit
               </AppText>
 
               <AppText

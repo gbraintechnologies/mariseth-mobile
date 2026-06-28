@@ -8,6 +8,7 @@ import {
 import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
 import { tabbarScreenOptions, tabScreenOptions } from "@/utils/layoutmethods";
+import { isAdminUser } from "@/utils/userroles";
 import { UseQueryOptions } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
@@ -21,7 +22,9 @@ export default function TabsLayout() {
   const user = useStore(userStore, (state) => state.user);
   const enabled = useStore(useUniversalStore, (state) => state.enabled);
 
+  const isAdmin = isAdminUser(user);
   const isLeaderFarmer = user?.farmer?.type === "lead";
+  const tabRoleOptions = { isAdmin, isLeaderFarmer };
 
   const regions = userStore((state) => state.regions);
   const { data } = useFetchQuery(endpoints.regions, "regions", {
@@ -142,30 +145,37 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={tabScreenOptions("Home")}
+        options={tabScreenOptions("Home", tabRoleOptions)}
         // listeners={listener()}
       />
       <Tabs.Screen
         name="credits"
-        options={tabScreenOptions("Credits")}
+        options={tabScreenOptions("Credits", tabRoleOptions)}
         // listeners={listener()}
       />
       <Tabs.Screen
         name="myfarm"
-        options={tabScreenOptions("My Farm")}
+        options={tabScreenOptions("My Farm", tabRoleOptions)}
         // listeners={listener()}
       />
       <Tabs.Screen
         name="myfarmers"
         options={{
-          ...tabScreenOptions("My Farmers"),
-          ...(isLeaderFarmer ? {} : { href: null }),
+          ...tabScreenOptions("My Farmers", tabRoleOptions),
+          ...(isLeaderFarmer || isAdmin ? {} : { href: null }),
         }}
         // listeners={listener()}
       />
       <Tabs.Screen
+        name="finance"
+        options={{
+          ...tabScreenOptions("Finance", tabRoleOptions),
+          ...(isAdmin ? {} : { href: null }),
+        }}
+      />
+      <Tabs.Screen
         name="more"
-        options={tabScreenOptions("More")}
+        options={tabScreenOptions("More", tabRoleOptions)}
         // listeners={listener()}
       />
     </Tabs>

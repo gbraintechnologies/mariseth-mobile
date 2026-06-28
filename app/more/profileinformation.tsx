@@ -1,20 +1,42 @@
-import AppText from "@/components/ui/apptext";
 import InfoCard from "@/components/ui/infocard";
-import ProfileCard from "@/components/ui/profilecard";
+import ProfileCard, { formatPhoneDisplay } from "@/components/ui/profilecard";
+import AppText from "@/components/ui/apptext";
 import { colors } from "@/constants/colors";
 import { icons } from "@/constants/icons";
 import { userStore } from "@/stores/userstore";
+import { format, parseISO } from "date-fns";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const displayValue = (value?: string | number | null) => {
+  if (value === undefined || value === null || value === "") {
+    return "-";
+  }
+
+  return String(value);
+};
+
+const formatDateOfBirth = (value?: string) => {
+  if (!value) return "-";
+
+  try {
+    return format(parseISO(value), "do MMMM, yyyy");
+  } catch {
+    return value;
+  }
+};
 
 const ProfileInformation = () => {
   const topInset = useSafeAreaInsets().top;
-
   const user = userStore((state) => state.user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
+  const farmer = user?.farmer;
+  const isLeaderFarmer = farmer?.type === "lead";
+  const leaderShipExperience = farmer?.leadership_experience;
+  const isMentoring = leaderShipExperience?.is_mentoring_other_farmers;
+
   const basicProfileInfo = {
     headerTitle: "My Information",
     headerIcon: icons.user,
@@ -22,65 +44,62 @@ const ProfileInformation = () => {
     information: [
       {
         key: "Gender",
-        value: user?.farmer?.gender === "m" ? "Male" : "Female",
+        value: farmer?.gender === "m" ? "Male" : farmer?.gender === "f" ? "Female" : "-",
       },
       {
         key: "Date of Birth",
-        value: user?.farmer?.date_of_birth as string,
+        value: formatDateOfBirth(farmer?.date_of_birth),
       },
       {
         key: "National ID/Passport Number",
-        value: user?.farmer?.id_number as string,
+        value: displayValue(farmer?.id_number),
       },
       {
         key: "Contact Number",
-        value: user?.farmer?.phone_number as string,
+        value: formatPhoneDisplay(farmer?.phone_number) || "-",
       },
       {
         key: "Email",
-        value: (user?.farmer?.email as string) ?? "N/A",
+        value: displayValue(farmer?.email),
       },
       {
         key: "Address",
-        value: user?.farmer?.address as string,
+        value: displayValue(farmer?.address),
       },
       {
         key: "Village/Community",
-        value: user?.farmer?.village as string,
+        value: displayValue(farmer?.village),
       },
       {
         key: "District",
-        value: user?.farmer?.district?.name as string,
+        value: displayValue(farmer?.district?.name),
       },
       {
         key: "Country",
-        value: user?.farmer?.country as string,
+        value: displayValue(farmer?.country),
+      },
+      {
+        key: "Do you provide training to other farmers?",
+        value: farmer?.farm?.provide_training ? "Yes" : "No",
       },
     ],
   };
-  const leaderShipExperience = user?.farmer?.leadership_experience;
-  const isMentoring = leaderShipExperience?.is_mentoring_other_farmers;
 
   const leadershipExperienceInfo = {
     headerTitle: "Leadership & Experience",
-    headerIcon: icons.leadership,
     onEditPress: () => router.navigate("/more/leadershipinfoedit"),
     information: [
       {
         key: "Are you currently mentoring other farmers?",
         value: isMentoring ? "Yes" : "No",
       },
-      // {
-      //   key: "If Yes, how many farmers are you mentoring",
-      //   value: leaderShipExperience?.number_of_farmers_mentoring || "N/A",
-      // },
       ...(isMentoring
         ? [
             {
               key: "If Yes, how many farmers are you mentoring",
-              value:
-                user?.farmer?.leadership_experience
-                  ?.number_of_farmers_mentoring || "",
+              value: displayValue(
+                leaderShipExperience?.number_of_farmers_mentoring
+              ),
             },
           ]
         : []),
@@ -88,6 +107,14 @@ const ProfileInformation = () => {
         key: "Membership in Farming Cooperatives/Associations",
         value: leaderShipExperience?.has_farming_membership ? "Yes" : "No",
       },
+      ...(leaderShipExperience?.has_farming_membership
+        ? [
+            {
+              key: "If Other, Please Specify Here",
+              value: displayValue(leaderShipExperience?.farming_type),
+            },
+          ]
+        : []),
       {
         key: "Have you received any leadership or agricultural training?",
         value: leaderShipExperience?.has_received_farming_leadership_training
@@ -100,21 +127,20 @@ const ProfileInformation = () => {
   return (
     <ScrollView
       style={styles.profileInfoContainer}
-      contentContainerStyle={{
-        padding: 16,
-        paddingTop: topInset + 16,
-        paddingBottom: 60,
-      }}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { paddingTop: topInset + 20 },
+      ]}
     >
-      <ProfileCard item={user} />
-      <Pressable
-        style={styles.backButtonContainer}
-        onPress={() => {
-          router.back();
-        }}
-      >
+      <ProfileCard item={user} readonly />
+
+      <Pressable style={styles.backButtonContainer} onPress={() => router.back()}>
         <View style={styles.backIcon}>
-          <Image source={icons.arrowLeft} style={{ width: 18, height: 18 }} />
+          <Image
+            source={icons.arrowLeft}
+            style={styles.backIconImage}
+            tintColor={colors.primary}
+          />
         </View>
         <AppText fontFamily="SemiBold" fontSize={14} color="textBold">
           Back
@@ -130,19 +156,39 @@ const ProfileInformation = () => {
 export default ProfileInformation;
 
 const styles = StyleSheet.create({
-  profileInfoContainer: { flex: 1, backgroundColor: colors.backgroundPrimary },
+  profileInfoContainer: {
+    flex: 1,
+    backgroundColor: colors.backgroundPrimary,
+  },
+  contentContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 60,
+  },
   backButtonContainer: {
-    marginVertical: 18,
     flexDirection: "row",
     alignSelf: "flex-start",
     alignItems: "center",
+    gap: 8,
+    marginTop: 18,
+    marginBottom: 18,
   },
-
   backIcon: {
-    borderWidth: 1,
+    width: 34,
+    height: 34,
+    borderWidth: 0.85,
     borderRadius: 7,
-    borderColor: colors.formBorder,
-    padding: 8,
-    marginRight: 9,
+    borderColor: "#E2E8F0",
+    backgroundColor: colors.backgroundPrimary,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3.4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  backIconImage: {
+    width: 17,
+    height: 17,
   },
 });

@@ -3,30 +3,48 @@ import ErrorComponent from "@/components/ui/errorcomponent";
 import FarmDetails from "@/components/ui/farmdetails";
 import FarmProducts from "@/components/ui/farmproducts";
 import { SegmentedScrollView } from "@/components/ui/segmentedview";
+import SmallFarmerCard from "@/components/ui/smallfarmercard";
 import MyFarmSP from "@/components/ui/skeletonplaceholders/myfarm";
+import WeatherCard from "@/components/ui/weathercard";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
-import { isIOS, universalBlurhash } from "@/constants/generalconstants";
-import { images } from "@/constants/images";
-import { useFetchQuery } from "@/hooks/usefetchquery";
+import { isIOS } from "@/constants/generalconstants";
+import { useFetchQuery, usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
-import { ImageBackground } from "expo-image";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useStore } from "zustand";
 
 const MyFarm = () => {
   const user = useStore(userStore, (state) => state.user);
+  const isLeaderFarmer = user?.farmer?.type === "lead";
+
   const { data, isLoading, error, refetch } = useFetchQuery(
     endpoints.myFarm,
     "myfarm"
   );
-  // const queryClient = useQueryClient();
+
+  const {
+    data: farmersData,
+    isError: farmersError,
+    items: farmerItems,
+  } = usePaginatedInfiniteQuery<any>(endpoints.myFarmers, "smallholders", {
+    page_size: 10,
+    query: "",
+  });
+
+  const farmerCount = farmersError
+    ? 0
+    : farmersData?.pages?.[0]?.pagination?.total ?? farmerItems?.length ?? 0;
+
+  const recentlyAddedFarmers =
+    isLeaderFarmer && farmerCount > 0 ? farmerItems?.slice(0, 5) ?? [] : [];
+
   if (isLoading) return <MyFarmSP />;
   if (error) {
     const isEmpty = error.message?.detail === "No farm found for this user";
     const message =
-      "We couldn’t find any farm linked to your account. Please refresh or add a new farm to continue.";
+      "We couldn't find any farm linked to your account. Please refresh or add a new farm to continue.";
     return (
       <ErrorComponent
         type={(error as any)?.problem}
@@ -37,30 +55,34 @@ const MyFarm = () => {
     );
   }
 
+  const farmSubtitle = [
+    data?.farm_id,
+    data?.district?.name,
+    data?.region?.code,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const weatherLocation =
+    data?.district?.name ?? user?.farmer?.village ?? "Accra";
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
       contentContainerStyle={{ paddingBottom: isIOS ? "30%" : "20%" }}
     >
-      <View style={{ paddingHorizontal: 16 }}>
-        <ImageBackground
-          source={images.myFarm}
-          style={styles.farmImage}
-          imageStyle={{ borderRadius: 20 }}
-          placeholder={{ blurhash: universalBlurhash }}
-          contentFit="cover"
-          priority={"high"}
-          transition={500}
-        >
-          <View style={{ paddingLeft: 25, paddingBottom: 22 }}>
+      <View style={styles.heroSection}>
+        <View style={styles.weatherWrapper}>
+          <WeatherCard variant="farm" location={weatherLocation} />
+          <View style={styles.farmTitleOverlay}>
             <AppText fontFamily="Bold" fontSize={20} color="white">
               {data?.name}
             </AppText>
             <AppText fontFamily="SemiBold" fontSize={16} color="white">
-              {user?.farmer?.farmer_id} · {data?.location} · {data?.farm_id}
+              {farmSubtitle}
             </AppText>
           </View>
-        </ImageBackground>
+        </View>
       </View>
 
       <SegmentedScrollView
@@ -70,6 +92,19 @@ const MyFarm = () => {
         <FarmDetails item={data} />
         <FarmProducts products={data} />
       </SegmentedScrollView>
+
+      {recentlyAddedFarmers.length > 0 ? (
+        <View style={styles.recentlyAddedSection}>
+          <AppText fontFamily="SemiBold" fontSize={16} color="black">
+            Recently Added
+          </AppText>
+          <View style={styles.recentlyAddedList}>
+            {recentlyAddedFarmers.map((item) => (
+              <SmallFarmerCard key={item.id} item={item} showNewBadge />
+            ))}
+          </View>
+        </View>
+      ) : null}
     </ScrollView>
   );
 };
@@ -77,11 +112,27 @@ const MyFarm = () => {
 export default MyFarm;
 
 const styles = StyleSheet.create({
-  farmImage: {
-    height: 175,
-    width: "100%",
-    borderRadius: 30,
-    marginVertical: 32,
-    justifyContent: "flex-end",
+  heroSection: {
+    paddingHorizontal: 16,
+    marginTop: 32,
+    marginBottom: 32,
+  },
+  weatherWrapper: {
+    position: "relative",
+  },
+  farmTitleOverlay: {
+    position: "absolute",
+    left: 25,
+    bottom: 22,
+    right: 16,
+  },
+  recentlyAddedSection: {
+    paddingHorizontal: 16,
+    gap: 12,
+    marginTop: 12,
+  },
+  recentlyAddedList: {
+    borderTopWidth: 1,
+    borderTopColor: colors.light,
   },
 });

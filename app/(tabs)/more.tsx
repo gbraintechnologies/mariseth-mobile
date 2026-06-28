@@ -19,6 +19,18 @@ const More = () => {
   const logoutModalVisible = useUniversalStore(
     (state) => state.logoutModalVisible
   );
+
+  const handleLinkPress = (item: moreLink) => {
+    if (item.variant === "logout") {
+      useUniversalStore.setState({ logoutModalVisible: true });
+      return;
+    }
+
+    if (item.route) {
+      router.navigate(item.route);
+    }
+  };
+
   return (
     <>
       {logoutModalVisible && <LogoutModal />}
@@ -26,43 +38,47 @@ const More = () => {
         style={[
           styles.moreContainer,
           {
-            paddingTop: topInset + 16,
+            paddingTop: topInset + 20,
           },
         ]}
       >
         <ProfileCard item={user} />
-        <View style={{ marginTop: 31 }}>
+
+        <View style={styles.linksSection}>
           {moreLinks.map((item: moreLink, index: number) => {
-            const isLast = index === moreLinks.length - 1;
+            const isLogout = item.variant === "logout";
+
             return (
               <Pressable
                 key={index}
-                style={styles.moreLinkContainer}
-                onPress={() =>
-                  isLast
-                    ? useUniversalStore.setState({ logoutModalVisible: true })
-                    : router.navigate(item?.route)
-                }
+                style={[
+                  styles.moreLinkContainer,
+                  isLogout && styles.logoutLinkContainer,
+                ]}
+                onPress={() => handleLinkPress(item)}
               >
                 <Image
-                  source={item?.icon}
-                  style={{ height: 24, width: 24, marginRight: 12 }}
+                  source={item.icon}
+                  style={[
+                    styles.linkIcon,
+                    isLogout && styles.logoutIcon,
+                    isLogout && { tintColor: colors.error },
+                  ]}
                 />
                 <AppText
                   fontSize={16}
                   fontFamily="Regular"
-                  color={isLast ? "error" : "black"}
-                  style={{ flex: 1 }}
+                  color={isLogout ? "error" : "textBold"}
+                  style={styles.linkLabel}
                 >
-                  {item?.name}
+                  {item.name}
                 </AppText>
                 <Image
                   source={icons.arrowRight}
-                  style={{
-                    height: 16,
-                    width: 16,
-                    tintColor: isLast ? colors.error : colors.primary,
-                  }}
+                  style={[
+                    styles.chevronIcon,
+                    { tintColor: isLogout ? colors.error : colors.primary },
+                  ]}
                 />
               </Pressable>
             );
@@ -79,12 +95,39 @@ const styles = StyleSheet.create({
   moreContainer: {
     flex: 1,
     backgroundColor: colors.backgroundPrimary,
-    padding: 16,
+    paddingHorizontal: 16,
+  },
+  linksSection: {
+    marginTop: 31,
+    gap: 8,
   },
   moreLinkContainer: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 46,
     paddingVertical: 11,
-    marginBottom: 8,
+  },
+  logoutLinkContainer: {
+    minHeight: 38,
+    paddingVertical: 9,
+  },
+  linkIcon: {
+    height: 24,
+    width: 24,
+    marginRight: 12,
+    tintColor: colors.primary,
+  },
+  logoutIcon: {
+    height: 20,
+    width: 20,
+    marginRight: 8,
+  },
+  linkLabel: {
+    flex: 1,
+    lineHeight: 19,
+  },
+  chevronIcon: {
+    height: 16,
+    width: 16,
   },
 });

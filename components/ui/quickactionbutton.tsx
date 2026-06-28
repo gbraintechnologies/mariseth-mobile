@@ -19,12 +19,12 @@ const QuickActionButton: React.FC<quickActionButtonProps> = ({
   > = {
     credit: {
       label: "Apply for Credit",
-      icon: icons.phone,
+      icon: icons.cardAdd,
       route: "/credits/applycredit",
     },
     farmer: {
       label: "Add New Farmer",
-      icon: icons.bill,
+      icon: icons.userAdd,
       route: `/myfarmers/addfarmer?data=""`,
     },
   };
@@ -50,10 +50,10 @@ const styles = StyleSheet.create({
   quickActionButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 13,
+    height: 50,
     boxShadow: "0px 4px 19px 0px rgba(63, 30, 87, 0.10);",
     borderRadius: 12,
-    paddingLeft: 13,
+    paddingLeft: 14,
     backgroundColor: colors.backgroundPrimary,
   },
   quickActionButtonIcon: { height: 24, width: 24, marginRight: 12 },

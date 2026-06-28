@@ -1,10 +1,16 @@
 import AppButton from "@/components/ui/appbutton";
+import AppText from "@/components/ui/apptext";
 import AppTextInput from "@/components/ui/apptextinput";
+import ApplyForSelector, {
+  ApplyForOption,
+} from "@/components/ui/applyforselector";
 import FormErrorMessage from "@/components/ui/formerrormessage";
 import InputCreditSelector from "@/components/ui/inputcreditselector";
 import MetricSelector from "@/components/ui/metricselector";
+import SmallFarmerCard from "@/components/ui/smallfarmercard";
 import { colors } from "@/constants/colors";
 import { endpoints } from "@/constants/endpoints";
+import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import useAuthMutation from "@/hooks/usemutation";
 import { userStore } from "@/stores/userstore";
 import { inputCredit, inputCreditCategory } from "@/types/credit";
@@ -12,7 +18,6 @@ import { handleAuthApiError } from "@/utils/apierrorhandler";
 import { handleToastShow } from "@/utils/commonmethods";
 import { applyCreditSchema } from "@/utils/validationschema";
 import { useQueryClient } from "@tanstack/react-query";
-import { addDays, startOfDay } from "date-fns";
 import { router } from "expo-router";
 import { useFormik } from "formik";
 import React from "react";
@@ -23,6 +28,8 @@ import { useToast } from "react-native-toast-notifications";
 import { useStore } from "zustand";
 
 const ApplyCredit = () => {
+  const user = useStore(userStore, (state) => state.user);
+  const isLeaderFarmer = user?.farmer?.type === "lead";
   const metrics = userStore.getState().metrics;
   const quantityMetrics = metrics.filter(
     (metric) => metric.category_name === "quantity_metric"
@@ -33,63 +40,54 @@ const ApplyCredit = () => {
     (category) => category.category_name === "input_credits_category"
   ) || []) as inputCreditCategory[];
 
-  // console.log(creditCategories);
+  const { items: farmers } = usePaginatedInfiniteQuery<any>(
+    endpoints.myFarmers,
+    "smallholders",
+    {
+      page_size: 10,
+      query: "",
+    }
+  );
+
+  const recentlyAddedFarmers = farmers?.slice(0, 7) ?? [];
 
   const bottomInset = useSafeAreaInsets().bottom;
-  // const isLoading = false;
   const toast = useToast();
   const queryClient = useQueryClient();
-  const { mutate, isLoading, error } = useAuthMutation(
+  const { mutate, isLoading } = useAuthMutation(
     endpoints.applyCredit,
     "POST",
     "applycredit",
     {
-      onSuccess: (data) => {
-        // console.log(data);
-        const toastMessage = "Credit applied successfully!";
-        handleToastShow(toast, toastMessage);
+      onSuccess: () => {
+        handleToastShow(toast, "Credit applied successfully!");
         queryClient
           .invalidateQueries({ queryKey: ["credit-history"] })
           .then(() => {
             router.navigate("/credits");
           });
       },
-
       onError: (error: any) => {
-        console.log(error);
         handleAuthApiError(error, formik, toast);
       },
     }
   );
+
   const formik = useFormik({
     initialValues: {
-      // input_credits: "",
-      // type: "",
+      apply_for: "myself" as ApplyForOption,
+      farmer_ids: [] as number[],
       input_credit_category: "",
       input_credit: "",
       quantity: "",
-      // due_date: "",
-      // credit_amount: "",
-      // interest_rate: "",
       notes: "",
       quantity_metric: quantityMetrics[0]?.id,
     },
     validationSchema: applyCreditSchema,
     onSubmit: async (values) => {
-      // const { interest_rate, ...rest } = values;
-      // const payload = {
-      //   ...rest,
-      //   type: values.type.toLowerCase(),
-      //   ...(interest_rate ? { interest_rate } : {}),
-      // };
-      // console.log(payload);
-      console.log(values);
-
       mutate(values);
     },
   });
-  const today = startOfDay(new Date());
-  const tomorrow = addDays(today, 1);
 
   const inputCreditsArray = React.useMemo(
     () =>
@@ -98,301 +96,215 @@ const ApplyCredit = () => {
           Number(credit?.category.id) ===
           Number(formik.values.input_credit_category)
       ) || [],
-    [formik.values.input_credit_category]
+    [formik.values.input_credit_category, inputCredits]
   ) as inputCredit[];
 
+  const isMyFarmer = formik.values.apply_for === "my_farmer";
+
+  const toggleFarmerSelection = (farmerId: number) => {
+    const currentIds = formik.values.farmer_ids;
+    const nextIds = currentIds.includes(farmerId)
+      ? currentIds.filter((id) => id !== farmerId)
+      : [...currentIds, farmerId];
+
+    formik.setFieldValue("farmer_ids", nextIds);
+    formik.setFieldTouched("farmer_ids", true, false);
+  };
+
   return (
-    <>
+    <View style={styles.screen}>
       <KeyboardAwareScrollView
         extraHeight={100}
         extraScrollHeight={100}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
-        style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 150,
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
       >
-        <InputCreditSelector
-          label={"Input Credit Category"}
-          placeholder={"Select"}
-          data={creditCategories}
-          field={"input_credit_category"}
-          formik={formik}
-          value={formik.values.input_credit_category}
-        />
-        <FormErrorMessage
-          error={
-            (formik.touched.input_credit_category &&
-              formik.errors.input_credit_category) as string
-          }
-        />
+        <View style={styles.formSection}>
+          {isLeaderFarmer ? (
+            <>
+              <ApplyForSelector
+                value={formik.values.apply_for}
+                onChange={(value) => {
+                  formik.setFieldValue("apply_for", value);
+                  formik.setFieldValue("farmer_ids", []);
+                }}
+              />
+              <FormErrorMessage
+                error={
+                  (formik.touched.apply_for &&
+                    formik.errors.apply_for) as string
+                }
+              />
+            </>
+          ) : null}
 
-        <InputCreditSelector
-          label={"Input Credit"}
-          placeholder={"Select"}
-          data={inputCreditsArray}
-          field={"input_credit"}
-          formik={formik}
-          value={formik.values.input_credit}
-        />
-        <FormErrorMessage
-          error={
-            (formik.touched.input_credit &&
-              formik.errors.input_credit) as string
-          }
-        />
-        {/* <AppTextInput
-          error={formik.touched.input_credits && formik.errors.input_credits}
-          label="Input Credits"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          required
-          value={formik.values.input_credits}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          keyboardType="default"
-          onBlur={() => formik.setFieldTouched("input_credits")}
-          onChangeText={formik.handleChange("input_credits")}
-        />
+          <InputCreditSelector
+            label="Input Credit Category"
+            placeholder="Select category"
+            data={creditCategories}
+            field="input_credit_category"
+            formik={formik}
+            value={formik.values.input_credit_category}
+          />
+          <FormErrorMessage
+            error={
+              (formik.touched.input_credit_category &&
+                formik.errors.input_credit_category) as string
+            }
+          />
 
-        <FormErrorMessage
-          error={
-            (formik.touched.input_credits &&
-              formik.errors.input_credits) as string
-          }
-        /> */}
-        {/* <SelectModal
-          label={"Input Credits"}
-          placeholder={"Select"}
-          data={[
-            "Agro Chemicals",
-            "Fertilizer",
-            "Hybrid Seed",
-            "Mechanisation(Ploughing",
-          ]}
-          field={"input_credits"}
-          formik={formik}
-          value={formik.values.input_credits}
-        />
-        <FormErrorMessage
-          error={
-            (formik.touched.input_credits &&
-              formik.errors.input_credits) as string
-          }
-        /> */}
-        {/* <AppTextInput
-          error={formik.touched.type && formik.errors.type}
-          label="Type"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          required
-          value={formik.values.type}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          keyboardType="default"
-          onBlur={() => formik.setFieldTouched("type")}
-          onChangeText={formik.handleChange("type")}
-        />
+          <InputCreditSelector
+            label="Input Credit"
+            placeholder="Select input credit"
+            data={inputCreditsArray}
+            field="input_credit"
+            formik={formik}
+            value={formik.values.input_credit}
+          />
+          <FormErrorMessage
+            error={
+              (formik.touched.input_credit &&
+                formik.errors.input_credit) as string
+            }
+          />
 
-        <FormErrorMessage
-          error={(formik.touched.type && formik.errors.type) as string}
-        /> */}
+          <AppTextInput
+            error={formik.touched.quantity && formik.errors.quantity}
+            label="Quantity"
+            placeholder="Enter quantity"
+            style={{
+              backgroundColor: isLoading
+                ? colors.backgroundTertiary
+                : colors.backgroundPrimary,
+            }}
+            required
+            value={formik.values.quantity}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+            keyboardType="numeric"
+            onBlur={() => formik.setFieldTouched("quantity")}
+            onChangeText={formik.handleChange("quantity")}
+            leftComponent={
+              <MetricSelector
+                label="Quantity Metric"
+                formik={formik}
+                data={quantityMetrics}
+                field="quantity_metric"
+              />
+            }
+          />
+          <FormErrorMessage
+            error={
+              (formik.touched.quantity && formik.errors.quantity) as string
+            }
+          />
 
-        {/* <SelectModal
-          label={"Type"}
-          placeholder={"Select"}
-          data={[
-            "Agro Chemicals",
-            "Fertilizer",
-            "Hybrid Seed",
-            "Mechanisation(Ploughing",
-          ]}
-          field={"type"}
-          formik={formik}
-          value={formik.values.type}
-        />
-        <FormErrorMessage
-          error={(formik.touched.type && formik.errors.type) as string}
-        /> */}
-        <AppTextInput
-          error={formik.touched.quantity && formik.errors.quantity}
-          label="Quantity"
-          placeholder="0"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          required
-          value={formik.values.quantity}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          keyboardType="numeric"
-          onBlur={() => formik.setFieldTouched("quantity")}
-          onChangeText={formik.handleChange("quantity")}
-          leftComponent={
-            <MetricSelector
-              label="Quantity Metric"
-              formik={formik}
-              data={quantityMetrics}
-              field="quantity_metric"
+          <AppTextInput
+            error={formik.touched.notes && formik.errors.notes}
+            label="Extra Information / Notes"
+            placeholder="Add any extra information"
+            style={{
+              backgroundColor: isLoading
+                ? colors.backgroundTertiary
+                : colors.backgroundPrimary,
+            }}
+            multiline={true}
+            textAlignVertical="top"
+            TextinputHeight={102}
+            value={formik.values.notes}
+            autoCapitalize="none"
+            autoCorrect={false}
+            editable={!isLoading}
+            keyboardType="default"
+            onBlur={() => formik.setFieldTouched("notes")}
+            onChangeText={formik.handleChange("notes")}
+          />
+          <FormErrorMessage
+            error={(formik.touched.notes && formik.errors.notes) as string}
+          />
+        </View>
+
+        {isLeaderFarmer && recentlyAddedFarmers.length > 0 ? (
+          <View style={styles.recentlyAddedSection}>
+            <AppText fontFamily="SemiBold" fontSize={16} color="black">
+              Recently Added
+            </AppText>
+
+            <View style={styles.recentlyAddedList}>
+              {recentlyAddedFarmers.map((item, index) => (
+                <SmallFarmerCard
+                  key={item.id}
+                  item={item}
+                  showNewBadge={!isMyFarmer && index < 5}
+                  showCheckbox={isMyFarmer}
+                  checked={formik.values.farmer_ids.includes(item.id)}
+                  onCheckToggle={() => toggleFarmerSelection(item.id)}
+                />
+              ))}
+            </View>
+
+            <FormErrorMessage
+              error={
+                (formik.touched.farmer_ids &&
+                  formik.errors.farmer_ids) as string
+              }
             />
-          }
-        />
-
-        <FormErrorMessage
-          error={(formik.touched.quantity && formik.errors.quantity) as string}
-        />
-
-        {/* <AppDatePicker
-          formik={formik}
-          label="Due Date"
-          field="due_date"
-          value={formik.values.due_date}
-          minDate={tomorrow}
-          maxDate={null}
-          initialDate={new Date()}
-        />
-
-        <FormErrorMessage
-          error={(formik.touched.due_date && formik.errors.due_date) as string}
-        />
-
-        <AppTextInput
-          error={formik.touched.credit_amount && formik.errors.credit_amount}
-          label="Credit Amount"
-          placeholder=""
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          required
-          value={formik.values.credit_amount}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          leftComponent={
-            <AppText
-              color="formInputText"
-              fontFamily="Regular"
-              fontSize={17}
-              style={{ marginRight: 10 }}
-            >
-              GH₵
-            </AppText>
-          }
-          keyboardType="numeric"
-          onBlur={() => formik.setFieldTouched("credit_amount")}
-          onChangeText={formik.handleChange("credit_amount")}
-        />
-
-        <FormErrorMessage
-          error={
-            (formik.touched.credit_amount &&
-              formik.errors.credit_amount) as string
-          }
-        />
-
-        <AppTextInput
-          error={formik.touched.interest_rate && formik.errors.interest_rate}
-          label="Interest Rate"
-          // placeholder="8%"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          // required
-          value={formik.values.interest_rate}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          leftComponent={
-            <AppText
-              color="formInputText"
-              fontFamily="Regular"
-              fontSize={17}
-              style={{ marginRight: 10 }}
-            >
-              %
-            </AppText>
-          }
-          keyboardType="numeric"
-          onBlur={() => formik.setFieldTouched("interest_rate")}
-          onChangeText={formik.handleChange("interest_rate")}
-        />
-
-        <FormErrorMessage
-          error={
-            (formik.touched.interest_rate &&
-              formik.errors.interest_rate) as string
-          }
-        /> */}
-
-        <AppTextInput
-          error={formik.touched.notes && formik.errors.notes}
-          label="Extra Information / Notes"
-          // placeholder="8%"
-          style={{
-            backgroundColor: isLoading
-              ? colors.backgroundTertiary
-              : colors.backgroundPrimary,
-          }}
-          multiline={true}
-          textAlignVertical="top"
-          TextinputHeight={105}
-          value={formik.values.notes}
-          autoCapitalize="none"
-          autoCorrect={false}
-          editable={!isLoading}
-          keyboardType="default"
-          onBlur={() => formik.setFieldTouched("notes")}
-          onChangeText={formik.handleChange("notes")}
-        />
-
-        <FormErrorMessage
-          error={(formik.touched.notes && formik.errors.notes) as string}
-        />
+          </View>
+        ) : null}
       </KeyboardAwareScrollView>
 
-      <View
-        style={[
-          {
-            position: "absolute",
-
-            width: "100%",
-            paddingHorizontal: 18,
-          },
-          { bottom: bottomInset + 20 },
-        ]}
-      >
+      <View style={[styles.footer, { paddingBottom: bottomInset + 23 }]}>
         <AppButton
-          title={"Submit Credit Application"}
+          title="Apply Now"
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          borderRadius={8}
           onPress={formik.submitForm}
           loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>
-    </>
+    </View>
   );
 };
 
 export default ApplyCredit;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.backgroundPrimary,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 120,
+    gap: 32,
+  },
+  formSection: {
+    gap: 24,
+  },
+  recentlyAddedSection: {
+    gap: 12,
+  },
+  recentlyAddedList: {
+    width: "100%",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    paddingTop: 23,
+    paddingHorizontal: 18,
+  },
+});

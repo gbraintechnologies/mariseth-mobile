@@ -19,7 +19,13 @@ const FarmerCard: React.FC<farmerCard> = ({
   count,
   isLoading,
 }) => {
-  const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
+  const name = [item?.first_name, item?.last_name, item?.other_names]
+    .filter(Boolean)
+    .join(" ");
+  const farmerCount = Number(count);
+  const farmerLabel =
+    !Number.isNaN(farmerCount) && farmerCount === 1 ? "Farmer" : "Farmers";
+
   const cardTypes = {
     small: {
       title: name,
@@ -33,7 +39,7 @@ const FarmerCard: React.FC<farmerCard> = ({
       title: "My Smallholder Farmers",
       count: isLoading ? "..." : count,
       phone: "",
-      subtitle: `Farmer${item?.length > 1 ? "s" : ""}`,
+      subtitle: farmerLabel,
       abstractImage: images.looper,
       abtractStyle: styles.looper,
     },
@@ -52,39 +58,43 @@ const FarmerCard: React.FC<farmerCard> = ({
           />
           <AppText
             fontFamily="SemiBold"
-            fontSize={13}
+            fontSize={14}
             color="textBold"
             style={{ flex: 1 }}
           >
             {cardTypes[type]?.title}
           </AppText>
-          {onPress && (
+          {onPress ? (
             <Pressable style={styles.viewAllButton} onPress={onPress}>
-              <AppText fontFamily="SemiBold" fontSize={10} color="primary">
-                View All
+              <AppText fontFamily="Medium" fontSize={10} color="tabBarInactive">
+                View all
               </AppText>
             </Pressable>
-          )}
+          ) : null}
         </View>
-        <View style={styles.farmerCardCountContainer}>
+        <View
+          style={[
+            styles.farmerCardCountContainer,
+            type === "small" && styles.farmerCardCountContainerSmall,
+          ]}
+        >
           {type === "big" && (
             <AppText
               fontFamily="SemiBold"
-              fontSize={25}
-              color="textBold"
-              style={{ marginRight: 12 }}
+              fontSize={18}
+              color="formLabelText"
             >
               {cardTypes[type]?.count}
             </AppText>
           )}
 
-          <AppText fontFamily="SemiBold" fontSize={12} color="primary">
-            {cardTypes[type]?.subtitle}
-          </AppText>
-
-          {type !== "big" && (
-            <AppText fontFamily="SemiBold" fontSize={12} color="textPrimary">
-              {` . ${cardTypes[type]?.phone}`}
+          {type === "big" ? (
+            <AppText fontFamily="SemiBold" fontSize={12} color="primary">
+              {cardTypes[type]?.subtitle}
+            </AppText>
+          ) : (
+            <AppText fontFamily="Medium" fontSize={12} color="textPrimary">
+              {`${cardTypes[type]?.subtitle} · ${cardTypes[type]?.phone}`}
             </AppText>
           )}
         </View>
@@ -101,7 +111,6 @@ const styles = StyleSheet.create({
     boxShadow: "0px 4px 19px 0px rgba(63, 30, 87, 0.10)",
     paddingVertical: 12,
     paddingHorizontal: 15,
-    marginVertical: 32,
     borderRadius: 16,
     flexDirection: "column",
     overflow: "hidden",
@@ -117,6 +126,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     overflow: "hidden",
+    gap: 11,
+    paddingHorizontal: 9,
+    paddingVertical: 8,
+  },
+  farmerCardCountContainerSmall: {
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    gap: 0,
   },
   looper: {
     width: 180,
@@ -134,9 +151,9 @@ const styles = StyleSheet.create({
     top: 0,
   },
   viewAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 50,
-    backgroundColor: colors.secondaryLight,
+    paddingHorizontal: 25,
+    paddingVertical: 8,
+    borderRadius: 49,
+    backgroundColor: colors.buttonActionSheet,
   },
 });

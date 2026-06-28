@@ -1,5 +1,4 @@
 import { colors } from "@/constants/colors";
-import { genderOptions } from "@/constants/generalconstants";
 import { userStore } from "@/stores/userstore";
 import { myFarm1 } from "@/types/farm";
 import { subYears } from "date-fns";
@@ -13,9 +12,9 @@ import AppDatePicker from "./appdatepicker";
 import AppText from "./apptext";
 import AppTextInput from "./apptextinput";
 import FormErrorMessage from "./formerrormessage";
+import GenderSelector from "./genderselector";
 import IDSelector from "./idselector";
 import RegionSelector from "./regionselector";
-import Select from "./select";
 interface profileFormProps {
   formik: FormikProps<any>;
   isLoading: boolean;
@@ -33,25 +32,28 @@ const ProfileForm: React.FC<profileFormProps> = ({
   required = true,
 }) => {
   const regions = userStore((state) => state.regions);
-  //  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const isFarmerForm = type === "farmer";
   const bottomInset = useSafeAreaInsets().bottom;
+
   return (
-    <>
+    <View style={styles.screen}>
       <KeyboardAwareScrollView
         extraHeight={150}
         extraScrollHeight={50}
         enableOnAndroid={true}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         bounces={false}
-        style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 150,
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          styles.formScrollContent,
+        ]}
       >
         <AppTextInput
           error={formik.errors.name}
           label="Name"
+          placeholder="Enter full name"
           style={{
             backgroundColor: isLoading
               ? colors.backgroundTertiary
@@ -70,11 +72,9 @@ const ProfileForm: React.FC<profileFormProps> = ({
 
         <FormErrorMessage error={formik.errors.name as string} />
 
-        <Select
-          label="Gender"
-          data={genderOptions}
-          formik={formik}
-          field="gender"
+        <GenderSelector
+          value={formik.values.gender}
+          onChange={(value) => formik.setFieldValue("gender", value)}
         />
 
         <FormErrorMessage
@@ -317,30 +317,55 @@ const ProfileForm: React.FC<profileFormProps> = ({
       </KeyboardAwareScrollView>
 
       <View
-        style={[
-          {
-            position: "absolute",
-
-            width: "100%",
-            paddingHorizontal: 18,
-          },
-          { bottom: bottomInset + 20 },
-        ]}
+        style={[styles.formFooter, { paddingBottom: bottomInset + 23 }]}
       >
         <AppButton
-          title={type === "profile" ? "Save Changes" : "Create Farmer"}
+          title={
+            type === "profile"
+              ? "Save Changes"
+              : isFarmerForm
+                ? "Add Farmer"
+                : "Create Farmer"
+          }
           textColor="white"
           btnColor="buttonPrimary"
-          style={{}}
+          borderRadius={8}
+          height={48}
           onPress={formik.submitForm}
           loading={isLoading}
           disabled={!(formik.isValid && formik.dirty)}
         />
       </View>
-    </>
+    </View>
   );
 };
 
 export default ProfileForm;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.backgroundPrimary,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 150,
+  },
+  formScrollContent: {
+    gap: 24,
+    paddingBottom: 120,
+  },
+  formFooter: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    paddingTop: 23,
+    paddingHorizontal: 18,
+  },
+});

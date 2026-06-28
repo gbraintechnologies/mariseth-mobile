@@ -55,23 +55,21 @@ const ResendTimer: React.FC<ResendTimerProps> = ({ setOtp, formik }) => {
       disabled={resendTimer > 0 || isLoading}
       onPress={handleResendCode}
     >
-      <AppText fontSize={14} fontFamily="Regular" color="textPrimary">
-        Didn't receive a code?{" "}
+      <AppText fontSize={14} fontFamily="Regular" color="formLabelText">
+        Didn&apos;t receive a code?{" "}
       </AppText>
 
       {isLoading ? (
-        <AppText fontSize={14} fontFamily="Regular" color="textPrimary">
+        <AppText fontSize={14} fontFamily="Regular" color="formLabelText">
           Sending...
         </AppText>
-      ) : resendTimer > 0 ? null : (
-        <AppText fontSize={14} fontFamily="Regular" color="primary">
-          Click to re-send
-        </AppText>
-      )}
-
-      {resendTimer > 0 && (
-        <AppText fontFamily="Bold" fontSize={14} color="primary">
+      ) : resendTimer > 0 ? (
+        <AppText fontFamily="SemiBold" fontSize={14} color="formLabelText">
           {`${resendTimer}s`}
+        </AppText>
+      ) : (
+        <AppText fontSize={14} fontFamily="SemiBold" color="formLabelText">
+          Click to re-send
         </AppText>
       )}
     </Pressable>

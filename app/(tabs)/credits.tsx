@@ -61,12 +61,9 @@ const Credits = () => {
               <ActiveCreditCard />
               <SectionHeader
                 title="Credit Applications"
-                btnIcon="refresh"
-                btnTitle="Refresh"
                 marginBottom={1}
-                marginTop={30}
+                marginTop={12}
                 titleColor="black"
-                onPress={() => refetch()}
               />
             </>
           }
@@ -77,6 +74,7 @@ const Credits = () => {
           isRefetching={isRefetching}
           renderItem={({ item }: any) => <CreditHistoryCard item={item} />}
           type={"credits"}
+          emptyVariant="inline"
         />
       </View>
 

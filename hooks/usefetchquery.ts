@@ -122,6 +122,13 @@ interface WeatherLocation {
 interface CurrentWeatherResponse {
   location: WeatherLocation;
   current: CurrentWeather;
+  forecast?: {
+    forecastday: Array<{
+      day: {
+        daily_chance_of_rain: number;
+      };
+    }>;
+  };
 }
 
 interface ApiError {
@@ -133,7 +140,7 @@ function useCurrentWeather(
   location: string,
   options?: UseQueryOptions<CurrentWeatherResponse, ApiError>
 ) {
-  const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${location}&aqi=no`;
+  const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${location}&days=1&aqi=no`;
 
   const { data, isLoading, error } = useQuery<CurrentWeatherResponse, ApiError>(
     {

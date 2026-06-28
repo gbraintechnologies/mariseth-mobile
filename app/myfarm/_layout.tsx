@@ -1,4 +1,4 @@
-import { headerHandler } from "@/utils/layoutmethods";
+import { formScreenHeaderHandler } from "@/utils/layoutmethods";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -7,7 +7,7 @@ export default function myFarmLayout() {
     <Stack>
       <Stack.Screen
         name="editfarmdetails"
-        options={headerHandler("Edit Farm Details")}
+        options={formScreenHeaderHandler("Edit Farm Details")}
       />
     </Stack>
   );

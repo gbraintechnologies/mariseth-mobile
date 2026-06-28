@@ -9,19 +9,22 @@ import {
 } from "react-native-confirmation-code-field";
 
 import { colors } from "@/constants/colors";
-import { isIOS, largeScreen } from "@/constants/generalconstants";
-// import useAuthStore from "@/stores/useauthstore";
+import { isIOS } from "@/constants/generalconstants";
 
 const cell_count = 4;
+
 type OtpInputProps = {
-  onOtpEntered: any;
-  clearValue: any;
-  borderColor: any;
+  onOtpEntered: (otp: string) => void;
+  clearValue: boolean;
+  borderColor?: string;
+  autoFocus?: boolean;
 };
+
 const OtpInput: FC<OtpInputProps> = ({
   onOtpEntered,
   clearValue,
-  borderColor,
+  borderColor = colors.formBorder,
+  autoFocus = false,
 }) => {
   const [value, setValue] = useState("");
   const ref = useBlurOnFulfill({ value, cellCount: cell_count });
@@ -29,51 +32,54 @@ const OtpInput: FC<OtpInputProps> = ({
     value,
     setValue,
   });
-  // const { onTapInput } = useAuthStore();
 
   useEffect(() => {
     if (value.length === cell_count) {
       onOtpEntered(value);
     }
-  }, [value]);
+  }, [value, onOtpEntered]);
 
   useEffect(() => {
     if (clearValue) {
       setValue("");
     }
   }, [clearValue]);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+
+    const timer = setTimeout(() => {
+      ref.current?.focus();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [autoFocus, ref]);
+
   return (
     <CodeField
       ref={ref}
       {...props}
-      caretHidden={false}
       value={value}
       onChangeText={setValue}
       cellCount={cell_count}
-      rootStyle={[styles.codeFieldRoot, { borderColor: borderColor }]}
+      rootStyle={styles.codeFieldRoot}
       keyboardType="number-pad"
-      textContentType="oneTimeCode"
-      // autoComplete={Platform.select({
-      //   android: "sms-otp",
-      //   default: "one-time-code",
-      // })}
-
-      autoComplete={isIOS ? "one-time-code" : "sms-otp"}
-      testID="my-code-input"
-      // onFocus={() => onTapInput()}
+      showSoftInputOnFocus
+      autoCorrect={false}
+      textContentType={isIOS ? "oneTimeCode" : "none"}
       renderCell={({ index, symbol, isFocused }) => (
         <View
           onLayout={getCellOnLayoutHandler(index)}
           key={index}
           style={[
             styles.cell,
-
             {
-              borderColor: isFocused ? colors?.primary : borderColor,
+              borderColor: isFocused ? colors.primary : borderColor,
             },
+            isFocused && styles.cellFocused,
           ]}
         >
-          <Text style={[styles.cellText, { color: colors.textPrimary }]}>
+          <Text style={styles.cellText}>
             {symbol || (isFocused ? <Cursor /> : null)}
           </Text>
         </View>
@@ -83,28 +89,32 @@ const OtpInput: FC<OtpInputProps> = ({
 };
 
 export default OtpInput;
-const styles = StyleSheet.create({
-  root: {
-    height: "auto",
-    width: "100%",
-  },
 
+const styles = StyleSheet.create({
   codeFieldRoot: {
     width: "100%",
-    justifyContent: "space-between",
+    gap: 11,
   },
   cell: {
-    width: "20%",
-    height: largeScreen ? 55 : 45,
+    flex: 1,
+    height: 54,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 6,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: colors.white,
   },
-
+  cellFocused: {
+    borderRadius: 8,
+    shadowColor: colors.formShadow,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
   cellText: {
-    fontSize: 21,
-    fontFamily: "NexaBold",
+    fontSize: 17,
+    color: colors.formInputText,
     textAlign: "center",
     textAlignVertical: "center",
   },

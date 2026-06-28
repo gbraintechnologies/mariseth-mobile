@@ -1,4 +1,4 @@
-import { headerHandler } from "@/utils/layoutmethods";
+import { applyCreditHeaderHandler } from "@/utils/layoutmethods";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -7,7 +7,11 @@ export default function CreditsLayout() {
     <Stack>
       <Stack.Screen
         name="applycredit"
-        options={headerHandler("Apply Credit")}
+        options={applyCreditHeaderHandler()}
+      />
+      <Stack.Screen
+        name="viewpaybacklog"
+        options={{ headerShown: false }}
       />
     </Stack>
   );
