@@ -83,6 +83,7 @@ function usePaginatedInfiniteQuery<T>(
         ? lastPage?.pagination?.page + 1
         : undefined;
     },
+    ...options,
   });
 
   return {

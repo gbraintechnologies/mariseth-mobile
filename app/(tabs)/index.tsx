@@ -11,7 +11,7 @@ import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
 import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
-import { isAdminUser } from "@/utils/userroles";
+import { isAdminUser, shouldShowLeadFarmerHome } from "@/utils/userroles";
 import { router } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -19,7 +19,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 const Index = () => {
   const user = userStore((state) => state.user);
   const isAdmin = isAdminUser(user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
+  const isLeaderFarmer = shouldShowLeadFarmerHome(user);
 
   const { data, isLoading, isError, items } = usePaginatedInfiniteQuery<any>(
     endpoints.myFarmers,
@@ -27,7 +27,8 @@ const Index = () => {
     {
       page_size: 10,
       query: "",
-    }
+    },
+    { enabled: isLeaderFarmer }
   );
 
   const farmerCount = isError
@@ -59,33 +60,32 @@ const Index = () => {
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
       contentContainerStyle={styles.scrollContent}
     >
-      <View style={styles.topSection}>
+      <View style={styles.homeSection}>
         <WeatherCard />
 
-        <View>
+        <View style={styles.quickActionsBlock}>
           <AppText fontFamily="SemiBold" fontSize={16} color="black">
             Quick Actions
           </AppText>
           <View style={styles.quickActionsContainer}>
-            <QuickActionButton
-              type="credit"
-              width={isLeaderFarmer ? "48%" : "100%"}
-            />
+            <QuickActionButton type="credit" />
             {isLeaderFarmer ? <QuickActionButton type="farmer" /> : null}
           </View>
         </View>
       </View>
 
-      {isLeaderFarmer ? (
-        <FarmerCard
-          type="big"
-          onPress={() => router.navigate("/myfarmers")}
-          isLoading={isLoading}
-          count={isError ? 0 : farmerCount}
-        />
-      ) : null}
+      <View style={styles.cardsSection}>
+        {isLeaderFarmer ? (
+          <FarmerCard
+            type="big"
+            onPress={() => router.navigate("/myfarmers")}
+            isLoading={isLoading}
+            count={isError ? 0 : farmerCount}
+          />
+        ) : null}
 
-      <HomeActiveCreditCard />
+        <HomeActiveCreditCard />
+      </View>
 
       {recentlyAddedFarmers.length > 0 ? (
         <View style={styles.recentlyAddedSection}>
@@ -95,7 +95,12 @@ const Index = () => {
 
           <View style={styles.recentlyAddedList}>
             {recentlyAddedFarmers.map((item) => (
-              <SmallFarmerCard key={item.id} item={item} showNewBadge />
+              <SmallFarmerCard
+                key={item.id}
+                item={item}
+                showNewBadge
+                avatarSize={40}
+              />
             ))}
           </View>
         </View>
@@ -120,17 +125,22 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     gap: 32,
+    paddingTop: 4,
     paddingBottom: isIOS ? "30%" : "20%",
   },
-  topSection: {
+  homeSection: {
     paddingHorizontal: 16,
+    gap: 32,
+  },
+  quickActionsBlock: {
+    gap: 12,
+  },
+  cardsSection: {
     gap: 32,
   },
   quickActionsContainer: {
     flexDirection: "row",
     width: "100%",
-    justifyContent: "space-between",
-    marginTop: 12,
     gap: 18,
   },
   recentlyAddedSection: {

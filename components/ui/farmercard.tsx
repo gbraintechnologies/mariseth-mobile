@@ -55,6 +55,7 @@ const FarmerCard: React.FC<farmerCard> = ({
           <Image
             source={icons.farmer}
             style={{ width: 24, height: 24, marginRight: 12 }}
+            tintColor={colors.primary}
           />
           <AppText
             fontFamily="SemiBold"
@@ -66,7 +67,7 @@ const FarmerCard: React.FC<farmerCard> = ({
           </AppText>
           {onPress ? (
             <Pressable style={styles.viewAllButton} onPress={onPress}>
-              <AppText fontFamily="Medium" fontSize={10} color="tabBarInactive">
+              <AppText fontFamily="Medium" fontSize={10} color="primary">
                 View all
               </AppText>
             </Pressable>
@@ -154,6 +155,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingVertical: 8,
     borderRadius: 49,
-    backgroundColor: colors.buttonActionSheet,
+    backgroundColor: colors.secondaryLight,
   },
 });

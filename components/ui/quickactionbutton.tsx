@@ -8,10 +8,12 @@ import AppText from "./apptext";
 interface quickActionButtonProps {
   type: "credit" | "farmer";
   width?: any;
+  flex?: number;
 }
 const QuickActionButton: React.FC<quickActionButtonProps> = ({
   type,
-  width = "48%",
+  width,
+  flex,
 }) => {
   const types: Record<
     string,
@@ -30,14 +32,27 @@ const QuickActionButton: React.FC<quickActionButtonProps> = ({
   };
   return (
     <Pressable
-      style={[styles.quickActionButton, { width: width }]}
+      style={[
+        styles.quickActionButton,
+        width ? { width } : { flex: flex ?? 1, minWidth: 0 },
+      ]}
       onPress={() => {
         router.navigate(types[type].route);
       }}
     >
-      <Image source={types[type].icon} style={styles.quickActionButtonIcon} />
+      <Image
+        source={types[type].icon}
+        style={styles.quickActionButtonIcon}
+        tintColor={colors.primary}
+      />
 
-      <AppText fontFamily="SemiBold" fontSize={13} color="textBold">
+      <AppText
+        fontFamily="SemiBold"
+        fontSize={13}
+        color="textBold"
+        numberOfLines={2}
+        style={styles.quickActionLabel}
+      >
         {types[type].label}
       </AppText>
     </Pressable>
@@ -56,5 +71,8 @@ const styles = StyleSheet.create({
     paddingLeft: 14,
     backgroundColor: colors.backgroundPrimary,
   },
-  quickActionButtonIcon: { height: 24, width: 24, marginRight: 12 },
+  quickActionButtonIcon: { height: 24, width: 24, marginRight: 12, flexShrink: 0 },
+  quickActionLabel: {
+    flexShrink: 1,
+  },
 });

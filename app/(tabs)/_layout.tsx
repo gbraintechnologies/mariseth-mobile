@@ -6,9 +6,8 @@ import {
   usePaginatedInfiniteQuery,
 } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
-import { useUniversalStore } from "@/stores/useuniversalstore";
 import { tabbarScreenOptions, tabScreenOptions } from "@/utils/layoutmethods";
-import { isAdminUser } from "@/utils/userroles";
+import { isAdminUser, isLeadFarmerUser, shouldShowLeadFarmerHome } from "@/utils/userroles";
 import { UseQueryOptions } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
@@ -20,11 +19,11 @@ import { useStore } from "zustand";
 // };
 export default function TabsLayout() {
   const user = useStore(userStore, (state) => state.user);
-  const enabled = useStore(useUniversalStore, (state) => state.enabled);
 
   const isAdmin = isAdminUser(user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
-  const tabRoleOptions = { isAdmin, isLeaderFarmer };
+  const isLeaderFarmer = isLeadFarmerUser(user);
+  const showLeadFarmerHome = shouldShowLeadFarmerHome(user);
+  const tabRoleOptions = { isAdmin, isLeaderFarmer, showLeadFarmerHome };
 
   const regions = userStore((state) => state.regions);
   const { data } = useFetchQuery(endpoints.regions, "regions", {
@@ -39,7 +38,7 @@ export default function TabsLayout() {
   }, [data]);
 
   const { data: userData } = useFetchQuery(endpoints.getMyFamer, "getprofile", {
-    enabled: enabled,
+    enabled: !!user?.access_token,
   } as UseQueryOptions);
   React.useEffect(() => {
     if (userData) {
@@ -107,7 +106,7 @@ export default function TabsLayout() {
       // console.log(inputCredits);
       userStore.setState({ inputCredits: inputCredits });
     }
-  }, [items]);
+  }, [inputCredits]);
 
   // function listener() {
   //   return {
@@ -162,7 +161,7 @@ export default function TabsLayout() {
         name="myfarmers"
         options={{
           ...tabScreenOptions("My Farmers", tabRoleOptions),
-          ...(isLeaderFarmer || isAdmin ? {} : { href: null }),
+          ...(showLeadFarmerHome || isAdmin ? {} : { href: null }),
         }}
         // listeners={listener()}
       />

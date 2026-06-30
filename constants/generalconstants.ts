@@ -83,9 +83,9 @@ export const weatherBackgrounds = {
     end: { x: 0.5, y: 1 }, // 180deg
   },
   sunny: {
-    colors: ["#FFED9E", "#F4BE0B"],
+    colors: ["#62B8F6", "#2C79C1"],
     start: { x: 0.5, y: 0 },
-    end: { x: 0.5, y: 1 }, // 180deg
+    end: { x: 0.5, y: 1 },
   },
 };
 

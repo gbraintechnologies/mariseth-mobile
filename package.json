@@ -13,7 +13,7 @@
     "android:prod:release": "yarn env:prod && EXPO_PUBLIC_APP_ENV=production && cd android && ./gradlew clean && cd .. && expo run:android --variant release",
     "android:clean": "cd android && ./gradlew clean && cd ..",
     "device:install": "cd android && gradlew.bat app:installDebug",
-    "device:launch": "adb reverse tcp:8081 tcp:8081 && adb shell am start -n com.marisethfarms.android/.MainActivity",
+    "device:launch": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:8082 tcp:8082 && adb shell am start -n com.marisethfarms.android/.MainActivity",
     "device:uninstall": "adb uninstall com.marisethfarms.android",
     "device:run": "yarn device:install && yarn device:launch",
     "metro": "EXPO_PUBLIC_APP_ENV=development expo start --dev-client",

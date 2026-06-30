@@ -1,5 +1,5 @@
 import { colors } from "@/constants/colors";
-import { largeScreen } from "@/constants/generalconstants";
+import { largeScreen, weatherBackgrounds } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
 import { useCurrentWeather } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
@@ -63,6 +63,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
     locationOverride ?? user?.farmer?.village ?? "Accra";
 
   const { data, isLoading, error } = useCurrentWeather(weatherLocation);
+  const showWeatherFallback = variant === "default" && !!error;
 
   if (isLoading) {
     return (
@@ -75,7 +76,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
     );
   }
 
-  if (error) {
+  if (error && !showWeatherFallback) {
     return (
       <View
         style={[
@@ -93,11 +94,21 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
       </View>
     );
   }
-  const { icon, gradient } = getWeatherAssets(
-    data?.current?.condition?.text as string
-  );
+
+  const locationName = data?.location?.name ?? weatherLocation;
+  const temperature = data?.current?.temp_c ?? "--";
+  const conditionText = data?.current?.condition?.text ?? "Sunny";
+  const windKph = data?.current?.wind_kph ?? "--";
+  const pressureMb = data?.current?.pressure_mb ?? "--";
+  const humidity = data?.current?.humidity ?? "--";
+  const { icon: weatherIcon, gradient: weatherGradient } =
+    getWeatherAssets(conditionText);
+  const icon =
+    showWeatherFallback && variant === "default" ? icons.sunny : weatherIcon;
+  const gradient =
+    variant === "default" ? weatherBackgrounds.sunny : weatherGradient;
   const chanceOfRain =
-    data?.forecast?.forecastday?.[0]?.day?.daily_chance_of_rain ?? 0;
+    data?.forecast?.forecastday?.[0]?.day?.daily_chance_of_rain ?? "--";
 
   return (
     <LinearGradient
@@ -110,37 +121,50 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
         variant === "farm" && styles.weatherContainerFarm,
       ]}
     >
-      <View style={styles.weatherToolbar}>
-        <Pressable style={styles.weatherToolbarButton}>
-          <AppText fontFamily="SemiBold" fontSize={22} color="white">
-            +
-          </AppText>
-        </Pressable>
-
-        <View style={styles.weatherLocationContainer}>
+      {variant === "default" ? (
+        <View style={styles.weatherLocationOnly}>
           <AppText
             fontFamily="SemiBold"
             fontSize={16}
             color="white"
             style={{ textAlign: "center" }}
           >
-            {data?.location?.name}
+            {locationName}
           </AppText>
-          <View style={styles.weatherDots}>
-            <View style={[styles.weatherDot, styles.weatherDotActive]} />
-            <View style={styles.weatherDot} />
-            <View style={styles.weatherDot} />
-          </View>
         </View>
+      ) : (
+        <View style={styles.weatherToolbar}>
+          <Pressable style={styles.weatherToolbarButton}>
+            <AppText fontFamily="SemiBold" fontSize={22} color="white">
+              +
+            </AppText>
+          </Pressable>
 
-        <Pressable style={styles.weatherToolbarButton}>
-          <View style={styles.overflowMenu}>
-            <View style={styles.overflowDot} />
-            <View style={styles.overflowDot} />
-            <View style={styles.overflowDot} />
+          <View style={styles.weatherLocationContainer}>
+            <AppText
+              fontFamily="SemiBold"
+              fontSize={16}
+              color="white"
+              style={{ textAlign: "center" }}
+            >
+              {locationName}
+            </AppText>
+            <View style={styles.weatherDots}>
+              <View style={[styles.weatherDot, styles.weatherDotActive]} />
+              <View style={styles.weatherDot} />
+              <View style={styles.weatherDot} />
+            </View>
           </View>
-        </Pressable>
-      </View>
+
+          <Pressable style={styles.weatherToolbarButton}>
+            <View style={styles.overflowMenu}>
+              <View style={styles.overflowDot} />
+              <View style={styles.overflowDot} />
+              <View style={styles.overflowDot} />
+            </View>
+          </Pressable>
+        </View>
+      )}
 
       <View style={styles.weatherHeaderContainer}>
         <View style={styles.headerIconContainer}>
@@ -150,14 +174,15 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
           />
         </View>
         <View style={styles.weatherDateContainer}>
-          <AppText
-            fontFamily="SemiBold"
-            fontSize={16}
-            color="white"
-            style={{ textAlign: "center" }}
-          >
-            {format(new Date(), "EEEE | MMM d")}
-          </AppText>
+          <View style={styles.weatherDateRow}>
+            <AppText fontFamily="SemiBold" fontSize={16} color="white">
+              {format(new Date(), "EEEE")}
+            </AppText>
+            <View style={styles.weatherDateDivider} />
+            <AppText fontFamily="SemiBold" fontSize={16} color="white">
+              {format(new Date(), "MMM d")}
+            </AppText>
+          </View>
           <View style={styles.weatherTempContainer}>
             <AppText
               fontFamily="SemiBold"
@@ -165,7 +190,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
               color="white"
               style={{ textAlign: "center", verticalAlign: "middle" }}
             >
-              {data?.current?.temp_c}
+              {temperature}
             </AppText>
             <AppText
               fontFamily="SemiBold"
@@ -185,7 +210,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
             color="white"
             style={{ textAlign: "center" }}
           >
-            {data?.current?.condition?.text}
+            {conditionText}
           </AppText>
         </View>
       </View>
@@ -194,13 +219,13 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
           <WeatherCondition
             icon={icons.wind}
             description={"Wind"}
-            metric={`${data?.current?.wind_kph} km/h`}
+            metric={`${windKph} km/h`}
             marginBottom={20}
           />
           <WeatherCondition
             icon={icons.pressure}
             description={"Pressure"}
-            metric={`${data?.current?.pressure_mb} mbar`}
+            metric={`${pressureMb} mbar`}
           />
         </View>
 
@@ -215,7 +240,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
           <WeatherCondition
             icon={icons.humidity}
             description={"Humidity"}
-            metric={`${data?.current?.humidity}%`}
+            metric={`${humidity}%`}
           />
         </View>
       </View>
@@ -285,7 +310,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingBottom: 21,
     borderBottomWidth: 1,
-    borderBottomColor: colors.white,
+    borderBottomColor: "rgba(255, 255, 255, 0.5)",
+  },
+  weatherLocationOnly: {
+    alignItems: "center",
+    marginBottom: 24,
   },
   headerIconContainer: {
     flexDirection: "column",
@@ -296,7 +325,17 @@ const styles = StyleSheet.create({
   weatherDateContainer: {
     flexDirection: "column",
     width: "50%",
-    // backgroundColor: "blue",
+    alignItems: "center",
+  },
+  weatherDateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+  weatherDateDivider: {
+    width: 2,
+    height: 19,
+    backgroundColor: colors.white,
   },
   weatherTempContainer: {
     flexDirection: "row",

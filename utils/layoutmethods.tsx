@@ -127,7 +127,11 @@ export function changePinHeaderHandler() {
 
 export function tabScreenOptions(
   tabLabel: string,
-  roleOptions?: { isAdmin?: boolean; isLeaderFarmer?: boolean }
+  roleOptions?: {
+    isAdmin?: boolean;
+    isLeaderFarmer?: boolean;
+    showLeadFarmerHome?: boolean;
+  }
 ) {
   const tabIcons: Record<string, string> = {
     Home: icons?.home,
@@ -141,7 +145,9 @@ export function tabScreenOptions(
   const isMore = tabLabel === "More";
   const isAdminHome = tabLabel === "Home" && roleOptions?.isAdmin;
   const isLeadFarmerHome =
-    tabLabel === "Home" && roleOptions?.isLeaderFarmer && !roleOptions?.isAdmin;
+    tabLabel === "Home" &&
+    (roleOptions?.showLeadFarmerHome ?? roleOptions?.isLeaderFarmer) &&
+    !roleOptions?.isAdmin;
 
   return {
     headerShown: isMore || isAdminHome ? false : true,
@@ -162,20 +168,14 @@ export function tabScreenOptions(
     headerLeft: () => {
       if (isLeadFarmerHome) {
         return (
-          <View style={styles.homeHeaderLeft}>
-            <Pressable
-              style={styles.menuButton}
-              onPress={() => router.navigate("/more")}
-            >
-              <Image
-                source={icons.more}
-                style={{ width: 20, height: 20, tintColor: colors.textBold }}
-              />
-            </Pressable>
-            <AppText fontFamily="SemiBold" fontSize={18} color="textBold">
-              Home
-            </AppText>
-          </View>
+          <AppText
+            fontFamily="SemiBold"
+            fontSize={18}
+            color="textBold"
+            style={{ marginLeft: 16 }}
+          >
+            Home
+          </AppText>
         );
       }
 
@@ -206,24 +206,14 @@ export function tabScreenOptions(
               <View style={styles.notificationBadge} />
             </Pressable>
 
-            <Pressable
-              style={styles.homeProfileButton}
-              onPress={() => router.navigate("/more/profileinformation")}
-            >
+            <Pressable onPress={() => router.navigate("/more/profileinformation")}>
               <InitialsAvatar
                 name={fullName}
                 containerSize={34}
                 fontSize={12}
+                bgColor="secondary"
+                textColor="white"
               />
-              <AppText
-                fontFamily="Regular"
-                fontSize={14}
-                color="black"
-                numberOfLines={1}
-                style={{ maxWidth: 103 }}
-              >
-                {fullName}
-              </AppText>
             </Pressable>
           </View>
         );
@@ -273,25 +263,6 @@ const styles = StyleSheet.create({
     borderColor: colors.formBorder,
     padding: 5,
     marginRight: 9,
-  },
-
-  homeHeaderLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 16,
-    gap: 10,
-  },
-
-  menuButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#F1F5F9",
-    backgroundColor: colors.white,
-    justifyContent: "center",
-    alignItems: "center",
-    boxShadow: "0px 4px 12px 0px rgba(0, 0, 0, 0.03)",
   },
 
   homeHeaderRight: {

@@ -14,6 +14,7 @@ interface smallCardFarmer {
   showCheckbox?: boolean;
   checked?: boolean;
   onCheckToggle?: () => void;
+  avatarSize?: number;
 }
 const SmallFarmerCard: React.FC<smallCardFarmer> = ({
   item,
@@ -21,6 +22,7 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({
   showCheckbox = false,
   checked = false,
   onCheckToggle,
+  avatarSize = 34,
 }) => {
   const name = `${item?.first_name} ${item?.last_name} ${item?.other_names}`;
 
@@ -57,7 +59,11 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({
         </Pressable>
       ) : null}
 
-      <InitialsAvatar name={name} containerSize={34} fontSize={12} />
+      <InitialsAvatar
+        name={name}
+        containerSize={avatarSize}
+        fontSize={avatarSize > 36 ? 14 : 12}
+      />
       <View style={styles.textColumn}>
         <AppText fontFamily="SemiBold" fontSize={14} color="textBold">
           {name}
@@ -79,7 +85,7 @@ const SmallFarmerCard: React.FC<smallCardFarmer> = ({
       {showNewBadge ? (
         <View style={styles.smallFarmerStatusContainer}>
           <AppText fontFamily="Medium" fontSize={10} style={styles.newBadgeText}>
-            New
+            NEW
           </AppText>
         </View>
       ) : null}
@@ -92,15 +98,17 @@ export default SmallFarmerCard;
 const styles = StyleSheet.create({
   smallFarmerCardContainer: {
     width: "100%",
+    minHeight: 72,
     flexDirection: "row",
     paddingVertical: 16,
+    paddingHorizontal: 0,
     borderBottomWidth: 1,
     borderBottomColor: colors.light,
     alignItems: "center",
   },
   textColumn: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 12,
     justifyContent: "center",
   },
   supportingRow: {
