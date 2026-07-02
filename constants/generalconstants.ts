@@ -34,6 +34,59 @@ export const permissionContent = {
 //   return model ? homeButtonModels.includes(model) : false;
 // }
 
+export const helpSupportContact = [
+  {
+    id: "phone",
+    label: "Call Us",
+    value: "+233 30 000 0000",
+    actionUrl: "tel:+233300000000",
+  },
+  {
+    id: "email",
+    label: "Email Us",
+    value: "support@marisethfarms.com",
+    actionUrl: "mailto:support@marisethfarms.com",
+  },
+  {
+    id: "hours",
+    label: "Support Hours",
+    value: "Mon–Fri, 8:00 AM – 5:00 PM",
+  },
+];
+
+export const helpSupportFaqs = [
+  {
+    id: "apply-credit",
+    question: "How do I apply for input credit?",
+    answer:
+      "Open the Credits tab, tap Apply for Credit, choose the input category and credit type, enter the quantity, and submit your application.",
+  },
+  {
+    id: "change-pin",
+    question: "How do I change my PIN or password?",
+    answer:
+      "Go to More, select Change Pin or Change Password, enter your current PIN, then set and confirm your new PIN.",
+  },
+  {
+    id: "update-profile",
+    question: "How do I update my personal information?",
+    answer:
+      "Open More → My Information, then tap Edit on the My Information or Leadership & Experience card to update your details.",
+  },
+  {
+    id: "update-farm",
+    question: "How do I update my farm details?",
+    answer:
+      "Open the My Farm tab, switch between Farm Details and Farm Products, then tap Edit to update your farm information or crops.",
+  },
+  {
+    id: "credit-status",
+    question: "How can I check my credit application status?",
+    answer:
+      "Your active credit appears on the Home and Credits screens. Credit history and payback details are available under the Credits tab.",
+  },
+];
+
 export const moreLinks: Array<moreLink> = [
   {
     name: "My Information",
@@ -48,6 +101,7 @@ export const moreLinks: Array<moreLink> = [
   {
     name: "Help & Support",
     icon: icons.dialog,
+    route: "/more/helpsupport",
   },
   {
     name: "Log out",

@@ -22,6 +22,10 @@ export default function MoreLayout() {
         name="leadershipinfoedit"
         options={editLeadershipHeaderHandler()}
       />
+      <Stack.Screen
+        name="helpsupport"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

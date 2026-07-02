@@ -177,20 +177,14 @@ export function tabScreenOptions(
     headerLeft: () => {
       if (isSmallholderTabHeader) {
         return (
-          <View style={styles.smallholderHeaderLeft}>
-            <Pressable
-              style={styles.homeMenuButton}
-              onPress={() => router.navigate("/(tabs)/more")}
-            >
-              <Image
-                source={icons.more}
-                style={{ width: 20, height: 20, tintColor: colors.textBold }}
-              />
-            </Pressable>
-            <AppText fontFamily="SemiBold" fontSize={18} color="textBold">
-              {tabLabel}
-            </AppText>
-          </View>
+          <AppText
+            fontFamily="SemiBold"
+            fontSize={18}
+            color="textBold"
+            style={{ marginLeft: 16 }}
+          >
+            {tabLabel}
+          </AppText>
         );
       }
 
@@ -235,7 +229,6 @@ export function tabScreenOptions(
             </Pressable>
 
             <Pressable
-              style={styles.homeProfileButton}
               onPress={() => router.navigate("/more/profileinformation")}
             >
               <InitialsAvatar
@@ -245,9 +238,6 @@ export function tabScreenOptions(
                 bgColor="secondary"
                 textColor="white"
               />
-              <AppText fontFamily="SemiBold" fontSize={13} color="textBold">
-                {fullName}
-              </AppText>
             </Pressable>
           </View>
         );
@@ -352,36 +342,11 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
   },
 
-  homeProfileButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-
-  smallholderHeaderLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginLeft: 16,
-  },
-
   smallholderHeaderRight: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 16,
     gap: 20,
-  },
-
-  homeMenuButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.formBorder,
-    backgroundColor: colors.white,
-    justifyContent: "center",
-    alignItems: "center",
-    boxShadow: "0px 4px 12px 0px rgba(0, 0, 0, 0.03)",
   },
 
   applyCreditHeaderLeft: {
