@@ -4,6 +4,7 @@ import AppText from "@/components/ui/apptext";
 import { colors } from "@/constants/colors";
 import { icons } from "@/constants/icons";
 import { userStore } from "@/stores/userstore";
+import { isLeadFarmerUser, isSmallholderUser } from "@/utils/userroles";
 import { format, parseISO } from "date-fns";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -33,7 +34,9 @@ const ProfileInformation = () => {
   const topInset = useSafeAreaInsets().top;
   const user = userStore((state) => state.user);
   const farmer = user?.farmer;
-  const isLeaderFarmer = farmer?.type === "lead";
+  const isLeaderFarmer = isLeadFarmerUser(user);
+  const isSmallholder = isSmallholderUser(user);
+  const showLeadershipExperience = isLeaderFarmer || isSmallholder;
   const leaderShipExperience = farmer?.leadership_experience;
   const isMentoring = leaderShipExperience?.is_mentoring_other_farmers;
 
@@ -78,10 +81,6 @@ const ProfileInformation = () => {
         key: "Country",
         value: displayValue(farmer?.country),
       },
-      {
-        key: "Do you provide training to other farmers?",
-        value: farmer?.farm?.provide_training ? "Yes" : "No",
-      },
     ],
   };
 
@@ -107,19 +106,19 @@ const ProfileInformation = () => {
         key: "Membership in Farming Cooperatives/Associations",
         value: leaderShipExperience?.has_farming_membership ? "Yes" : "No",
       },
-      ...(leaderShipExperience?.has_farming_membership
-        ? [
-            {
-              key: "If Other, Please Specify Here",
-              value: displayValue(leaderShipExperience?.farming_type),
-            },
-          ]
-        : []),
+      {
+        key: "If Other, Please Specify Here",
+        value: displayValue(leaderShipExperience?.farming_type),
+      },
       {
         key: "Have you received any leadership or agricultural training?",
         value: leaderShipExperience?.has_received_farming_leadership_training
           ? "Yes"
           : "No",
+      },
+      {
+        key: "Do you provide training to other farmers?",
+        value: farmer?.farm?.provide_training ? "Yes" : "No",
       },
     ],
   };
@@ -148,7 +147,9 @@ const ProfileInformation = () => {
       </Pressable>
 
       <InfoCard info={basicProfileInfo} />
-      {isLeaderFarmer ? <InfoCard info={leadershipExperienceInfo} /> : null}
+      {showLeadershipExperience ? (
+        <InfoCard info={leadershipExperienceInfo} />
+      ) : null}
     </ScrollView>
   );
 };

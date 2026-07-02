@@ -7,15 +7,24 @@ import { icons } from "@/constants/icons";
 import { userStore } from "@/stores/userstore";
 import { useUniversalStore } from "@/stores/useuniversalstore";
 import { moreLink } from "@/types/more";
+import { isSmallholderUser } from "@/utils/userroles";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+const getLinkLabel = (item: moreLink, isSmallholder: boolean) => {
+  if (isSmallholder && item.route === "/more/changepin") {
+    return "Change Password";
+  }
+  return item.name;
+};
+
 const More = () => {
   const topInset = useSafeAreaInsets().top;
   const user = userStore((state) => state.user);
+  const isSmallholder = isSmallholderUser(user);
   const logoutModalVisible = useUniversalStore(
     (state) => state.logoutModalVisible
   );
@@ -71,10 +80,10 @@ const More = () => {
                   color={isLogout ? "error" : "textBold"}
                   style={styles.linkLabel}
                 >
-                  {item.name}
+                  {getLinkLabel(item, isSmallholder)}
                 </AppText>
                 <Image
-                  source={icons.arrowRight}
+                  source={isLogout ? icons.arrowRight : icons.arrowDown}
                   style={[
                     styles.chevronIcon,
                     { tintColor: isLogout ? colors.error : colors.primary },

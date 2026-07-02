@@ -130,7 +130,9 @@ export function tabScreenOptions(
   roleOptions?: {
     isAdmin?: boolean;
     isLeaderFarmer?: boolean;
+    isSmallholder?: boolean;
     showLeadFarmerHome?: boolean;
+    showFarmerHomeHeader?: boolean;
   }
 ) {
   const tabIcons: Record<string, string> = {
@@ -144,9 +146,16 @@ export function tabScreenOptions(
 
   const isMore = tabLabel === "More";
   const isAdminHome = tabLabel === "Home" && roleOptions?.isAdmin;
-  const isLeadFarmerHome =
+  const isSmallholderTabHeader =
+    !!roleOptions?.isSmallholder &&
+    !roleOptions?.isAdmin &&
+    (tabLabel === "Home" || tabLabel === "Credits" || tabLabel === "My Farm");
+  const isFarmerHomeHeader =
     tabLabel === "Home" &&
-    (roleOptions?.showLeadFarmerHome ?? roleOptions?.isLeaderFarmer) &&
+    !isSmallholderTabHeader &&
+    (roleOptions?.showFarmerHomeHeader ??
+      roleOptions?.showLeadFarmerHome ??
+      roleOptions?.isLeaderFarmer) &&
     !roleOptions?.isAdmin;
 
   return {
@@ -166,7 +175,26 @@ export function tabScreenOptions(
     ),
 
     headerLeft: () => {
-      if (isLeadFarmerHome) {
+      if (isSmallholderTabHeader) {
+        return (
+          <View style={styles.smallholderHeaderLeft}>
+            <Pressable
+              style={styles.homeMenuButton}
+              onPress={() => router.navigate("/(tabs)/more")}
+            >
+              <Image
+                source={icons.more}
+                style={{ width: 20, height: 20, tintColor: colors.textBold }}
+              />
+            </Pressable>
+            <AppText fontFamily="SemiBold" fontSize={18} color="textBold">
+              {tabLabel}
+            </AppText>
+          </View>
+        );
+      }
+
+      if (isFarmerHomeHeader) {
         return (
           <AppText
             fontFamily="SemiBold"
@@ -195,7 +223,37 @@ export function tabScreenOptions(
       const user = useStore(userStore, (state) => state.user);
       const fullName = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
 
-      if (isLeadFarmerHome) {
+      if (isSmallholderTabHeader) {
+        return (
+          <View style={styles.smallholderHeaderRight}>
+            <Pressable style={styles.notificationButton}>
+              <Image
+                source={icons.notification}
+                style={{ height: 24, width: 24, tintColor: colors.primary }}
+              />
+              <View style={styles.notificationBadge} />
+            </Pressable>
+
+            <Pressable
+              style={styles.homeProfileButton}
+              onPress={() => router.navigate("/more/profileinformation")}
+            >
+              <InitialsAvatar
+                name={fullName}
+                containerSize={34}
+                fontSize={12}
+                bgColor="secondary"
+                textColor="white"
+              />
+              <AppText fontFamily="SemiBold" fontSize={13} color="textBold">
+                {fullName}
+              </AppText>
+            </Pressable>
+          </View>
+        );
+      }
+
+      if (isFarmerHomeHeader) {
         return (
           <View style={styles.homeHeaderRight}>
             <Pressable style={styles.notificationButton}>
@@ -298,6 +356,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+
+  smallholderHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginLeft: 16,
+  },
+
+  smallholderHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 16,
+    gap: 20,
+  },
+
+  homeMenuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.formBorder,
+    backgroundColor: colors.white,
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0px 4px 12px 0px rgba(0, 0, 0, 0.03)",
   },
 
   applyCreditHeaderLeft: {

@@ -9,6 +9,16 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import AppText from "./apptext";
 
+const formatCreditAmount = (amount?: string | number | null) => {
+  if (amount === undefined || amount === null || amount === "") return "—";
+  const numeric = Number(String(amount).replace(/,/g, ""));
+  if (Number.isNaN(numeric)) return String(amount);
+  return numeric.toLocaleString("en-GH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 const DetailColumn = ({
   label,
   value,
@@ -112,7 +122,7 @@ const ActiveCreditCard = () => {
                 GHC
               </AppText>
               <AppText fontFamily="SemiBold" fontSize={12} color="formLabelText">
-                {data?.credit_amount ?? "-"}
+                {formatCreditAmount(data?.credit_amount)}
               </AppText>
             </View>
           </View>
@@ -162,7 +172,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 15,
     boxShadow: "0px 4px 19px 0px rgba(63, 30, 87, 0.10)",
-    marginTop: 32,
+    marginTop: 4,
     borderRadius: 16,
     gap: 20,
   },
@@ -177,12 +187,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   payCreditButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     backgroundColor: colors.primary,
     borderRadius: 49,
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 34,
   },
   twoColumnRow: {
     flexDirection: "row",

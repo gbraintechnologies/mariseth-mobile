@@ -7,7 +7,7 @@ import {
 } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
 import { tabbarScreenOptions, tabScreenOptions } from "@/utils/layoutmethods";
-import { isAdminUser, isLeadFarmerUser, shouldShowLeadFarmerHome } from "@/utils/userroles";
+import { isAdminUser, isLeadFarmerUser, isSmallholderUser, shouldShowFarmerHomeHeader, shouldShowLeadFarmerHome } from "@/utils/userroles";
 import { UseQueryOptions } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
@@ -22,8 +22,16 @@ export default function TabsLayout() {
 
   const isAdmin = isAdminUser(user);
   const isLeaderFarmer = isLeadFarmerUser(user);
+  const isSmallholder = isSmallholderUser(user);
   const showLeadFarmerHome = shouldShowLeadFarmerHome(user);
-  const tabRoleOptions = { isAdmin, isLeaderFarmer, showLeadFarmerHome };
+  const showFarmerHomeHeader = shouldShowFarmerHomeHeader(user);
+  const tabRoleOptions = {
+    isAdmin,
+    isLeaderFarmer,
+    isSmallholder,
+    showLeadFarmerHome,
+    showFarmerHomeHeader,
+  };
 
   const regions = userStore((state) => state.regions);
   const { data } = useFetchQuery(endpoints.regions, "regions", {

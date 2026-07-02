@@ -10,6 +10,8 @@ interface sectionHeaderProps {
   btnIcon?: keyof typeof icons;
   onPress?: () => void;
   btnTitle?: string;
+  linkTitle?: string;
+  onLinkPress?: () => void;
   marginBottom?: ViewStyle["marginBottom"];
   marginTop?: ViewStyle["marginTop"];
   titleColor?: keyof typeof colors;
@@ -21,6 +23,8 @@ const SectionHeader: React.FC<sectionHeaderProps> = ({
   btnIcon,
   btnTitle,
   onPress,
+  linkTitle,
+  onLinkPress,
   marginBottom,
   titleColor = "primary",
   marginTop,
@@ -28,6 +32,7 @@ const SectionHeader: React.FC<sectionHeaderProps> = ({
   editVariant = "primary",
 }) => {
   const showAction = onPress && btnIcon && btnTitle;
+  const showLink = linkTitle && onLinkPress;
 
   return (
     <View
@@ -40,6 +45,13 @@ const SectionHeader: React.FC<sectionHeaderProps> = ({
       <AppText fontFamily="SemiBold" fontSize={16} color={titleColor}>
         {title}
       </AppText>
+      {showLink ? (
+        <Pressable onPress={onLinkPress}>
+          <AppText fontFamily="Medium" fontSize={14} style={styles.linkText}>
+            {linkTitle}
+          </AppText>
+        </Pressable>
+      ) : null}
       {showAction ? (
         <View style={styles.actionGroup}>
           {dualEdit ? (
@@ -107,5 +119,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 100,
     backgroundColor: colors.buttonActionSheet,
+  },
+  linkText: {
+    color: "#2563EB",
   },
 });

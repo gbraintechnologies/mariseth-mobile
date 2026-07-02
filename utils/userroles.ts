@@ -33,3 +33,15 @@ export function shouldShowLeadFarmerHome(userData?: user | null) {
   if (isSmallholderUser(userData)) return false;
   return isLeadFarmerUser(userData) || !!userData.farmer;
 }
+
+/** Farmer home tab header (Home + bell + avatar): lead and smallholder, not admin. */
+export function shouldShowFarmerHomeHeader(userData?: user | null) {
+  if (!userData || isAdminUser(userData)) return false;
+  return isLeadFarmerUser(userData) || isSmallholderUser(userData);
+}
+
+/** Farm Details / Farm Products edit on My Farm tab. */
+export function canEditOwnFarm(userData?: user | null) {
+  if (!userData?.farmer || isAdminUser(userData)) return false;
+  return isLeadFarmerUser(userData) || isSmallholderUser(userData);
+}

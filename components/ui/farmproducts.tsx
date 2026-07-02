@@ -2,6 +2,7 @@ import { width } from "@/constants/generalconstants";
 import { userStore } from "@/stores/userstore";
 import { myFarm } from "@/types/farm";
 import { dataEncoder } from "@/utils/commonmethods";
+import { canEditOwnFarm } from "@/utils/userroles";
 import { router } from "expo-router";
 import React from "react";
 import { View } from "react-native";
@@ -15,7 +16,7 @@ interface farmProductsProps {
 
 const FarmProducts: React.FC<farmProductsProps> = ({ products }) => {
   const user = userStore((state) => state.user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
+  const canEdit = canEditOwnFarm(user);
 
   const handleEdit = () => {
     if (!products) return;
@@ -42,9 +43,9 @@ const FarmProducts: React.FC<farmProductsProps> = ({ products }) => {
         btnIcon="edit"
         btnTitle="Edit"
         titleColor="black"
-        dualEdit={isLeaderFarmer}
+        dualEdit={canEdit}
         editVariant="muted"
-        {...(isLeaderFarmer ? { onPress: handleEdit } : {})}
+        {...(canEdit ? { onPress: handleEdit } : {})}
       />
       {crops.length > 0 ? (
         <FarmProduct products={crops} type="crop" showTitle={false} />
@@ -52,7 +53,7 @@ const FarmProducts: React.FC<farmProductsProps> = ({ products }) => {
         <ListEmptyComponent
           type="crops"
           variant="inline"
-          {...(isLeaderFarmer ? { onPress: handleEdit } : {})}
+          {...(canEdit ? { onPress: handleEdit } : {})}
         />
       )}
       {livestock.length > 0 ? (

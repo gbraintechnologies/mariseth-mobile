@@ -10,15 +10,18 @@ import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
 import { icons } from "@/constants/icons";
 import { usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
+import { userStore } from "@/stores/userstore";
+import { isSmallholderUser } from "@/utils/userroles";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
 const Credits = () => {
+  const user = userStore((state) => state.user);
+  const isSmallholder = isSmallholderUser(user);
+
   const {
-    data,
     isLoading,
-    isError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -36,8 +39,6 @@ const Credits = () => {
   );
 
   if (error) {
-    // console.log("CREDITS ERROR", error?.problem);
-
     return (
       <ErrorComponent
         type={(error as any)?.problem}
@@ -60,10 +61,16 @@ const Credits = () => {
             <>
               <ActiveCreditCard />
               <SectionHeader
-                title="Credit Applications"
+                title={isSmallholder ? "Credit History" : "Credit Applications"}
                 marginBottom={1}
-                marginTop={12}
+                marginTop={32}
                 titleColor="black"
+                {...(isSmallholder && hasNextPage
+                  ? {
+                      linkTitle: "View all",
+                      onLinkPress: () => fetchNextPage(),
+                    }
+                  : {})}
               />
             </>
           }

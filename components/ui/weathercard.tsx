@@ -49,7 +49,7 @@ const WeatherCondition: React.FC<weatherCondition> = ({
   );
 };
 interface WeatherCardProps {
-  variant?: "default" | "hero" | "farm";
+  variant?: "default" | "hero" | "farm" | "home";
   location?: string;
 }
 
@@ -63,7 +63,10 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
     locationOverride ?? user?.farmer?.village ?? "Accra";
 
   const { data, isLoading, error } = useCurrentWeather(weatherLocation);
-  const showWeatherFallback = variant === "default" && !!error;
+  const showWeatherFallback =
+    (variant === "default" || variant === "home") && !!error;
+  const showToolbar =
+    variant === "hero" || variant === "farm" || variant === "home";
 
   if (isLoading) {
     return (
@@ -104,9 +107,14 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
   const { icon: weatherIcon, gradient: weatherGradient } =
     getWeatherAssets(conditionText);
   const icon =
-    showWeatherFallback && variant === "default" ? icons.sunny : weatherIcon;
+    showWeatherFallback &&
+    (variant === "default" || variant === "home")
+      ? icons.sunny
+      : weatherIcon;
   const gradient =
-    variant === "default" ? weatherBackgrounds.sunny : weatherGradient;
+    variant === "default" || variant === "home"
+      ? weatherBackgrounds.sunny
+      : weatherGradient;
   const chanceOfRain =
     data?.forecast?.forecastday?.[0]?.day?.daily_chance_of_rain ?? "--";
 
@@ -121,7 +129,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
         variant === "farm" && styles.weatherContainerFarm,
       ]}
     >
-      {variant === "default" ? (
+      {!showToolbar ? (
         <View style={styles.weatherLocationOnly}>
           <AppText
             fontFamily="SemiBold"

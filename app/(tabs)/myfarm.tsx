@@ -11,13 +11,15 @@ import { endpoints } from "@/constants/endpoints";
 import { isIOS } from "@/constants/generalconstants";
 import { useFetchQuery, usePaginatedInfiniteQuery } from "@/hooks/usefetchquery";
 import { userStore } from "@/stores/userstore";
+import { isLeadFarmerUser, isSmallholderUser } from "@/utils/userroles";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useStore } from "zustand";
 
 const MyFarm = () => {
   const user = useStore(userStore, (state) => state.user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
+  const isLeaderFarmer = isLeadFarmerUser(user);
+  const isSmallholder = isSmallholderUser(user);
 
   const { data, isLoading, error, refetch } = useFetchQuery(
     endpoints.myFarm,
@@ -28,10 +30,15 @@ const MyFarm = () => {
     data: farmersData,
     isError: farmersError,
     items: farmerItems,
-  } = usePaginatedInfiniteQuery<any>(endpoints.myFarmers, "smallholders", {
-    page_size: 10,
-    query: "",
-  });
+  } = usePaginatedInfiniteQuery<any>(
+    endpoints.myFarmers,
+    "smallholders",
+    {
+      page_size: 10,
+      query: "",
+    },
+    { enabled: isLeaderFarmer }
+  );
 
   const farmerCount = farmersError
     ? 0
@@ -69,18 +76,28 @@ const MyFarm = () => {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundPrimary }}
-      contentContainerStyle={{ paddingBottom: isIOS ? "30%" : "20%" }}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingBottom: isIOS ? "30%" : "20%" },
+      ]}
     >
-      <View style={styles.heroSection}>
+      <View
+        style={[
+          styles.heroSection,
+          isSmallholder && styles.heroSectionSmallholder,
+        ]}
+      >
         <View style={styles.weatherWrapper}>
           <WeatherCard variant="farm" location={weatherLocation} />
           <View style={styles.farmTitleOverlay}>
             <AppText fontFamily="Bold" fontSize={20} color="white">
               {data?.name}
             </AppText>
-            <AppText fontFamily="SemiBold" fontSize={16} color="white">
-              {farmSubtitle}
-            </AppText>
+            {farmSubtitle ? (
+              <AppText fontFamily="SemiBold" fontSize={16} color="white">
+                {farmSubtitle}
+              </AppText>
+            ) : null}
           </View>
         </View>
       </View>
@@ -112,10 +129,16 @@ const MyFarm = () => {
 export default MyFarm;
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    gap: 32,
+    paddingTop: 4,
+  },
   heroSection: {
     paddingHorizontal: 16,
     marginTop: 32,
-    marginBottom: 32,
+  },
+  heroSectionSmallholder: {
+    marginTop: 0,
   },
   weatherWrapper: {
     position: "relative",
@@ -123,8 +146,9 @@ const styles = StyleSheet.create({
   farmTitleOverlay: {
     position: "absolute",
     left: 25,
-    bottom: 22,
+    top: 118,
     right: 16,
+    gap: 3,
   },
   recentlyAddedSection: {
     paddingHorizontal: 16,

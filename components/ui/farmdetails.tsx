@@ -2,6 +2,7 @@ import { width } from "@/constants/generalconstants";
 import { userStore } from "@/stores/userstore";
 import { myFarm } from "@/types/farm";
 import { dataEncoder } from "@/utils/commonmethods";
+import { canEditOwnFarm } from "@/utils/userroles";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
@@ -19,7 +20,7 @@ const displayValue = (value?: string | number | null) => {
 
 const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
   const user = userStore((state) => state.user);
-  const isLeaderFarmer = user?.farmer?.type === "lead";
+  const canEdit = canEditOwnFarm(user);
   const farmingMethods = Array.isArray(item?.farming_methods)
     ? item?.farming_methods?.map((method: any) => method).join(", ") || emptyValue
     : emptyValue;
@@ -106,8 +107,8 @@ const FarmDetails: React.FC<farmDetailsProps> = React.memo(({ item }) => {
         btnIcon="edit"
         btnTitle="Edit"
         titleColor="black"
-        dualEdit={isLeaderFarmer}
-        {...(isLeaderFarmer
+        dualEdit={canEdit}
+        {...(canEdit
           ? {
               onPress: () =>
                 router.navigate(

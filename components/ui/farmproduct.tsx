@@ -1,5 +1,7 @@
 import { colors } from "@/constants/colors";
+import { icons } from "@/constants/icons";
 import { farmProduct } from "@/types/farm";
+import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 import AppText from "./apptext";
 
@@ -12,13 +14,15 @@ const FarmProduct = ({
   type: "livestock" | "crop";
   showTitle?: boolean;
 }) => {
-  if (!products) return null;
+  if (!products?.length) return null;
+
   const types = {
     livestock: {
       title: "Livestock",
     },
     crop: { title: "Crops" },
   };
+
   return (
     <>
       {showTitle ? (
@@ -26,7 +30,7 @@ const FarmProduct = ({
           fontFamily="SemiBold"
           fontSize={16}
           color="textBold"
-          style={{ marginBottom: 12 }}
+          style={styles.sectionTitle}
         >
           {types[type].title}
         </AppText>
@@ -34,7 +38,12 @@ const FarmProduct = ({
       <View style={styles.productsContainer}>
         {products.map((product) => (
           <View style={styles.cropCard} key={product?.id}>
-            <AppText fontFamily="Medium" fontSize={13} color="textBold">
+            <Image
+              source={icons.phone}
+              style={styles.productIcon}
+              tintColor={colors.buttonPrimary}
+            />
+            <AppText fontFamily="Medium" fontSize={14} color="textBold">
               {product?.product?.name}
             </AppText>
           </View>
@@ -43,22 +52,36 @@ const FarmProduct = ({
     </>
   );
 };
+
 export default FarmProduct;
+
 const styles = StyleSheet.create({
-  cropCard: {
-    backgroundColor: colors.backgroundPrimary,
+  sectionTitle: {
     marginBottom: 12,
-    borderRadius: 12,
-    boxShadow: "0px 4px 19px 0px rgba(63, 30, 87, 0.10)",
-    width: "48%",
-    paddingVertical: 13,
-    paddingLeft: 31,
   },
   productsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     width: "100%",
-    justifyContent: "space-between",
+    gap: 8,
     marginBottom: 20,
+  },
+  cropCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    width: "100%",
+    minHeight: 50,
+    paddingVertical: 13,
+    paddingHorizontal: 31,
+    backgroundColor: colors.backgroundPrimary,
+    borderRadius: 12,
+    shadowColor: "rgba(63, 30, 87, 0.10)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 19,
+    elevation: 4,
+  },
+  productIcon: {
+    width: 24,
+    height: 24,
   },
 });
